@@ -1,0 +1,7 @@
+{
+	"oocs-module": {
+		"sudo": {
+			"exclude-users": ["root"]
+		}
+	}
+}
