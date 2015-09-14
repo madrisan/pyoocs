@@ -38,8 +38,8 @@ class sudo_parser:
         self.group_specs = {}
         self.user_specs = {}
 
-        oocscfg = read_config("sudo")
-        self.user_exclude_list = oocscfg.get("exclude-users", [])
+        config = read_config("sudo")
+        self.user_exclude_list = config.get("exclude-users", [])
 
         self._parse()
 

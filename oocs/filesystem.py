@@ -125,12 +125,12 @@ def check_filesystem(verbose=False):
         '/var/tmp'   : mod_dir|mod_stickybit|0777,
     }
 
-    oocscfg = read_config("filesystem")
+    config = read_config("filesystem")
 
     for f in sorted(filemodes.keys()):
         fp = unix_file(f)
 
-        req_mode_cfg = oocscfg.get(f+"-modes", [])
+        req_mode_cfg = config.get(f+"-modes", [])
         if req_mode_cfg: req_mode = req_mode_cfg
         else: req_mode = filemodes[f]
 
