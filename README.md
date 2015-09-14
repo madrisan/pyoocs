@@ -6,7 +6,7 @@
 
 ### A customizable and modular security scanner for Linux
 
-This project is an early stage of development and only two modules are currently available:
+This project is at an early stage of development and only two modules are currently available:
 
 * *filesystem*: checks for wrong permission settings of several system folder and files
 * *sudo*: checks for root rights given to users and security issues
