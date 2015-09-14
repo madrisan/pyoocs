@@ -118,6 +118,7 @@ def check_filesystem(verbose=False):
         '/dev/null'  : mod_chdev|0666,
         '/dev/random': mod_chdev|0666,
         '/dev/random': mod_chdev|0666,
+        '/'          : mod_dir|0755,
         '/home'      : mod_dir|0755,
         '/root'      : mod_dir|0550,
         '/tmp'       : mod_dir|mod_stickybit|0777,
