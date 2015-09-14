@@ -5,6 +5,7 @@ import errno, os, stat
 import grp, pwd
 from os.path import isdir, join
 
+from oocs.config import read_config
 from oocs.output import message, message_alert, message_ok, quote
 
 # S_IRWXU     00700  mask for file owner permissions
@@ -53,7 +54,23 @@ class unix_file:
             self.owner = self.group = None
 
     def check_mode(self, shouldbe):
-        return self.mode == str(oct(shouldbe))
+        try:
+            iter(shouldbe)
+        except TypeError, te:
+            shouldbe = [shouldbe]
+
+        shouldbe_str = ''
+        for mode in shouldbe:
+            if not isinstance(mode, basestring): mode = str(oct(mode))
+            shouldbe_str += (mode + ' or ')
+        shouldbe_str = shouldbe_str[:-len(' or ')]
+
+        for mode in shouldbe:
+            # trasform octal strings into integers
+            if isinstance(mode, basestring): mode = int(mode, 8)
+            if self.mode == oct(mode):
+                return (True, shouldbe_str, self.mode)
+        return (False, shouldbe_str, self.mode)
 
     def check_owner(self, shouldbe_usr, shouldbe_grp):
         return (self.owner == shouldbe_usr) and (self.group == shouldbe_grp)
@@ -107,13 +124,19 @@ def check_filesystem(verbose=False):
         '/var/tmp'   : mod_dir|mod_stickybit|0777,
     }
 
+    oocscfg = read_config("filesystem")
+
     for f in sorted(filemodes.keys()):
         fp = unix_file(f)
-        req_mode = filemodes[f]
-        match = fp.check_mode(req_mode)
+
+        req_mode_cfg = oocscfg.get(f+"-modes", [])
+        if req_mode_cfg: req_mode = req_mode_cfg
+        else: req_mode = filemodes[f]
+
+        (match, val_req, val_found) = fp.check_mode(req_mode)
         if not match:
-            message_alert(fp.get_name(), reason = fp.get_mode() +
-                          ' instead of ' + str(oct(req_mode)),
+            message_alert(fp.get_name(), reason = val_found +
+                          ' instead of ' + val_req,
                           level='critical')
         elif verbose:
             message_ok(fp.get_name())
@@ -126,11 +149,11 @@ def check_filesystem(verbose=False):
         sdname = join('/home', subdir)
 
         fp = unix_file(sdname)
-        match = fp.check_mode(req_mode)
+        (match, val_req, val_found) = fp.check_mode(req_mode)
         if not match:
             message_alert(fp.get_name(),
-                reason = fp.get_mode() +
-                ' instead of ' + str(oct(req_mode)), level='warning')
+                reason = val_found +
+                ' instead of ' + val_req, level='warning')
 
     message('Checking for file permissions in /etc/profile.d',
             header=True, dots=True)

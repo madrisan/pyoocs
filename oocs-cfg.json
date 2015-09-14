@@ -1,5 +1,8 @@
 {
 	"oocs-module": {
+		"filesystem": {
+			"/root-modes": ["040750", "040550"]
+		},
 		"sudo": {
 			"exclude-users": ["root"]
 		}
