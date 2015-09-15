@@ -231,7 +231,8 @@ class sudo_parser:
     def catch_root_escalation(self):
         exclude_list = self.user_exclude_list
 
-        bad_commands = {}   # commands that may lead to root escalation
+        cmnd_warning = {}   # commands that may lead to root escalation
+        cmnd_normal = {}
         super_users = []
 
         for user in self.user_specs:
@@ -263,20 +264,24 @@ class sudo_parser:
                     for usr in real_users_list:
                         if su_command: super_users.append(usr)
                         if not owned_by_root:
-                            bad_commands.setdefault(usr,[]).append(cmnd)
+                            cmnd_warning.setdefault(usr,[]).append(cmnd)
+                        else:
+                            cmnd_normal.setdefault(usr,[]).append(cmnd)
                 else:
                     if su_command: super_users.append(real_users_list)
                     if not owned_by_root:
-                        bad_commands.setdefault(real_users_list,[]).append(cmnd)
+                        cmnd_warning.setdefault(real_users_list,[]).append(cmnd)
+                    else:
+                        cmnd_normal.setdefault(usr,[]).append(cmnd)
 
-        return (list(set(super_users)), bad_commands)
+        return (list(set(super_users)), cmnd_warning, cmnd_normal)
 
 
 def check_sudo(mainfile='/etc/sudoers', modulesdir=None, verbose=False):
     message('Checking the sudo configuration', header=True)
 
     sudocfg = sudo_parser(mainfile, modulesdir)
-    (super_users, sudo_rules) = sudocfg.catch_root_escalation()
+    (super_users, cmnd_warning, cmnd_normal) = sudocfg.catch_root_escalation()
 
     if verbose:
         for user in sudocfg.get_exclude_list():
@@ -292,7 +297,11 @@ def check_sudo(mainfile='/etc/sudoers', modulesdir=None, verbose=False):
         message_alert(quote(usr) + ' can become super user',
                       level='critical')
 
-    for key in sorted(sudo_rules.keys()):
+    for key in sorted(cmnd_warning.keys()):
         message_alert('to be checked: user ' + quote(key) + ' can execute ' +
-                       str(sudo_rules[key]), level="critical")
+                       str(cmnd_warning[key]), level="critical")
+    if verbose:
+        for key in sorted(cmnd_normal.keys()):
+            message_ok('user ' + quote(key) + ' can run ' +
+                        str(cmnd_normal[key]))
 
