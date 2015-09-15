@@ -286,7 +286,7 @@ def check_sudo(mainfile='/etc/sudoers', modulesdir=None, verbose=False):
     if verbose:
         for user in sudocfg.get_exclude_list():
             message_alert('ignoring user/group ' + quote(user) +
-                          ' see configuration', level="note")
+                          ' (see configuration)', level="note")
 
     #print("\n[CMND_ALIAS]\n" + str(sudocfg.get_cmnd_aliases()))
     #print("\n[USER_ALIAS]\n" + str(sudocfg.get_user_aliases()))
