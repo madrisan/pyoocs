@@ -227,6 +227,23 @@ class sudo_parser:
         # remove duplicates
         return list(set(expanded_list))
 
+    def _expand_user(self, user):
+        expanded_list = []
+        if user in self.user_aliases:
+            not_excluded = [
+                usr for usr in self.user_aliases[user]
+                    if usr not in self.user_exclude_list ]
+            for usr in not_excluded: expanded_list.append(usr)
+        elif user not in self.user_exclude_list:
+            expanded_list.append(user)
+        return list(set(expanded_list))  
+
+    def _expand_users(self):
+        expanded_list = []
+        for user in self.user_specs:
+            expanded_list.append(_expand_user(user))
+        return list(set(expanded_list))
+
     def get_cmnd_aliases(self):
         return self.user_aliases
     def get_user_aliases(self):
@@ -246,15 +263,7 @@ class sudo_parser:
         super_users = []
 
         for user in self.user_specs:
-            if user in self.user_aliases:
-                excluded = [
-                    usr for usr in self.user_aliases[user] if usr in exclude_list]
-                if excluded: continue
-                real_users_list = self.user_aliases[user]
-            else:
-                if user in exclude_list: continue
-                real_users_list = user
-
+            real_users_list = self._expand_user(user)
             runas_list = self.user_specs[user]['runas']   # FIXME: unused value!
 
             for cmnd in self.user_specs[user]['cmnd']:
