@@ -86,8 +86,11 @@ class unix_file:
     def get_owner(self): return self.owner
     def get_group(self): return self.group
 
-    def owned_by_root(self):   # FIXME: we should also check the file mode
-        return (self.uid == 0) and (self.gid == 0)
+    # owned by root and not writable by others
+    def owned_by_root(self):
+        if not self.mode: return False  # the file does not exist
+        return ((self.uid == 0) and (self.gid == 0) and
+                  not ((int(self.mode, 8) % 8) >> 1 & 1))
 
     def filelist(self):
         if not isdir(self.name): return []
