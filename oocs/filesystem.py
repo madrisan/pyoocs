@@ -48,7 +48,7 @@ class unix_file:
             self.gid = stat_info.st_gid
             self.owner = pwd.getpwuid(self.uid)[0]
             self.group = grp.getgrgid(self.gid)[0]
-        except OSError as e:
+        except OSError:
             self.mode = None    # FIXME: os.strerror(e.errno)
             self.uid = self.gid = None
             self.owner = self.group = None
@@ -56,7 +56,7 @@ class unix_file:
     def check_mode(self, shouldbe):
         try:
             iter(shouldbe)
-        except TypeError as te:
+        except TypeError:
             shouldbe = [shouldbe]
 
         shouldbe_str = ''
@@ -98,7 +98,7 @@ class unix_file:
         try: 
             dirlist = os.listdir(self.name)
             return [name for name in dirlist if isdir(join(self.name, name))]
-        except OSError as e:
+        except OSError:
             return []
 
 class unix_command(unix_file):
