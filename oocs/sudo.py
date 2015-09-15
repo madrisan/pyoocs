@@ -245,7 +245,7 @@ class sudo_parser:
         return list(set(expanded_list))
 
     def get_cmnd_aliases(self):
-        return self.user_aliases
+        return self.cmnd_aliases
     def get_user_aliases(self):
         return self.user_aliases
     def get_group_specs(self):
