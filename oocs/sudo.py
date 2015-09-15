@@ -231,7 +231,7 @@ class sudo_parser:
     def catch_root_escalation(self):
         exclude_list = self.user_exclude_list
 
-        bad_commands = {}
+        bad_commands = {}   # commands that may lead to root escalation
         super_users = []
 
         for user in self.user_specs:
@@ -262,11 +262,11 @@ class sudo_parser:
                 if type(real_users_list) == list:
                     for usr in real_users_list:
                         if su_command: super_users.append(usr)
-                        if owned_by_root:
+                        if not owned_by_root:
                             bad_commands.setdefault(usr,[]).append(cmnd)
                 else:
                     if su_command: super_users.append(real_users_list)
-                    if owned_by_root:
+                    if not owned_by_root:
                         bad_commands.setdefault(real_users_list,[]).append(cmnd)
 
         return (list(set(super_users)), bad_commands)
@@ -292,8 +292,7 @@ def check_sudo(mainfile='/etc/sudoers', modulesdir=None, verbose=False):
         message_alert(quote(usr) + ' can become super user',
                       level='critical')
 
-    if verbose:
-        for key in sorted(sudo_rules.keys()):
-            message_ok('user ' + quote(key) + ' can run ' +
-                        str(sudo_rules[key]))
+    for key in sorted(sudo_rules.keys()):
+        message_alert('to be checked: user ' + quote(key) + ' can execute ' +
+                       str(sudo_rules[key]), level="critical")
 
