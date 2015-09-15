@@ -201,8 +201,8 @@ class sudo_parser:
 
         for line in self.lines:
             self.tokens = self._tokenize(line)
-            #print "LINE: " + str(line)
-            #print "  --> " + str(self.tokens)
+            #print "DEBUG: LINE: " + str(line)
+            #print "DEBUG:   --> " + str(self.tokens)
             (token, value) = self._token_pop()
             if token == "TOK_CMND_ALIAS":
                 aliases = self._token_match("Alias_List")
@@ -216,6 +216,16 @@ class sudo_parser:
                 self.user_specs.update(self._parse_users(value))
             else:
                 pass   # ignore the other directives
+
+    def _expand_cmnd(self, cmnd_list):
+        expanded_list = []
+        for cmnd in cmnd_list:
+            if cmnd in self.cmnd_aliases:
+                for c in self.cmnd_aliases[cmnd]: expanded_list.append(c)
+            else:
+                expanded_list.append(cmnd)
+        # remove duplicates
+        return list(set(expanded_list))
 
     def get_cmnd_aliases(self):
         return self.user_aliases
@@ -245,17 +255,14 @@ class sudo_parser:
                 if user in exclude_list: continue
                 real_users_list = user
 
-            runas_list = self.user_specs[user]['runas']
+            runas_list = self.user_specs[user]['runas']   # FIXME: unused value!
 
             for cmnd in self.user_specs[user]['cmnd']:
-                su_command = False
                 owned_by_root = False
 
                 if cmnd != 'ALL':
                     cmnd_file = unix_command(cmnd)
-                    if cmnd_file.get_name() == '/bin/su' and \
-                       cmnd_file.get_args() in [['-'], []]:
-                        su_command = True
+                    su_command = cmnd_file.command_su_root()
                     owned_by_root = cmnd_file.owned_by_root()
                 else:
                     su_command = True
@@ -272,7 +279,28 @@ class sudo_parser:
                     if not owned_by_root:
                         cmnd_warning.setdefault(real_users_list,[]).append(cmnd)
                     else:
-                        cmnd_normal.setdefault(usr,[]).append(cmnd)
+                        cmnd_normal.setdefault(real_users_list,[]).append(cmnd)
+
+        for group in self.group_specs:
+            owned_by_root = False
+            runas_list = self.group_specs[group]['runas']
+
+            for cmnd in self._expand_cmnd(self.group_specs[group]['cmnd']):
+                if cmnd != 'ALL':
+                    cmnd_file = unix_command(cmnd)
+                    su_command = cmnd_file.command_su_root()
+                    if cmnd_file.owned_by_root():
+                        cmnd_normal.setdefault(group,[]).append(cmnd)
+                        continue
+                    if 'ALL' in runas_list or 'root' in runas_list:
+                        cmnd_warning.setdefault(group,[]).append(cmnd)
+                    else:
+                        cmnd_normal.setdefault(group,[]).append(cmnd)
+                else:
+                    if 'ALL' in runas_list or 'root' in runas_list:
+                        su_command = True
+
+            if su_command: super_users.append(group)
 
         return (list(set(super_users)), cmnd_warning, cmnd_normal)
 
@@ -298,10 +326,9 @@ def check_sudo(mainfile='/etc/sudoers', modulesdir=None, verbose=False):
                       level='critical')
 
     for key in sorted(cmnd_warning.keys()):
-        message_alert('to be checked: user ' + quote(key) + ' can execute ' +
+        message_alert('to be checked: ' + quote(key) + ' can execute ' +
                        str(cmnd_warning[key]), level="critical")
     if verbose:
         for key in sorted(cmnd_normal.keys()):
-            message_ok('user ' + quote(key) + ' can run ' +
-                        str(cmnd_normal[key]))
+            message_ok(quote(key) + ' can run ' + str(cmnd_normal[key]))
 

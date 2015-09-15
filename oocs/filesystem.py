@@ -92,6 +92,9 @@ class unix_file:
         return ((self.uid == 0) and (self.gid == 0) and
                   not ((int(self.mode, 8) % 8) >> 1 & 1))
 
+    def command_su_root(self):
+        return (self.name == '/bin/su' and self.args in [['-'], []])
+
     def filelist(self):
         if not isdir(self.name): return []
         (_, _, files) = os.walk(self.name).next()
