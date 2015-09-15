@@ -91,7 +91,7 @@ class sudo_parser:
             (r"[0-9]+",      lambda scanner,token:("TOK_INTEGER", token)),
             (r"[A-Za-z_]+\w*",
                              lambda scanner,token:("TOK_IDENTIFIER", token)),
-            (r"[A-Za-z_/]+[A-Za-z_0-9/\-\[\]* ]*",
+            (r"[A-Za-z_/]+[A-Za-z_0-9/\-\[\]*. ]*",
                              lambda scanner,token:("TOK_COMMAND", token)),
             (r"#[0-9]+",     lambda scanner,token:("TOK_UID", token)),
             (r"%[A-Za-z]+",  lambda scanner,token:("TOK_GROUP", token)),

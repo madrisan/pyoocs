@@ -16,6 +16,7 @@ from oocs.sudo import check_sudo as check_sudo
 def main():
    check_filesystem(verbose=False)
    check_sudo('/etc/sudoers', '/etc/sudoers.d', verbose=True)
+   check_sudo('./sudoers-test.conf.txt', verbose=True)
 
 if __name__ == '__main__':
     main()
