@@ -37,12 +37,12 @@ mod_chdev = stat.S_IFCHR
 mod_stickybit = stat.S_ISVTX
 
 class unix_file:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, filename):
+        self.filename = filename
 
         try:
-            #self.mode = oct(os.stat(name)[stat.ST_MODE])
-            stat_info = os.stat(name)
+            #self.mode = oct(os.stat(filename)[stat.ST_MODE])
+            stat_info = os.stat(filename)
             self.mode = oct(stat_info[stat.ST_MODE])
             self.uid = stat_info.st_uid
             self.gid = stat_info.st_gid
@@ -75,16 +75,14 @@ class unix_file:
     def check_owner(self, shouldbe_usr, shouldbe_grp):
         return (self.owner == shouldbe_usr) and (self.group == shouldbe_grp)
 
-    def get_name(self):
-        return self.name
+    def name(self): return self.filename
 
-    def get_mode(self):
-        return str(self.mode)
+    def mode(self): return str(self.mode)
 
-    def get_uid(self): return self.uid
-    def get_gid(self): return self.gid
-    def get_owner(self): return self.owner
-    def get_group(self): return self.group
+    def uid(self): return self.uid
+    def gid(self): return self.gid
+    def owner(self): return self.owner
+    def group(self): return self.group
 
     # owned by root and not writable by others
     def owned_by_root(self):
@@ -93,17 +91,17 @@ class unix_file:
                   not ((int(self.mode, 8) % 8) >> 1 & 1))
 
     def command_su_root(self):
-        return (self.name == '/bin/su' and self.args in [['-'], []])
+        return (self.filename == '/bin/su' and self.args in [['-'], []])
 
     def filelist(self):
-        if not isdir(self.name): return []
-        (_, _, files) = os.walk(self.name).next()
+        if not isdir(self.filename): return []
+        (_, _, files) = os.walk(self.filename).next()
         return files
 
     def subdirs(self):
         try: 
-            dirlist = os.listdir(self.name)
-            return [name for name in dirlist if isdir(join(self.name, name))]
+            dirlist = os.listdir(self.filename)
+            return [e for e in dirlist if isdir(join(self.filename, e))]
         except OSError:
             return []
 
@@ -113,7 +111,7 @@ class unix_command(unix_file):
         unix_file.__init__(self, command.split()[0])
         self.args = command.split()[1:]
 
-    def get_args(self):
+    def cmnd_args(self):
         return self.args
 
 def check_filesystem(verbose=False):
@@ -142,11 +140,11 @@ def check_filesystem(verbose=False):
 
         (match, val_req, val_found) = fp.check_mode(req_mode)
         if not match:
-            message_alert(fp.get_name(), reason = val_found +
+            message_alert(fp.name(), reason = val_found +
                           ' instead of ' + val_req,
                           level='critical')
         elif verbose:
-            message_ok(fp.get_name())
+            message_ok(fp.name())
 
     message("Checking the mode of the /home subdirs", header=True, dots=True)
 
@@ -158,7 +156,7 @@ def check_filesystem(verbose=False):
         fp = unix_file(sdname)
         (match, val_req, val_found) = fp.check_mode(req_mode)
         if not match:
-            message_alert(fp.get_name(),
+            message_alert(fp.name(),
                 reason = val_found +
                 ' instead of ' + val_req, level='warning')
 
@@ -167,11 +165,11 @@ def check_filesystem(verbose=False):
 
     dp = unix_file('/etc/profile.d')
     for file in dp.filelist():
-        fname = join(dp.get_name(), file)
+        fname = join(dp.name(), file)
         fp = unix_file(fname)
         match = fp.check_owner('root', 'root')
         if not match:
-            message_alert(fp.get_name(),
-                reason = quote(fp.get_owner() + '.' + fp.get_group()) +
+            message_alert(fp.name(),
+                reason = quote(fp.owner() + '.' + fp.group()) +
                 ' instead of ' + quote('root.root'), level='critical')
 
