@@ -76,6 +76,8 @@ class unix_file:
         return (self.owner == shouldbe_usr) and (self.group == shouldbe_grp)
 
     def name(self): return self.filename
+    def basename(self): return os.path.basename(self.filename)
+    def dirname(self): return os.path.dirname(self.filename)
 
     def mode(self): return str(self.mode)
 
@@ -83,6 +85,8 @@ class unix_file:
     def gid(self): return self.gid
     def owner(self): return self.owner
     def group(self): return self.group
+
+    def exists(self): return os.path.exists(self.filename)
 
     # owned by root and not writable by others
     def owned_by_root(self):
