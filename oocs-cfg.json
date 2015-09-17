@@ -3,6 +3,28 @@
 		"filesystem": {
 			"/root-modes": ["040750", "040550"]
 		},
+		"partitions": {
+			"required": [
+				{
+					"mountpoint": "/dev/shm",
+					"opts": "nodev,noexec,nosuid"
+				},
+				{
+					"mountpoint": "/home",
+					"opts": "nodev"
+				},
+				{
+					"mountpoint": "/tmp",
+					"opts": "nodev,noexec,nosuid"
+				},
+				{
+					"mountpoint": "/var"
+				},
+				{
+					"mountpoint": "/var/log"
+				}
+			]
+		},
 		"sudo": {
 			"exclude-users": ["root"]
 		}

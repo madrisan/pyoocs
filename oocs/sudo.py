@@ -315,7 +315,7 @@ class sudo_parser:
 
 
 def check_sudo(mainfile='/etc/sudoers', modulesdir=None, verbose=False):
-    message('Checking the sudo configuration', header=True)
+    message('Checking the sudo configuration', header=True, dots=True)
 
     sudocfg = sudo_parser(mainfile, modulesdir)
     (super_users, cmnd_warning, cmnd_normal) = sudocfg.catch_root_escalation()

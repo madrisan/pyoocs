@@ -6,9 +6,10 @@
 
 ### A customizable and modular security scanner for Linux
 
-This project is at an early stage of development and only two modules are currently available:
+This project is at an early stage of development and only a few modules are currently available:
 
 * *filesystem*: checks for wrong permission settings of several system folder and files
+* *partitions*: checks for mandatory filesystems and mounting options
 * *sudo*: checks for root rights given to users and security issues
 
 
@@ -20,5 +21,5 @@ This project is at an early stage of development and only two modules are curren
 > License | GPL v3+
 > Operating System | Linux
 > Implementation | Python 2.4+
-> Current status | early alpha
+> Current status | alpha
 

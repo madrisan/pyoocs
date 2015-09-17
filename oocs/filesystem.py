@@ -6,7 +6,7 @@ import grp, pwd
 from os.path import isdir, join
 
 from oocs.config import read_config
-from oocs.output import message, message_alert, message_ok, quote
+from oocs.output import message, message_abort, message_alert, message_ok, quote
 
 # S_IRWXU     00700  mask for file owner permissions
 # S_IRUSR     00400  owner has read permission
@@ -37,10 +37,11 @@ mod_chdev = stat.S_IFCHR
 mod_stickybit = stat.S_ISVTX
 
 class unix_file:
-    def __init__(self, filename):
+    def __init__(self, filename, abort_on_error=False):
         self.filename = filename
-
+        self.exists = False
         try:
+            self.exists = os.path.exists(filename)
             #self.mode = oct(os.stat(filename)[stat.ST_MODE])
             stat_info = os.stat(filename)
             self.mode = oct(stat_info[stat.ST_MODE])
@@ -49,6 +50,11 @@ class unix_file:
             self.owner = pwd.getpwuid(self.uid)[0]
             self.group = grp.getgrgid(self.gid)[0]
         except OSError:
+            if abort_on_error and not self.exists:
+                message_abort("file not found: " + filename)
+            elif abort_on_error:
+                message_abort("i/o error while opening " + filename)
+
             self.mode = None    # FIXME: os.strerror(e.errno)
             self.uid = self.gid = None
             self.owner = self.group = None
@@ -87,6 +93,16 @@ class unix_file:
     def group(self): return self.group
 
     def exists(self): return os.path.exists(self.filename)
+
+    def exists(self): return self.exists
+
+    def readlines(self):
+        fd = open(self.filename, 'r')
+        try:
+            content = fd.readlines()
+        except:
+            content = []
+        return content
 
     # owned by root and not writable by others
     def owned_by_root(self):

@@ -11,10 +11,12 @@ __email__ = "davide.madrisan.gmail.com"
 __status__ = "Alpha"
 
 from oocs.filesystem import check_filesystem as check_filesystem
+from oocs.partitions import check_partitions as check_partitions
 from oocs.sudo import check_sudo as check_sudo
 
 def main():
    check_filesystem(verbose=False)
+   check_partitions(verbose=False)
    check_sudo('/etc/sudoers', '/etc/sudoers.d', verbose=True)
    check_sudo('./sudoers-test.conf.txt', verbose=True)
 
