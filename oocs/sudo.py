@@ -9,7 +9,7 @@ from os.path import isfile, join
 
 from oocs.config import read_config
 from oocs.filesystem import unix_file, unix_command
-from oocs.output import message, message_abort, message_alert, message_ok, quote
+from oocs.output import die, message, message_alert, message_ok, quote
 
 from sys import version_info as pyver
 if pyver < (2, 5):
@@ -58,7 +58,7 @@ class sudo_parser:
 
     def _read_files(self):
         if geteuid() != 0:
-            message_abort("This check (" + __name__ + ") must be run as root")
+            die(2, "This check (" + __name__ + ") must be run as root")
 
         self.lines = []
         try:

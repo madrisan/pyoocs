@@ -12,6 +12,11 @@ def colonize(message):
     if not message: return ''
     return ": %s" % message
 
+def die(exitcode, message):
+    "Print error and exit with errorcode"
+    sys.stderr.write('pyoocs: Fatal error: %s\n' % message)
+    sys.exit(exitcode)
+
 def quote(message):
     return "'%s'" % message
 
@@ -22,9 +27,6 @@ def message(message, **options):
     prefix = options.get('header') and '\n*** ' or ''
 
     sys.stdout.write(tab*TABSTR + prefix + str(message) + dots + end)
-
-def message_abort(message):
-    sys.exit('Fatal error: ' + message + ' - aborting...')
 
 def message_alert(message, **options):
     extra_message = options.get('reason') or ''

@@ -6,7 +6,7 @@ try:
 except ImportError:
     import simplejson as json
 
-from oocs.output import message, message_abort
+from oocs.output import die, message
 
 oocs_filepath = "oocs-cfg.json"
 
@@ -21,4 +21,4 @@ def read_config(module, filepath = oocs_filepath):
                 level='warning')
         return {}
     except ValueError:
-        message_abort('Invalid syntax while trying to open ' + filepath)
+        die(1, 'Invalid syntax while trying to open ' + filepath)

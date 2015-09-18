@@ -10,15 +10,24 @@ __version__ = "0"
 __email__ = "davide.madrisan.gmail.com"
 __status__ = "Alpha"
 
+import sys
+
 from oocs.filesystem import check_filesystem as check_filesystem
+from oocs.output import die as die
 from oocs.partitions import check_partitions as check_partitions
 from oocs.sudo import check_sudo as check_sudo
 
 def main():
-   check_filesystem(verbose=False)
-   check_partitions(verbose=False)
-   check_sudo('/etc/sudoers', '/etc/sudoers.d', verbose=True)
-   check_sudo('./sudoers-test.conf.txt', verbose=True)
+    check_filesystem(verbose=False)
+    check_partitions(verbose=False)
+    check_sudo('/etc/sudoers', '/etc/sudoers.d', verbose=True)
 
 if __name__ == '__main__':
-    main()
+    exitcode = 0
+    try:
+        main()
+    except KeyboardInterrupt:
+        die(3, 'Exiting on user request')
+    sys.exit(exitcode)
+
+# vim:ts=4:sw=4:et

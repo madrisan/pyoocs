@@ -3,7 +3,7 @@
 
 from oocs.config import read_config
 from oocs.filesystem import unix_file
-from oocs.output import message, message_abort, message_alert, quote
+from oocs.output import message, message_alert, quote
 
 class partitions:
     def __init__(self, procfile):

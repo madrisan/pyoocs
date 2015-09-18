@@ -6,7 +6,7 @@ import grp, pwd
 from os.path import isdir, join
 
 from oocs.config import read_config
-from oocs.output import message, message_abort, message_alert, message_ok, quote
+from oocs.output import die, message, message_alert, message_ok, quote
 
 # S_IRWXU     00700  mask for file owner permissions
 # S_IRUSR     00400  owner has read permission
