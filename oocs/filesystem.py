@@ -51,9 +51,9 @@ class unix_file:
             self.group = grp.getgrgid(self.gid)[0]
         except OSError:
             if abort_on_error and not self.exists:
-                message_abort("file not found: " + filename)
+                die(1, "file not found: " + filename)
             elif abort_on_error:
-                message_abort("i/o error while opening " + filename)
+                die(1, "i/o error while opening " + filename)
 
             self.mode = None    # FIXME: os.strerror(e.errno)
             self.uid = self.gid = None
