@@ -97,6 +97,10 @@ class unix_file:
     def exists(self): return self.exists
 
     def readlines(self):
+        "Return content of a file"
+        if not os.path.isfile(self.filename):
+            return None
+
         fd = open(self.filename, 'r')
         try:
             content = fd.readlines()

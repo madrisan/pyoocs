@@ -42,7 +42,7 @@ class partitions:
 
     def _parse(self):
         input = unix_file(self.procfile, abort_on_error=True)
-        return input.readlines()
+        return input.readlines() or []
 
     def check_required(self):
         for part in self.required_parts:
