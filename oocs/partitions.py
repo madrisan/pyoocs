@@ -1,7 +1,7 @@
 # This python module is part of the oocs scanner for Linux.
 # Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
 
-from oocs.config import read_config
+from oocs.config import config
 from oocs.filesystem import unix_file
 from oocs.output import message, message_alert, quote
 
@@ -11,13 +11,13 @@ class partitions:
         self.partitions = []
 
         try:
-            partscfg = read_config("partitions")
+            cfg = config().read("partitions")
         except KeyError:
             message_alert("configuration file: 'partitions' block not found!",
                           level='warning')
-            partscfg = {}
+            cfg = {}
 
-        self.required_parts = partscfg.get("required", {})
+        self.required_parts = cfg.get("required", {})
         if not self.required_parts:
             message_alert(
                 "configuration file: 'partitions:requires' block not found!",

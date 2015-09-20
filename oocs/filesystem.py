@@ -5,7 +5,7 @@ import errno, os, stat
 import grp, pwd
 from os.path import isdir, join
 
-from oocs.config import read_config
+from oocs.config import config
 from oocs.output import die, message, message_alert, message_ok, quote
 
 # S_IRWXU     00700  mask for file owner permissions
@@ -153,12 +153,12 @@ def check_filesystem(verbose=False):
         '/var/tmp'   : mod_dir|mod_stickybit|0777,
     }
 
-    config = read_config("filesystem")
+    cfg = config().read("filesystem")
 
     for f in sorted(filemodes.keys()):
         fp = unix_file(f)
 
-        req_mode_cfg = config.get(f+"-modes", [])
+        req_mode_cfg = cfg.get(f+"-modes", [])
         if req_mode_cfg: req_mode = req_mode_cfg
         else: req_mode = filemodes[f]
 

@@ -10,7 +10,7 @@ __version__ = "0"
 __email__ = "davide.madrisan.gmail.com"
 __status__ = "Alpha"
 
-import sys
+import os, sys
 
 from oocs.filesystem import check_filesystem as check_filesystem
 from oocs.output import die as die

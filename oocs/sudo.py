@@ -7,7 +7,7 @@
 from os import listdir, geteuid
 from os.path import isfile, join
 
-from oocs.config import read_config
+from oocs.config import config
 from oocs.filesystem import unix_file, unix_command
 from oocs.output import die, message, message_alert, message_ok, quote
 
@@ -38,8 +38,8 @@ class sudo_parser:
         self.group_specs = {}
         self.user_specs = {}
 
-        config = read_config("sudo")
-        self.user_exclude_list = config.get("exclude-users", [])
+        cfg = config().read("sudo")
+        self.user_exclude_list = cfg.get("exclude-users", [])
 
         self._parse()
 
