@@ -27,13 +27,14 @@ class partitions:
 
     def _check_partition_opts(self, mountpoint, opts=''):
         for line in self.partitions:
-            if mountpoint in line.split():
-                mount_opts = line.split()[3]
-                mount_opts_list = line.split()[3].split(',')
+            cols = line.split()
+            if mountpoint == cols[1]:
+                mount_opts = cols[3]
+                mount_opts_list = cols[3].split(',')
                 opts_match = set(opts).issubset(set(mount_opts_list))
                 return (opts_match, mount_opts)
 
-        return (False, mount_opts)
+        return (False, None)
 
     def _partition_exists(self, mountpoint):
         for line in self.partitions:
@@ -51,14 +52,16 @@ class partitions:
 
             exists = self._partition_exists(mountpoint)
             if not exists:
-                message_alert(mountpoint + ": not such partition",
+                message_alert(mountpoint + ": no such partition",
                               level="critical")
                 continue
 
             (match, opts) = self._check_partition_opts(mountpoint, req_opts)
-            if not match:
+            if not match and opts:
                 message_alert(mountpoint + ": mount options "
                     + quote(opts) + ", required: " + quote(req_opts))
+            elif not opts:
+                message_alert(mountpoint + ": no such filesystem")
 
 def check_partitions(verbose=False):
     message('Checking partitions', header=True, dots=True)
