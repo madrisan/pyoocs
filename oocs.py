@@ -10,14 +10,15 @@ __version__ = "0"
 __email__ = "davide.madrisan.gmail.com"
 __status__ = "Alpha"
 
-import os, sys
+import os, socket, sys
 
 from oocs.filesystem import check_filesystem as check_filesystem
-from oocs.output import die as die
+from oocs.output import die, message
 from oocs.partitions import check_partitions as check_partitions
 from oocs.sudo import check_sudo as check_sudo
 
 def main():
+    message("\nHost: %s" % socket.getfqdn())
     check_filesystem(verbose=False)
     check_partitions(verbose=False)
     check_sudo('/etc/sudoers', '/etc/sudoers.d', verbose=True)
