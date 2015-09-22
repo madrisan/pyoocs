@@ -19,7 +19,7 @@ from oocs.partitions import check_partitions as check_partitions
 from oocs.sudo import check_sudo as check_sudo
 
 def main():
-    message("\nHost: %s" % socket.getfqdn())
+    message("Host: %s" % socket.getfqdn())
     check_kernel(verbose=False)
     check_filesystem(verbose=False)
     check_partitions(verbose=False)

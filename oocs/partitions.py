@@ -66,6 +66,14 @@ class partitions:
                 message_ok(mountpoint + ' (' + opts + ')')
 
 def check_partitions(verbose=False):
+    module = 'partitions'
+    cfg = config().read(module)
+    if cfg.get('enable', 1) != 1:
+        if verbose:
+            message_alert('Skipping ' + quote(module) +
+                          ' (disabled in the configuration)', level='note')
+        return
+
     message('Checking partitions', header=True, dots=True)
 
     fs = partitions(procfile='/proc/mounts')

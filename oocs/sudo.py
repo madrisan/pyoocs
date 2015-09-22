@@ -315,6 +315,14 @@ class sudo_parser:
 
 
 def check_sudo(mainfile='/etc/sudoers', modulesdir=None, verbose=False):
+    module = 'sudo'
+    cfg = config().read(module)
+    if cfg.get('enable', 1) != 1:
+        if verbose:
+            message_alert('Skipping ' + quote(module) +
+                          ' (disabled in the configuration)', level='note')
+        return
+
     message('Checking the sudo configuration', header=True, dots=True)
 
     sudocfg = sudo_parser(mainfile, modulesdir)

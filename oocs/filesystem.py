@@ -145,6 +145,14 @@ class unix_command(unix_file):
         return self.args
 
 def check_filesystem(verbose=False):
+    module = 'filesystem'
+    cfg = config().read(module)
+    if cfg.get('enable', 1) != 1:
+        if verbose:
+            message_alert('Skipping ' + quote(module) +
+                          ' (disabled in the configuration)', level='note')
+        return
+
     message('Checking the permissions of some system folders',
             header=True, dots=True)
 
@@ -158,8 +166,6 @@ def check_filesystem(verbose=False):
         '/tmp'       : mod_dir|mod_stickybit|0777,
         '/var/tmp'   : mod_dir|mod_stickybit|0777,
     }
-
-    cfg = config().read("filesystem")
 
     for f in sorted(filemodes.keys()):
         fp = unix_file(f)

@@ -59,6 +59,14 @@ class kernel:
                 message_ok(kparameter + ' = ' + quote(curr_value))
 
 def check_kernel(verbose=False):
+    module = 'kernel'
+    cfg = config().read(module)
+    if cfg.get('enable', 1) != 1:
+        if verbose:
+            message_alert('Skipping ' + quote(module) +
+                          ' (disabled in the configuration)', level='note')
+        return
+
     message('Checking kernel runtime parameters', header=True, dots=True)
 
     ker = kernel()

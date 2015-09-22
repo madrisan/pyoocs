@@ -1,9 +1,11 @@
 {
 	"oocs-module": {
 		"filesystem": {
+			"enable": 1,
 			"/root-modes": ["040750", "040550"]
 		},
 		"kernel": {
+			"enable": 1,
 			"parameters": {
 				"kernel.exec-shield": 1,
 				"kernel.randomize_va_space": 2,
@@ -30,6 +32,7 @@
 			}
 		},
 		"partitions": {
+			"enable": 1,
 			"required": [
 				{
 					"mountpoint": "/dev/shm",
@@ -52,6 +55,7 @@
 			]
 		},
 		"sudo": {
+			"enable": 1,
 			"exclude-users": ["root"]
 		}
 	}
