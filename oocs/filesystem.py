@@ -41,9 +41,9 @@ class unix_file:
         self.filename = filename
         self.exists = False
         try:
-            self.exists = os.path.exists(filename)
+            self.exists = os.path.exists(self.filename)
             #self.mode = oct(os.stat(filename)[stat.ST_MODE])
-            stat_info = os.stat(filename)
+            stat_info = os.stat(self.filename)
             self.mode = oct(stat_info[stat.ST_MODE])
             self.uid = stat_info.st_uid
             self.gid = stat_info.st_gid
@@ -51,9 +51,9 @@ class unix_file:
             self.group = grp.getgrgid(self.gid)[0]
         except OSError:
             if abort_on_error and not self.exists:
-                die(1, "file not found: " + filename)
+                die(1, "file not found: " + self.filename)
             elif abort_on_error:
-                die(1, "i/o error while opening " + filename)
+                die(1, "i/o error while opening " + self.filename)
 
             self.mode = None    # FIXME: os.strerror(e.errno)
             self.uid = self.gid = None
@@ -94,8 +94,16 @@ class unix_file:
 
     def exists(self): return self.exists
 
-    def readlines(self):
+    def readfile(self, len=0):
         "Return content of a file"
+        if not os.path.isfile(self.filename):
+            return None
+        if len:
+            return open(self.filename, 'r').read(len)
+        return open(self.filename, 'r').read()
+
+    def readlines(self):
+        "Return content of each line of a text file"
         if not os.path.isfile(self.filename):
             return None
 
