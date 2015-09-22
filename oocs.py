@@ -20,7 +20,7 @@ from oocs.sudo import check_sudo as check_sudo
 
 def main():
     message("\nHost: %s" % socket.getfqdn())
-    check_kernel()
+    check_kernel(verbose=False)
     check_filesystem(verbose=False)
     check_partitions(verbose=False)
     check_sudo('/etc/sudoers', '/etc/sudoers.d', verbose=True)

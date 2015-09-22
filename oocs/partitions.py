@@ -3,7 +3,7 @@
 
 from oocs.config import config
 from oocs.filesystem import unix_file
-from oocs.output import message, message_alert, quote
+from oocs.output import message, message_alert, message_ok, quote
 
 class partitions:
     def __init__(self, procfile):
@@ -45,7 +45,7 @@ class partitions:
         input = unix_file(self.procfile, abort_on_error=True)
         return input.readlines() or []
 
-    def check_required(self):
+    def check_required(self, verbose=False):
         for part in self.required_parts:
             mountpoint = part['mountpoint']
             req_opts = part.get('opts', '')
@@ -62,9 +62,11 @@ class partitions:
                     + quote(opts) + ", required: " + quote(req_opts))
             elif not opts:
                 message_alert(mountpoint + ": no such filesystem")
+            elif verbose:
+                message_ok(mountpoint + ' (' + opts + ')')
 
 def check_partitions(verbose=False):
     message('Checking partitions', header=True, dots=True)
 
     fs = partitions(procfile='/proc/mounts')
-    fs.check_required()
+    fs.check_required(verbose=verbose)
