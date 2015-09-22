@@ -92,8 +92,6 @@ class unix_file:
     def owner(self): return self.owner
     def group(self): return self.group
 
-    def exists(self): return os.path.exists(self.filename)
-
     def exists(self): return self.exists
 
     def readlines(self):
