@@ -23,7 +23,7 @@ def main():
     check_kernel(verbose=False)
     check_filesystem(verbose=False)
     check_partitions(verbose=False)
-    check_sudo('/etc/sudoers', '/etc/sudoers.d', verbose=True)
+    check_sudo(verbose=True)
 
 if __name__ == '__main__':
     exitcode = 0

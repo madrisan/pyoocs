@@ -58,6 +58,8 @@
 		},
 		"sudo": {
 			"enable": 1,
+			"conf-mainfile": "/etc/sudoers",
+			"conf-modulesdir": "/etc/sudoers.d",
 			"exclude-users": ["root"]
 		}
 	}

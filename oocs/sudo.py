@@ -18,9 +18,17 @@ else:
    from re import Scanner as Scanner
 
 class sudo_parser:
-    def __init__(self, mainfile, modulesdir = None):
-        self.mainfile = mainfile
-        self.modulesdir = modulesdir
+    def __init__(self):
+        cfg = config().read("sudo")
+
+        self.mainfile = cfg.get("conf-mainfile", "/etc/sudoers")
+        if not unix_file(self.mainfile).isfile():
+            die(2, 'No such file: ' + self.mainfile)
+
+        self.modulesdir = cfg.get("conf-modulesdir", None)
+        if self.modulesdir and not unix_file(self.modulesdir).isdir():
+            die(2, 'No such directory: ' + self.modulesdir)
+
         self.modules = []
         try:
             if self.modulesdir:
@@ -38,7 +46,6 @@ class sudo_parser:
         self.group_specs = {}
         self.user_specs = {}
 
-        cfg = config().read("sudo")
         self.user_exclude_list = cfg.get("exclude-users", [])
 
         self._parse()
@@ -314,7 +321,7 @@ class sudo_parser:
         return (list(set(super_users)), cmnd_warning, cmnd_normal)
 
 
-def check_sudo(mainfile='/etc/sudoers', modulesdir=None, verbose=False):
+def check_sudo(verbose=False):
     module = 'sudo'
     cfg = config().read(module)
     if cfg.get('enable', 1) != 1:
@@ -325,7 +332,7 @@ def check_sudo(mainfile='/etc/sudoers', modulesdir=None, verbose=False):
 
     message('Checking the sudo configuration', header=True, dots=True)
 
-    sudocfg = sudo_parser(mainfile, modulesdir)
+    sudocfg = sudo_parser()
     (super_users, cmnd_warning, cmnd_normal) = sudocfg.catch_root_escalation()
 
     if verbose:

@@ -94,6 +94,9 @@ class unix_file:
 
     def exists(self): return self.exists
 
+    def isdir(self): return os.path.isdir(self.filename)
+    def isfile(self): return os.path.isfile(self.filename)
+
     def readfile(self, len=0):
         "Return content of a file"
         if not os.path.isfile(self.filename):
