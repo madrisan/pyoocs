@@ -1,6 +1,8 @@
 # This python module is part of the oocs scanner for Linux.
 # Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
 
+from os.path import join
+
 from oocs.config import config
 from oocs.filesystem import unix_file
 from oocs.output import message, message_alert, message_ok, quote
@@ -76,5 +78,6 @@ def check_partitions(verbose=False):
 
     message('Checking partitions', header=True, dots=True)
 
-    fs = partitions(procfile='/proc/mounts')
+    procfilesystem = cfg.get('procfilesystem', '/proc')
+    fs = partitions(procfile=join(procfilesystem, 'mounts'))
     fs.check_required(verbose=verbose)

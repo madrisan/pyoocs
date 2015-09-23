@@ -25,6 +25,8 @@ class kernel:
                 "configuration file: 'kernel:parameters' block not found!",
                 level='warning')
 
+        self.procfilesystem = cfg.get('procfilesystem', '/proc')
+
     def version(self):
         release = kernel_release()
         return release
@@ -43,7 +45,8 @@ class kernel:
 
     def check_runtime_parameters(self, verbose=False):
         for kparameter in self.runtime_params:
-            filename = join('/proc', 'sys', kparameter.replace('.', '/'))
+            filename = join(self.procfilesystem, 'sys',
+                            kparameter.replace('.', '/'))
             f = unix_file(filename)
             if not f.exists:
                 message_alert("no such file: " + filename, level="warning")

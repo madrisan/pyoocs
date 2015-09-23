@@ -6,6 +6,7 @@
 		},
 		"kernel": {
 			"enable": 1,
+			"procfilesystem": "/proc",
 			"parameters": {
 				"kernel.exec-shield": 1,
 				"kernel.randomize_va_space": 2,
@@ -33,6 +34,7 @@
 		},
 		"partitions": {
 			"enable": 1,
+			"procfilesystem": "/proc",
 			"required": [
 				{
 					"mountpoint": "/dev/shm",
