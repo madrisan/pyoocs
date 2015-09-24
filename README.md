@@ -9,9 +9,9 @@
 This project is at an early stage of development and only a few modules are currently available:
 
 * *filesystem*: checks for wrong permission settings of several system folder and files
+* *kernel*: check the kernel runtime configuration
 * *partitions*: checks for mandatory filesystems and mounting options
 * *sudo*: checks for root rights given to users and security issues
-
 
 ---
 
