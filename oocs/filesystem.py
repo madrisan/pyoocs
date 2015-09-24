@@ -37,8 +37,9 @@ mod_dir = stat.S_IFDIR
 mod_chdev = stat.S_IFCHR
 mod_stickybit = stat.S_ISVTX
 
-class unix_file:
+class UnixFile:
     def __init__(self, filename, abort_on_error=False):
+        self.module = 'filesystem'
         self.filename = filename
         self.exists = False
         try:
@@ -139,10 +140,10 @@ class unix_file:
         except OSError:
             return []
 
-class unix_command(unix_file):
+class UnixCommand(UnixFile):
     """Derived class for commands: binary [options]"""
     def __init__(self, cmdline):
-        unix_file.__init__(self, cmdline.split()[0])
+        UnixFile.__init__(self, cmdline.split()[0])
         self.cmdline = cmdline
         self.cmdname = cmdline.split()[0]
         self.args = cmdline.split()[1:]
@@ -189,7 +190,7 @@ def check_filesystem(verbose=False):
     }
 
     for f in sorted(filemodes.keys()):
-        fp = unix_file(f)
+        fp = UnixFile(f)
 
         req_mode_cfg = cfg.get(f+"-modes", [])
         if req_mode_cfg: req_mode = req_mode_cfg
@@ -205,12 +206,12 @@ def check_filesystem(verbose=False):
 
     message("Checking the mode of the /home subdirs", header=True, dots=True)
 
-    home = unix_file('/home')
+    home = UnixFile('/home')
     for subdir in home.subdirs():
         req_mode = mod_dir|0700
         sdname = join('/home', subdir)
 
-        fp = unix_file(sdname)
+        fp = UnixFile(sdname)
         (match, val_req, val_found) = fp.check_mode(req_mode)
         if not match:
             message_alert(fp.name(),
@@ -220,10 +221,10 @@ def check_filesystem(verbose=False):
     message('Checking for file permissions in /etc/profile.d',
             header=True, dots=True)
 
-    dp = unix_file('/etc/profile.d')
+    dp = UnixFile('/etc/profile.d')
     for file in dp.filelist():
         fname = join(dp.name(), file)
-        fp = unix_file(fname)
+        fp = UnixFile(fname)
         match = fp.check_owner('root', 'root')
         if not match:
             message_alert(fp.name(),

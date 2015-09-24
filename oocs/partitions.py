@@ -4,10 +4,10 @@
 from os.path import join
 
 from oocs.config import config
-from oocs.filesystem import unix_file
+from oocs.filesystem import UnixFile
 from oocs.output import message, message_alert, message_ok, quote
 
-class partitions:
+class Partitions:
     def __init__(self, procfile):
         self.procfile = procfile
         self.partitions = []
@@ -44,7 +44,7 @@ class partitions:
         return False
 
     def _parse(self):
-        input = unix_file(self.procfile, abort_on_error=True)
+        input = UnixFile(self.procfile, abort_on_error=True)
         return input.readlines() or []
 
     def check_required(self, verbose=False):
@@ -79,5 +79,5 @@ def check_partitions(verbose=False):
     message('Checking partitions', header=True, dots=True)
 
     procfilesystem = cfg.get('procfilesystem', '/proc')
-    fs = partitions(procfile=join(procfilesystem, 'mounts'))
-    fs.check_required(verbose=verbose)
+    partitions = Partitions(procfile=join(procfilesystem, 'mounts'))
+    partitions.check_required(verbose=verbose)

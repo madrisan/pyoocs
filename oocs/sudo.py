@@ -8,7 +8,7 @@ from os import listdir, geteuid
 from os.path import isfile, join
 
 from oocs.config import config
-from oocs.filesystem import unix_file, unix_command
+from oocs.filesystem import UnixFile, UnixCommand
 from oocs.output import die, message, message_alert, message_ok, quote
 
 from sys import version_info as pyver
@@ -17,16 +17,16 @@ if pyver < (2, 5):
 else:
    from re import Scanner as Scanner
 
-class sudo_parser:
+class SudoParser:
     def __init__(self):
         cfg = config().read("sudo")
 
         self.mainfile = cfg.get("conf-mainfile", "/etc/sudoers")
-        if not unix_file(self.mainfile).isfile():
+        if not UnixFile(self.mainfile).isfile():
             die(2, 'No such file: ' + self.mainfile)
 
         self.modulesdir = cfg.get("conf-modulesdir", None)
-        if self.modulesdir and not unix_file(self.modulesdir).isdir():
+        if self.modulesdir and not UnixFile(self.modulesdir).isdir():
             die(2, 'No such directory: ' + self.modulesdir)
 
         self.modules = []
@@ -277,7 +277,7 @@ class sudo_parser:
                 owned_by_root = False
 
                 if cmnd != 'ALL':
-                    cmnd_file = unix_command(cmnd)
+                    cmnd_file = UnixCommand(cmnd)
                     su_command = cmnd_file.command_su_root()
                     owned_by_root = cmnd_file.owned_by_root()
                 else:
@@ -303,7 +303,7 @@ class sudo_parser:
 
             for cmnd in self._expand_cmnd(self.group_specs[group]['cmnd']):
                 if cmnd != 'ALL':
-                    cmnd_file = unix_command(cmnd)
+                    cmnd_file = UnixCommand(cmnd)
                     su_command = cmnd_file.command_su_root()
                     if cmnd_file.owned_by_root():
                         cmnd_normal.setdefault(group,[]).append(cmnd)
@@ -332,7 +332,7 @@ def check_sudo(verbose=False):
 
     message('Checking the sudo configuration', header=True, dots=True)
 
-    sudocfg = sudo_parser()
+    sudocfg = SudoParser()
     (super_users, cmnd_warning, cmnd_normal) = sudocfg.catch_root_escalation()
 
     if verbose:

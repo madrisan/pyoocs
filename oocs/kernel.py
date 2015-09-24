@@ -5,10 +5,10 @@ from platform import release as kernel_release
 from os.path import join
 
 from oocs.config import config
-from oocs.filesystem import unix_file
+from oocs.filesystem import UnixFile
 from oocs.output import message, message_alert, message_ok, quote
 
-class kernel:
+class Kernel:
     def __init__(self):
         self.runtime_params = {}
 
@@ -47,7 +47,7 @@ class kernel:
         for kparameter in self.runtime_params:
             filename = join(self.procfilesystem, 'sys',
                             kparameter.replace('.', '/'))
-            f = unix_file(filename)
+            f = UnixFile(filename)
             if not f.exists:
                 message_alert("no such file: " + filename, level="warning")
                 continue
@@ -72,6 +72,6 @@ def check_kernel(verbose=False):
 
     message('Checking kernel runtime parameters', header=True, dots=True)
 
-    ker = kernel()
-    message('Kernel version: ' + ker.version())
-    ker.check_runtime_parameters(verbose=verbose)
+    kernel = Kernel()
+    message('Kernel version: ' + kernel.version())
+    kernel.check_runtime_parameters(verbose=verbose)
