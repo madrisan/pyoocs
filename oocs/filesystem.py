@@ -140,12 +140,29 @@ class unix_file:
 
 class unix_command(unix_file):
     """Derived class for commands: binary [options]"""
-    def __init__(self, command):
-        unix_file.__init__(self, command.split()[0])
-        self.args = command.split()[1:]
+    def __init__(self, cmdline):
+        unix_file.__init__(self, cmdline.split()[0])
+        self.cmdline = cmdline
+        self.cmdname = cmdline.split()[0]
+        self.args = cmdline.split()[1:]
 
-    def cmnd_args(self):
-        return self.args
+    def cmnd_args(self): return self.args
+    def cmnd_name(self): return self.cmdname
+
+    def execute(self):
+        args = shlex.split(self.cmdline)
+        if not self.exists:
+            return ('', 'No such executable or script: ' + self.cmdname, 1)
+        try:
+            p = subprocess.Popen(args, stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
+            out, err = p.communicate()
+            retcode = p.returncode
+        except:
+            out = err = None
+            retcode = 1
+
+        return (out, err, retcode)
 
 def check_filesystem(verbose=False):
     module = 'filesystem'
