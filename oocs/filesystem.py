@@ -3,6 +3,7 @@
 
 import errno, os, stat
 import grp, pwd
+import shlex, subprocess
 from os.path import isdir, join
 
 from oocs.config import config
