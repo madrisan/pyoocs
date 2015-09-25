@@ -37,7 +37,7 @@ mod_dir = stat.S_IFDIR
 mod_chdev = stat.S_IFCHR
 mod_stickybit = stat.S_ISVTX
 
-class UnixFile:
+class UnixFile(object):
     def __init__(self, filename, abort_on_error=False):
         self.module = 'filesystem'
         self.filename = filename

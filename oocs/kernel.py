@@ -8,7 +8,7 @@ from oocs.config import config
 from oocs.filesystem import UnixFile
 from oocs.output import message, message_alert, message_ok, quote
 
-class Kernel:
+class Kernel(object):
     def __init__(self):
         self.runtime_params = {}
 

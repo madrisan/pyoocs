@@ -17,7 +17,7 @@ if pyver < (2, 5):
 else:
    from re import Scanner as Scanner
 
-class SudoParser:
+class SudoParser(object):
     def __init__(self):
         cfg = config().read("sudo")
 

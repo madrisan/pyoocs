@@ -9,7 +9,7 @@ except ImportError:
 
 from oocs.output import die, message
 
-class config:
+class config(object):
     def __init__(self):
         self.configfile = 'oocs-cfg.json'
         if not path.isfile(self.configfile):
