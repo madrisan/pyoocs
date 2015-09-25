@@ -7,7 +7,7 @@
 from os import listdir, geteuid
 from os.path import isfile, join
 
-from oocs.config import config
+from oocs.config import Config
 from oocs.filesystem import UnixFile, UnixCommand
 from oocs.output import die, message, message_alert, message_ok, quote
 
@@ -18,14 +18,24 @@ else:
    from re import Scanner as Scanner
 
 class SudoParser(object):
-    def __init__(self):
-        cfg = config().read("sudo")
+    def __init__(self, verbose=False):
+        self.module = 'sudo'
+        self.verbose = verbose
 
-        self.mainfile = cfg.get("conf-mainfile", "/etc/sudoers")
+        try:
+           self.cfg = Config().read(self.module)
+           self.enabled = (self.cfg.get('enable', 1) == 1)
+        except KeyError:
+            message_alert(self.module +
+                          ' directive not found in the configuration file',
+                          level='warning')
+            self.cfg = {}
+
+        self.mainfile = self.cfg.get("conf-mainfile", "/etc/sudoers")
         if not UnixFile(self.mainfile).isfile():
             die(2, 'No such file: ' + self.mainfile)
 
-        self.modulesdir = cfg.get("conf-modulesdir", None)
+        self.modulesdir = self.cfg.get("conf-modulesdir", None)
         if self.modulesdir and not UnixFile(self.modulesdir).isdir():
             die(2, 'No such directory: ' + self.modulesdir)
 
@@ -46,7 +56,7 @@ class SudoParser(object):
         self.group_specs = {}
         self.user_specs = {}
 
-        self.user_exclude_list = cfg.get("exclude-users", [])
+        self.user_exclude_list = self.cfg.get("exclude-users", [])
 
         self._parse()
 
@@ -251,6 +261,10 @@ class SudoParser(object):
             expanded_list.append(_expand_user(user))
         return list(set(expanded_list))
 
+    def configuration(self): return self.cfg
+    def enabled(self): return self.enabled
+    def module_name(self): return self.module
+
     def get_cmnd_aliases(self):
         return self.cmnd_aliases
     def get_user_aliases(self):
@@ -322,17 +336,15 @@ class SudoParser(object):
 
 
 def check_sudo(verbose=False):
-    module = 'sudo'
-    cfg = config().read(module)
-    if cfg.get('enable', 1) != 1:
+    sudocfg = SudoParser()
+
+    if not sudocfg.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(module) +
+            message_alert('Skipping ' + quote(sudocfg.module_name()) +
                           ' (disabled in the configuration)', level='note')
         return
 
     message('Checking the sudo configuration', header=True, dots=True)
-
-    sudocfg = SudoParser()
     (super_users, cmnd_warning, cmnd_normal) = sudocfg.catch_root_escalation()
 
     if verbose:

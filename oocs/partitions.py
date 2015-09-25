@@ -3,27 +3,34 @@
 
 from os.path import join
 
-from oocs.config import config
+from oocs.config import Config
 from oocs.filesystem import UnixFile
 from oocs.output import message, message_alert, message_ok, quote
 
-class Partitions:
-    def __init__(self, procfile):
-        self.procfile = procfile
-        self.partitions = []
+class Partitions(object):
+    def __init__(self, verbose=False):
+        self.module = 'partitions'
+        self.verbose = verbose
 
         try:
-            cfg = config().read("partitions")
+           self.cfg = Config().read(self.module)
+           self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_alert("configuration file: 'partitions' block not found!",
+            message_alert(self.module +
+                          ' directive not found in the configuration file',
                           level='warning')
-            cfg = {}
+            self.cfg = {}
 
-        self.required_parts = cfg.get("required", {})
+        self.partitions = []
+
+        self.required_parts = self.cfg.get("required", {})
         if not self.required_parts:
-            message_alert(
-                "configuration file: 'partitions:requires' block not found!",
+            message_alert(self.module +
+                ':required not found in the configuration file',
                 level='warning')
+
+        self.proc_filesystem = self.cfg.get('procfilesystem', '/proc')
+        self.proc_mountsfile = join(self.proc_filesystem, 'mounts')
 
         self.partitions = self._parse()
 
@@ -44,8 +51,12 @@ class Partitions:
         return False
 
     def _parse(self):
-        input = UnixFile(self.procfile, abort_on_error=True)
+        input = UnixFile(self.proc_mountsfile, abort_on_error=True)
         return input.readlines() or []
+
+    def configuration(self): return self.cfg
+    def enabled(self): return self.enabled
+    def module_name(self): return self.module
 
     def check_required(self, verbose=False):
         for part in self.required_parts:
@@ -68,16 +79,12 @@ class Partitions:
                 message_ok(mountpoint + ' (' + opts + ')')
 
 def check_partitions(verbose=False):
-    module = 'partitions'
-    cfg = config().read(module)
-    if cfg.get('enable', 1) != 1:
+    partitions = Partitions(verbose=verbose)
+    if not partitions.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(module) +
+            message_alert('Skipping ' + quote(partitions.module_name()) +
                           ' (disabled in the configuration)', level='note')
         return
 
     message('Checking partitions', header=True, dots=True)
-
-    procfilesystem = cfg.get('procfilesystem', '/proc')
-    partitions = Partitions(procfile=join(procfilesystem, 'mounts'))
     partitions.check_required(verbose=verbose)

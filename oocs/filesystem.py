@@ -6,7 +6,7 @@ import grp, pwd
 import shlex, subprocess
 from os.path import isdir, join
 
-from oocs.config import config
+from oocs.config import Config
 from oocs.output import die, message, message_alert, message_ok, quote
 
 # S_IRWXU     00700  mask for file owner permissions
@@ -37,9 +37,26 @@ mod_dir = stat.S_IFDIR
 mod_chdev = stat.S_IFCHR
 mod_stickybit = stat.S_ISVTX
 
+class Filesystem(object):
+    def __init__(self, verbose=False):
+        self.module = 'filesystem'
+        self.verbose = verbose
+
+        try:
+           self.cfg = Config().read(self.module)
+           self.enabled = (self.cfg.get('enable', 1) == 1)
+        except KeyError:
+            message_alert(self.module +
+                          ' directive not found in the configuration file',
+                          level='warning')
+            self.cfg = {}
+
+    def configuration(self): return self.cfg
+    def enabled(self): return self.enabled
+    def module_name(self): return self.module
+
 class UnixFile(object):
     def __init__(self, filename, abort_on_error=False):
-        self.module = 'filesystem'
         self.filename = filename
         self.exists = False
         try:
@@ -167,11 +184,10 @@ class UnixCommand(UnixFile):
         return (out, err, retcode)
 
 def check_filesystem(verbose=False):
-    module = 'filesystem'
-    cfg = config().read(module)
-    if cfg.get('enable', 1) != 1:
+    filesystem = Filesystem(verbose=verbose)
+    if not filesystem.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(module) +
+            message_alert('Skipping ' + quote(filesystem.module_name()) +
                           ' (disabled in the configuration)', level='note')
         return
 
@@ -188,6 +204,8 @@ def check_filesystem(verbose=False):
         '/tmp'       : mod_dir|mod_stickybit|0777,
         '/var/tmp'   : mod_dir|mod_stickybit|0777,
     }
+
+    cfg = filesystem.configuration()
 
     for f in sorted(filemodes.keys()):
         fp = UnixFile(f)

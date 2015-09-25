@@ -4,28 +4,35 @@
 from platform import release as kernel_release
 from os.path import join
 
-from oocs.config import config
+from oocs.config import Config
 from oocs.filesystem import UnixFile
 from oocs.output import message, message_alert, message_ok, quote
 
 class Kernel(object):
-    def __init__(self):
-        self.runtime_params = {}
+    def __init__(self, verbose=False):
+        self.module = 'kernel'
+        self.verbose = verbose
 
         try:
-            cfg = config().read("kernel")
+           self.cfg = Config().read(self.module)
+           self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_alert("configuration file: 'kernel' block not found!",
+            message_alert(self.module +
+                          ' directive not found in the configuration file',
                           level='warning')
-            cfg = {}
-
-        self.runtime_params = cfg.get("parameters", {})
+            self.cfg = {}
+        
+        self.runtime_params = self.cfg.get("parameters", {})
         if not self.runtime_params:
-            message_alert(
-                "configuration file: 'kernel:parameters' block not found!",
+            message_alert(self.module +
+                ':parameters not found in the configuration file',
                 level='warning')
 
-        self.procfilesystem = cfg.get('procfilesystem', '/proc')
+        self.procfilesystem = self.cfg.get('procfilesystem', '/proc')
+
+    def configuration(self): return self.cfg
+    def enabled(self): return self.enabled
+    def module_name(self): return self.module
 
     def version(self):
         release = kernel_release()
@@ -62,16 +69,14 @@ class Kernel(object):
                 message_ok(kparameter + ' = ' + quote(curr_value))
 
 def check_kernel(verbose=False):
-    module = 'kernel'
-    cfg = config().read(module)
-    if cfg.get('enable', 1) != 1:
+    kernel = Kernel(verbose=verbose)
+    if not kernel.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(module) +
+            message_alert('Skipping ' + quote(kernel.module_name()) +
                           ' (disabled in the configuration)', level='note')
         return
 
     message('Checking kernel runtime parameters', header=True, dots=True)
 
-    kernel = Kernel()
     message('Kernel version: ' + kernel.version())
     kernel.check_runtime_parameters(verbose=verbose)
