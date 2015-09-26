@@ -58,7 +58,7 @@ class Partitions(object):
     def enabled(self): return self.enabled
     def module_name(self): return self.module
 
-    def check_required(self, verbose=False):
+    def check_required(self):
         for part in self.required_parts:
             mountpoint = part['mountpoint']
             req_opts = part.get('opts', '')
@@ -75,7 +75,7 @@ class Partitions(object):
                     + quote(opts) + ", required: " + quote(req_opts))
             elif not opts:
                 message_alert(mountpoint + ": no such filesystem")
-            elif verbose:
+            elif self.verbose:
                 message_ok(mountpoint + ' (' + opts + ')')
 
 def check_partitions(verbose=False):
@@ -87,4 +87,4 @@ def check_partitions(verbose=False):
         return
 
     message('Checking partitions', header=True, dots=True)
-    partitions.check_required(verbose=verbose)
+    partitions.check_required()

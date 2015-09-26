@@ -50,7 +50,7 @@ class Kernel(object):
         # see /usr/include/linux/version.h
         return (((maj) << 16) + ((min) << 8) + (patch))
 
-    def check_runtime_parameters(self, verbose=False):
+    def check_runtime_parameters(self):
         for kparameter in self.runtime_params:
             filename = join(self.procfilesystem, 'sys',
                             kparameter.replace('.', '/'))
@@ -65,7 +65,7 @@ class Kernel(object):
                 message_alert(kparameter + " is " + quote(curr_value) +
                               ", required: " + quote(req_value),
                               level="warning")
-            elif verbose:
+            elif self.verbose:
                 message_ok(kparameter + ' = ' + quote(curr_value))
 
 def check_kernel(verbose=False):
@@ -79,4 +79,4 @@ def check_kernel(verbose=False):
     message('Checking kernel runtime parameters', header=True, dots=True)
 
     message('Kernel version: ' + kernel.version())
-    kernel.check_runtime_parameters(verbose=verbose)
+    kernel.check_runtime_parameters()
