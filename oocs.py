@@ -21,8 +21,8 @@ from oocs.sudo import check_sudo
 def main():
     message("Host: %s" % socket.getfqdn())
     check_kernel()
-    check_filesystem()
     check_partitions()
+    check_filesystem()
     check_sudo(verbose=True)
 
 if __name__ == '__main__':
