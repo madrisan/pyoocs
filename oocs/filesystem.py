@@ -5,10 +5,11 @@ import errno, os, stat
 import grp, pwd
 import shlex, subprocess
 from os.path import isdir, join
-from sys import version_info as pyver
+#from sys import version_info as pyver
 
 from oocs.config import Config
 from oocs.output import die, message, message_alert, message_ok, quote
+from oocs.py2x3 import isbasestring
 
 # S_IRWXU     00700  mask for file owner permissions
 # S_IRUSR     00400  owner has read permission
@@ -83,12 +84,6 @@ class UnixFile(object):
             self.owner = self.group = None
 
     def check_mode(self, shouldbe):
-        if pyver[0] == 3:
-            # In Python3 there is no longer a 'basestring' data type
-            str_types = str,
-        else:
-            str_types = basestring,
-
         try:
             iter(shouldbe)
         except TypeError:
@@ -96,13 +91,13 @@ class UnixFile(object):
 
         shouldbe_str = ''
         for mode in shouldbe:
-            if not isinstance(mode, str_types): mode = str(oct(mode))
+            if not isbasestring(mode): mode = str(oct(mode))
             shouldbe_str += (mode + ' or ')
         shouldbe_str = shouldbe_str[:-len(' or ')]
 
         for mode in shouldbe:
             # trasform octal strings into integers
-            if isinstance(mode, str_types): mode = int(mode, 8)
+            if isbasestring(mode): mode = int(mode, 8)
             if self.mode == oct(mode):
                 return (True, shouldbe_str, self.mode)
         return (False, shouldbe_str, self.mode)

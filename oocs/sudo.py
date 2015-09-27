@@ -10,12 +10,7 @@ from os.path import isfile, join
 from oocs.config import Config
 from oocs.filesystem import UnixFile, UnixCommand
 from oocs.output import die, message, message_alert, message_ok, quote
-
-from sys import version_info as pyver
-if pyver < (2, 5):
-   from sre import Scanner as Scanner
-else:
-   from re import Scanner as Scanner
+from oocs.py2x3 import Scanner
 
 class SudoParser(object):
     def __init__(self, verbose=False):
