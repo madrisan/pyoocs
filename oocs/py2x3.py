@@ -3,6 +3,11 @@
 
 import sys
 
+try:
+    import json
+except ImportError:
+    import simplejson as json
+
 def python_major():
     '''Return the major version # of the python interpreter we're running on'''
     return sys.version_info[0]

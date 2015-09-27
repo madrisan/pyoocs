@@ -1,11 +1,13 @@
 # This python module is part of the oocs scanner for Linux.
 # Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
 
-import errno, os, stat
-import grp, pwd
-import shlex, subprocess
+import os
+import stat
+import grp
+import pwd
+import shlex
+import subprocess
 from os.path import isdir, join
-#from sys import version_info as pyver
 
 from oocs.config import Config
 from oocs.output import die, message, message_alert, message_ok, quote

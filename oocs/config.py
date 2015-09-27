@@ -2,12 +2,9 @@
 # Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
 
 from os import path
-try:
-    import json
-except ImportError:
-    import simplejson as json
 
 from oocs.output import die, message
+from oocs.py2x3 import json
 
 class Config(object):
     def __init__(self):

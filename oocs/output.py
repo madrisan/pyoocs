@@ -3,7 +3,7 @@
 
 # Simple output primitives
 
-import errno, os, stat, sys
+import sys
 
 TABSTR = '   '
 
