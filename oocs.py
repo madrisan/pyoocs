@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 # Out of compliance scanner (currently just a POC)
 # Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>

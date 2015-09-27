@@ -5,6 +5,7 @@ import errno, os, stat
 import grp, pwd
 import shlex, subprocess
 from os.path import isdir, join
+from sys import version_info as pyver
 
 from oocs.config import Config
 from oocs.output import die, message, message_alert, message_ok, quote
@@ -78,7 +79,14 @@ class UnixFile(object):
             self.uid = self.gid = None
             self.owner = self.group = None
 
+
     def check_mode(self, shouldbe):
+        if pyver[0] == 3:
+            # In Python3 there is no longer a 'basestring' data type
+            str_types = str,
+        else:
+            str_types = basestring,
+
         try:
             iter(shouldbe)
         except TypeError:
@@ -86,13 +94,13 @@ class UnixFile(object):
 
         shouldbe_str = ''
         for mode in shouldbe:
-            if not isinstance(mode, basestring): mode = str(oct(mode))
+            if not isinstance(mode, str_types): mode = str(oct(mode))
             shouldbe_str += (mode + ' or ')
         shouldbe_str = shouldbe_str[:-len(' or ')]
 
         for mode in shouldbe:
             # trasform octal strings into integers
-            if isinstance(mode, basestring): mode = int(mode, 8)
+            if isinstance(mode, str_types): mode = int(mode, 8)
             if self.mode == oct(mode):
                 return (True, shouldbe_str, self.mode)
         return (False, shouldbe_str, self.mode)
@@ -147,7 +155,12 @@ class UnixFile(object):
 
     def filelist(self):
         if not isdir(self.filename): return []
-        (_, _, files) = os.walk(self.filename).next()
+        try:
+            (_, _, files) = os.walk(self.filename).next()
+        except:
+            # In Python3, use next(x) instead of x.next()
+            (_, _, files) = next(os.walk(self.filename))
+
         return files
 
     def subdirs(self):
@@ -195,14 +208,14 @@ def check_filesystem(verbose=False):
             header=True, dots=True)
 
     filemodes = {
-        '/dev/null'  : mod_chdev|0666,
-        '/dev/random': mod_chdev|0666,
-        '/dev/random': mod_chdev|0666,
-        '/'          : mod_dir|0755,
-        '/home'      : mod_dir|0755,
-        '/root'      : mod_dir|0550,
-        '/tmp'       : mod_dir|mod_stickybit|0777,
-        '/var/tmp'   : mod_dir|mod_stickybit|0777,
+        '/dev/null'  : mod_chdev|0o0666,
+        '/dev/random': mod_chdev|0o0666,
+        '/dev/random': mod_chdev|0o0666,
+        '/'          : mod_dir|0o0755,
+        '/home'      : mod_dir|0o0755,
+        '/root'      : mod_dir|0o0550,
+        '/tmp'       : mod_dir|mod_stickybit|0o0777,
+        '/var/tmp'   : mod_dir|mod_stickybit|0o0777,
     }
 
     cfg = filesystem.configuration()
@@ -226,7 +239,7 @@ def check_filesystem(verbose=False):
 
     home = UnixFile('/home')
     for subdir in home.subdirs():
-        req_mode = mod_dir|0700
+        req_mode = mod_dir|0o0700
         sdname = join('/home', subdir)
 
         fp = UnixFile(sdname)
