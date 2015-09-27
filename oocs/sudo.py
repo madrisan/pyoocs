@@ -23,13 +23,15 @@ class SudoParser(object):
         self.verbose = verbose
 
         try:
-           self.cfg = Config().read(self.module)
-           self.enabled = (self.cfg.get('enable', 1) == 1)
+            self.cfg = Config().read(self.module)
         except KeyError:
             message_alert(self.module +
                           ' directive not found in the configuration file',
                           level='warning')
             self.cfg = {}
+
+        self.enabled = (self.cfg.get('enable', 1) == 1)
+        self.verbose = (self.cfg.get('verbose', verbose) == 1)
 
         self.mainfile = self.cfg.get("conf-mainfile", "/etc/sudoers")
         if not UnixFile(self.mainfile).isfile():
@@ -336,7 +338,7 @@ class SudoParser(object):
 
 
 def check_sudo(verbose=False):
-    sudocfg = SudoParser()
+    sudocfg = SudoParser(verbose=verbose)
 
     if not sudocfg.enabled:
         if verbose:

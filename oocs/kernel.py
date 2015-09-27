@@ -14,13 +14,16 @@ class Kernel(object):
         self.verbose = verbose
 
         try:
-           self.cfg = Config().read(self.module)
-           self.enabled = (self.cfg.get('enable', 1) == 1)
+            self.cfg = Config().read(self.module)
+            self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
             message_alert(self.module +
                           ' directive not found in the configuration file',
                           level='warning')
             self.cfg = {}
+
+        self.enabled = (self.cfg.get('enable', 1) == 1)
+        self.verbose = (self.cfg.get('verbose', verbose) == 1)
         
         self.runtime_params = self.cfg.get("parameters", {})
         if not self.runtime_params:

@@ -13,8 +13,8 @@ class Partitions(object):
         self.verbose = verbose
 
         try:
-           self.cfg = Config().read(self.module)
-           self.enabled = (self.cfg.get('enable', 1) == 1)
+            self.cfg = Config().read(self.module)
+            self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
             message_alert(self.module +
                           ' directive not found in the configuration file',
@@ -22,6 +22,9 @@ class Partitions(object):
             self.cfg = {}
 
         self.partitions = []
+
+        self.enabled = (self.cfg.get('enable', 1) == 1)
+        self.verbose = (self.cfg.get('verbose', verbose) == 1)
 
         self.required_parts = self.cfg.get("required", {})
         if not self.required_parts:
