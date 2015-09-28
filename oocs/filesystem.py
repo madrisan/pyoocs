@@ -57,10 +57,12 @@ class Filesystem(object):
 
         self.enabled = (self.cfg.get('enable', 1) == 1)
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
+        self.procfilesystem = self.cfg.get('procfilesystem', '/proc')
 
     def configuration(self): return self.cfg
     def enabled(self): return self.enabled
     def module_name(self): return self.module
+    def procfilesystem(self): return self.procfilesystem
 
 class UnixFile(object):
     def __init__(self, filename, abort_on_error=False):

@@ -4,7 +4,7 @@
 from os.path import join
 
 from oocs.config import Config
-from oocs.filesystem import UnixFile
+from oocs.filesystem import Filesystem, UnixFile
 from oocs.output import message, message_alert, message_ok, quote
 
 class Partitions(object):
@@ -32,7 +32,7 @@ class Partitions(object):
                 ':required not found in the configuration file',
                 level='warning')
 
-        self.proc_filesystem = self.cfg.get('procfilesystem', '/proc')
+        self.proc_filesystem = Filesystem().procfilesystem
         self.proc_mountsfile = join(self.proc_filesystem, 'mounts')
 
         self.partitions = self._parse()

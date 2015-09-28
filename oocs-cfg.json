@@ -3,12 +3,12 @@
 		"filesystem": {
 			"enable": 1,
 			"verbose": 0,
+			"procfilesystem": "/proc",
 			"/root-modes": ["040750", "040550"]
 		},
 		"kernel": {
 			"enable": 1,
 			"verbose": 0,
-			"procfilesystem": "/proc",
 			"parameters": {
 				"kernel.exec-shield": 1,
 				"kernel.randomize_va_space": 2,
@@ -37,7 +37,6 @@
 		"partitions": {
 			"enable": 1,
 			"verbose": 0,
-			"procfilesystem": "/proc",
 			"required": [
 				{
 					"mountpoint": "/dev/shm",
