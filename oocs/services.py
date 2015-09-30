@@ -7,7 +7,7 @@ from os.path import join
 
 from oocs.config import Config
 from oocs.filesystem import Filesystem, UnixCommand, UnixFile
-from oocs.output import message, message_alert, message_ok, quote
+from oocs.output import message, message_alert, message_ok, quote, unlist
 
 class Services(object):
     def __init__(self, verbose=False):
@@ -41,26 +41,38 @@ class Services(object):
 
 class Service(Services):
     def __init__(self, service):
+        """Note: service can be a chain of commands as in the following
+                 example: 'syslogd|/sbin/rsyslogd'"""
         Services.__init__(self)
         self.service = service
         self.proc_filesystem = Filesystem().procfilesystem
 
     def status(self):
+        """Return a touple (status, pids) containing the status of the
+           process(es) (can be 'running' or 'down') and the list of the pid
+           numbers (or an empty one when the status is 'down').
+           If 'service' is a chain of commands, the global status of the given
+           processes will be considered.  This mean that the final status will
+           be set to 'running' if at least one of the processes will be found,
+           and the list of all the pid numbers will be reported."""
         cmdlines = glob.glob(join(self.proc_filesystem, '*', 'cmdline'))
+        srv_pids = []
+        srv_status = 'down'
         for f in cmdlines:
             for srv in self.service.split('|'):
                 cmdlinefile = UnixFile(f)
                 if not cmdlinefile.isfile(): continue
                 if srv in cmdlinefile.readfile():
-                    pid = f.split(sep)[2]
-                    return ('running', pid)
-        return ('down', None)
+                    srv_pids.append(int(f.split(sep)[2]))
+                    srv_status = 'running'
+        return (srv_status, srv_pids)
 
     def name(self):
         return self.service
 
     def pid(self):
-        """Return Null if not running, otherwise the pid(s)"""
+        """Return the list of pid numbers or an empty list when the process
+           is not running"""
         return self.status()[1]
 
 def check_services(verbose=False):
@@ -80,7 +92,7 @@ def check_services(verbose=False):
         pid = service.pid()
         if pid and services.verbose:
             message_ok('the service ' + quote(service.name()) +
-                       ' is running with pid %s' % pid)
+                       ' is running with pid(s) %s' % unlist(pid))
         else:
             message_alert('the service ' + quote(service.name()) +
                           ' is not running', level='critical')

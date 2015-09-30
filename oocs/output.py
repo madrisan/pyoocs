@@ -20,6 +20,9 @@ def die(exitcode, message):
 def quote(message):
     return "'%s'" % message
 
+def unlist(list):
+    return ', '.join(map(str, list))
+
 def message(message, **options):
     dots = options.get('dots') and ' ...' or ''
     end = options.get('end') or '\n'
