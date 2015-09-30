@@ -2,9 +2,11 @@
 # Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
 
 import glob
+from os import sep
+from os.path import join
 
 from oocs.config import Config
-from oocs.filesystem import UnixCommand, UnixFile
+from oocs.filesystem import Filesystem, UnixCommand, UnixFile
 from oocs.output import message, message_alert, message_ok, quote
 
 class Services(object):
@@ -41,22 +43,25 @@ class Service(Services):
     def __init__(self, service):
         Services.__init__(self)
         self.service = service
+        self.proc_filesystem = Filesystem().procfilesystem
 
     def status(self):
-        cmdlines = glob.glob('/proc/*/cmdline')
+        cmdlines = glob.glob(join(self.proc_filesystem, '*', 'cmdline'))
         for f in cmdlines:
             for srv in self.service.split('|'):
                 cmdlinefile = UnixFile(f)
                 if not cmdlinefile.isfile(): continue
                 if srv in cmdlinefile.readfile():
-                    return 'running'
-        return 'down'
+                    pid = f.split(sep)[2]
+                    return ('running', pid)
+        return ('down', None)
 
     def name(self):
         return self.service
 
-    def is_running(self):
-        return self.status() == 'running'
+    def pid(self):
+        """Return Null if not running, otherwise the pid(s)"""
+        return self.status()[1]
 
 def check_services(verbose=False):
     services = Services(verbose=verbose)
@@ -72,8 +77,10 @@ def check_services(verbose=False):
 
     for srv in services.required:
         service = Service(srv)
-        if not service.is_running():
+        pid = service.pid()
+        if pid and services.verbose:
+            message_ok('the service ' + quote(service.name()) +
+                       ' is running with pid %s' % pid)
+        else:
             message_alert('the service ' + quote(service.name()) +
                           ' is not running', level='critical')
-        elif services.verbose:
-            message_ok('the service ' + quote(service.name()) + ' is running')
