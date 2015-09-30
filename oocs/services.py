@@ -37,19 +37,30 @@ class Services(object):
         if retcode != 0: return err or 'unknown error'
         return out.split()[1]
 
-    def status(self, service):
+class Service(Services):
+    def __init__(self, service):
+        Services.__init__(self)
+        self.service = service
+
+    def status(self):
         cmdlines = glob.glob('/proc/*/cmdline')
         for f in cmdlines:
-            for srv in service.split('|'):
+            for srv in self.service.split('|'):
                 cmdlinefile = UnixFile(f)
                 if not cmdlinefile.isfile(): continue
                 if srv in cmdlinefile.readfile():
                     return 'running'
         return 'down'
 
+    def name(self):
+        return self.service
+
+    def is_running(self):
+        return self.status() == 'running'
+
 def check_services(verbose=False):
-    service = Services(verbose=verbose)
-    if not service.enabled:
+    services = Services(verbose=verbose)
+    if not services.enabled:
         if verbose:
             message_alert('Skipping ' + quote(module_name()) +
                           ' (disabled in the configuration)', level='note')
@@ -57,11 +68,12 @@ def check_services(verbose=False):
 
     message('Checking services', header=True, dots=True)
 
-    #message('runlevel: ' + service.runlevel())
+    #message('runlevel: ' + services.runlevel())
 
-    for srv in service.required:
-        if service.status(srv) == 'running':
-            message_alert('the service ' + quote(srv) + ' is not running',
-                          level='critical')
-        elif service.verbose:
-            message_ok('the service ' + quote(srv) + ' is running')
+    for srv in services.required:
+        service = Service(srv)
+        if not service.is_running():
+            message_alert('the service ' + quote(service.name()) +
+                          ' is not running', level='critical')
+        elif services.verbose:
+            message_ok('the service ' + quote(service.name()) + ' is running')

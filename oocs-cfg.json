@@ -60,6 +60,7 @@
 		},
                 "services": {
                         "enable": 1,
+			"verbose": 1,
                         "required": [
                                 "/usr/sbin/atd",
                                 "/usr/sbin/sshd",
