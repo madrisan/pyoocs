@@ -37,10 +37,6 @@ from oocs.py2x3 import isbasestring
 # S_ISGID   0002000  set-group-ID bit (see below)
 # S_ISVTX   0001000  sticky bit (see below)
 
-mod_dir = stat.S_IFDIR
-mod_chdev = stat.S_IFCHR
-mod_stickybit = stat.S_ISVTX
-
 class Filesystem(object):
     def __init__(self, verbose=False):
         self.module = 'filesystem'
@@ -58,6 +54,15 @@ class Filesystem(object):
         self.enabled = (self.cfg.get('enable', 1) == 1)
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
         self.procfilesystem = self.cfg.get('procfilesystem', '/proc')
+
+        self.mod_dir = stat.S_IFDIR
+        self.mod_chdev = stat.S_IFCHR
+        self.mod_stickybit = stat.S_ISVTX
+        self.mod_0550 = 360
+        self.mod_0666 = 438
+        self.mod_0700 = 448
+        self.mod_0755 = 493
+        self.mod_0777 = 511
 
     def configuration(self): return self.cfg
     def enabled(self): return self.enabled
@@ -198,10 +203,10 @@ class UnixCommand(UnixFile):
         return (out, err, retcode)
 
 def check_filesystem(verbose=False):
-    filesystem = Filesystem(verbose=verbose)
-    if not filesystem.enabled:
+    fs = Filesystem(verbose=verbose)
+    if not fs.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(filesystem.module_name()) +
+            message_alert('Skipping ' + quote(fs.module_name()) +
                           ' (disabled in the configuration)', level='note')
         return
 
@@ -209,17 +214,17 @@ def check_filesystem(verbose=False):
             header=True, dots=True)
 
     filemodes = {
-        '/dev/null'  : mod_chdev|0o0666,
-        '/dev/random': mod_chdev|0o0666,
-        '/dev/random': mod_chdev|0o0666,
-        '/'          : mod_dir|0o0755,
-        '/home'      : mod_dir|0o0755,
-        '/root'      : mod_dir|0o0550,
-        '/tmp'       : mod_dir|mod_stickybit|0o0777,
-        '/var/tmp'   : mod_dir|mod_stickybit|0o0777,
+        '/dev/null'  : fs.mod_chdev|fs.mod_0666,
+        '/dev/random': fs.mod_chdev|fs.mod_0666,
+        '/dev/random': fs.mod_chdev|fs.mod_0666,
+        '/'          : fs.mod_dir|fs.mod_0755,
+        '/home'      : fs.mod_dir|fs.mod_0755,
+        '/root'      : fs.mod_dir|fs.mod_0550,
+        '/tmp'       : fs.mod_dir|fs.mod_stickybit|fs.mod_0777,
+        '/var/tmp'   : fs.mod_dir|fs.mod_stickybit|fs.mod_0777,
     }
 
-    cfg = filesystem.configuration()
+    cfg = fs.configuration()
 
     for f in sorted(filemodes.keys()):
         fp = UnixFile(f)
@@ -240,7 +245,7 @@ def check_filesystem(verbose=False):
 
     home = UnixFile('/home')
     for subdir in home.subdirs():
-        req_mode = mod_dir|0o0700
+        req_mode = fs.mod_dir|fs.mod_0700
         sdname = join('/home', subdir)
 
         fp = UnixFile(sdname)
