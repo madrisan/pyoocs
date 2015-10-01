@@ -23,7 +23,8 @@ class Services(object):
                           level='warning')
             self.cfg = {}
 
-        self.required = self.cfg.get("required", [])
+        self.must_be_running = self.cfg.get("must-be-running", [])
+        self.must_be_stopped = self.cfg.get("must-be-stopped", [])
 
         self.enabled = (self.cfg.get('enable', 1) == 1)
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
@@ -31,7 +32,8 @@ class Services(object):
     def configuration(self): return self.cfg
     def enabled(self): return self.enabled
     def module_name(self): return self.module
-    def required(self): return self.required
+    def must_be_running(self): return self.must_be_running
+    def must_be_stopped(self): return self.must_be_stopped
 
     def runlevel(self):
         rl = UnixCommand('/sbin/runlevel')
@@ -124,7 +126,7 @@ def check_services(verbose=False):
 
     #message('runlevel: ' + services.runlevel())
 
-    for srv in services.required:
+    for srv in services.must_be_running:
         service = Service(srv)
         pid = service.pid()
         uids = service.uid()
@@ -137,3 +139,13 @@ def check_services(verbose=False):
         else:
             message_alert('the service ' + quote(service.name()) +
                           ' is not running', level='critical')
+
+    for srv in services.must_be_stopped:
+        service = Service(srv)
+        pid = service.pid()
+        if pid:
+            message_alert('the service ' + quote(service.name()) +
+                          ' should not be running', level='critical')
+        elif services.verbose:
+            message_ok('the service ' + quote(service.name()) +
+                       ' is not running as required')

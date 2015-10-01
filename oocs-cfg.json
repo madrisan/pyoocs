@@ -61,11 +61,13 @@
                 "services": {
                         "enable": 1,
 			"verbose": 1,
-                        "required": [
+                        "must-be-running": [
                                 "/usr/sbin/atd",
                                 "/usr/sbin/sshd",
                                 "ntpd|/lib/systemd/systemd-timesyncd",
                                 "syslogd|/sbin/rsyslogd|/lib/systemd/systemd-journald"
+                        ],
+                        "must-be-stopped": [
                         ]
                 },
 		"sudo": {
