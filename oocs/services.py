@@ -132,7 +132,8 @@ def check_services(verbose=False):
         if pid and services.verbose:
             message_ok('the service ' + quote(service.name()) +
                        ' is running with pid(s) %s, uid %s, gid %s' %
-                       (unlist(pid), unlist(uids), unlist(gids)))
+                       (unlist(pid,sep=','),
+                        unlist(uids,sep=','), unlist(gids, sep=',')))
         else:
             message_alert('the service ' + quote(service.name()) +
                           ' is not running', level='critical')
