@@ -38,7 +38,6 @@ class Services(object):
         out, err, retcode = rl.execute()
         if retcode != 0: return err or 'unknown error'
         return out.split()[1]
-startwith
 
 class Service(Services):
     def __init__(self, service):
@@ -50,8 +49,20 @@ class Service(Services):
         Services.__init__(self)
         self.service = service
         self.proc_filesystem = Filesystem().procfilesystem
+        self.status, self.pids, self.uids, self.gids = self._status()
 
-    def status(self):
+    def _proc_status_parser(self, pid):
+        procfile = glob.glob(join(self.proc_filesystem, str(pid), 'status'))[0]
+        rawdata = UnixFile(procfile).readlines() or []
+        data = {}
+        for line in rawdata:
+            cols = line.split(':')
+            key = cols[0].lower()
+            values = cols[1].rstrip('\n').split()
+            data[key] = values
+        return data
+
+    def _status(self):
         """
         Return a touple (status, pids) containing the status of the process(es)
         (can be 'running' or 'down') and the list of the pid numbers (or an
@@ -63,16 +74,29 @@ class Service(Services):
         list of all the pid numbers will be reported.
         """
         cmdlines = glob.glob(join(self.proc_filesystem, '*', 'cmdline'))
+        srv_gids = []
         srv_pids = []
+        srv_uids = []
         srv_status = 'down'
         for f in cmdlines:
             for srv in self.service.split('|'):
                 cmdlinefile = UnixFile(f)
                 if not cmdlinefile.isfile(): continuea
                 if cmdlinefile.readfile().startswith(srv):  # FIXME
-                    srv_pids.append(int(f.split(sep)[2]))
+                    pid = int(f.split(sep)[2])
+                    srv_pids.append(pid)
+
+                    proc_status = self._proc_status_parser(pid)
+                    # Real, effective, saved set, and file system UIDs
+                    uid = proc_status.get('uid', [None, None, None, None])
+                    # Real, effective, saved set, and file system GIDs
+                    gid = proc_status.get('gid', [None, None, None, None])
+                    srv_uids.append(uid[0])
+                    srv_gids.append(gid[0])
+
                     srv_status = 'running'
-        return (srv_status, srv_pids)
+
+        return (srv_status, srv_pids, srv_uids, srv_gids)
 
     def name(self):
         return self.service
@@ -80,7 +104,13 @@ class Service(Services):
     def pid(self):
         """Return the list of pid numbers or an empty list when the process
            is not running"""
-        return self.status()[1]
+        return self.pids
+
+    def status(self):
+        return self.status
+
+    def uid(self): return self.uids
+    def gid(self): return self.gids
 
 def check_services(verbose=False):
     services = Services(verbose=verbose)
@@ -97,9 +127,12 @@ def check_services(verbose=False):
     for srv in services.required:
         service = Service(srv)
         pid = service.pid()
+        uids = service.uid()
+        gids = service.gid()
         if pid and services.verbose:
             message_ok('the service ' + quote(service.name()) +
-                       ' is running with pid(s) %s' % unlist(pid))
+                       ' is running with pid(s) %s, uid %s, gid %s' %
+                       (unlist(pid), unlist(uids), unlist(gids)))
         else:
             message_alert('the service ' + quote(service.name()) +
                           ' is not running', level='critical')
