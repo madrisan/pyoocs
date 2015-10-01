@@ -64,7 +64,8 @@
                         "required": [
                                 "/usr/sbin/atd",
                                 "/usr/sbin/sshd",
-                                "syslogd|/sbin/rsyslogd"
+                                "ntpd|/lib/systemd/systemd-timesyncd",
+                                "syslogd|/sbin/rsyslogd|/lib/systemd/systemd-journald"
                         ]
                 },
 		"sudo": {
