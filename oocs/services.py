@@ -38,31 +38,38 @@ class Services(object):
         out, err, retcode = rl.execute()
         if retcode != 0: return err or 'unknown error'
         return out.split()[1]
+startwith
 
 class Service(Services):
     def __init__(self, service):
-        """Note: service can be a chain of commands as in the following
-                 example: 'syslogd|/sbin/rsyslogd'"""
+        """
+        Note: service can be a chain of commands as in the following example:
+           'syslogd|/sbin/rsyslogd'
+        The service string must match the one displayed by 'ps'.
+        """
         Services.__init__(self)
         self.service = service
         self.proc_filesystem = Filesystem().procfilesystem
 
     def status(self):
-        """Return a touple (status, pids) containing the status of the
-           process(es) (can be 'running' or 'down') and the list of the pid
-           numbers (or an empty one when the status is 'down').
-           If 'service' is a chain of commands, the global status of the given
-           processes will be considered.  This mean that the final status will
-           be set to 'running' if at least one of the processes will be found,
-           and the list of all the pid numbers will be reported."""
+        """
+        Return a touple (status, pids) containing the status of the process(es)
+        (can be 'running' or 'down') and the list of the pid numbers (or an
+        empty one when the status is 'down').
+
+        If 'service' is a chain of commands, the global status of the given
+        processes will be considered.  This mean that the final status will be
+        set to 'running' if at least one of the processes will be found, and the
+        list of all the pid numbers will be reported.
+        """
         cmdlines = glob.glob(join(self.proc_filesystem, '*', 'cmdline'))
         srv_pids = []
         srv_status = 'down'
         for f in cmdlines:
             for srv in self.service.split('|'):
                 cmdlinefile = UnixFile(f)
-                if not cmdlinefile.isfile(): continue
-                if srv in cmdlinefile.readfile():
+                if not cmdlinefile.isfile(): continuea
+                if cmdlinefile.readfile().startswith(srv):  # FIXME
                     srv_pids.append(int(f.split(sep)[2]))
                     srv_status = 'running'
         return (srv_status, srv_pids)
