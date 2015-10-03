@@ -4,7 +4,15 @@
 			"enable": 1,
 			"verbose": 0,
 			"procfilesystem": "/proc",
-			"/root-modes": ["040750", "040550"]
+                        "permissions": {
+                                "/dev/null"  : ["root", "root", "020666"],
+                                "/dev/random": ["root", "root", "020666"],
+                                "/"          : ["root", "root", "040755"],
+                                "/home"      : ["root", "root", "040755"],
+                                "/root"      : ["root", "root", "040750", "040550"],
+                                "/tmp"       : ["root", "root", "041777"],
+                                "/var/tmp"   : ["root", "root", "041777"]
+                        }
 		},
 		"kernel": {
 			"enable": 1,

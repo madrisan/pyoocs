@@ -10,32 +10,34 @@ import subprocess
 from os.path import isdir, join
 
 from oocs.config import Config
-from oocs.output import die, message, message_alert, message_ok, quote
+from oocs.output import message, message_alert, message_ok, quote, unlist
 from oocs.py2x3 import isbasestring
 
-# S_IRWXU     00700  mask for file owner permissions
-# S_IRUSR     00400  owner has read permission
-# S_IWUSR     00200  owner has write permission
-# S_IXUSR     00100  owner has execute permission
-# S_IRWXG     00070  mask for group permissions
-# S_IRGRP     00040  group has read permission
-# S_IWGRP     00020  group has write permission
-# S_IXGRP     00010  group has execute permission
-# S_IRWXO     00007  mask for permissions for others (not in group)
-# S_IROTH     00004  others have read permission
-# S_IWOTH     00002  others have write permission
-# S_IXOTH     00001  others have execute permission
-# S_IFMT    0170000  bitmask for the file type bitfields
-# S_IFSOCK  0140000  socket
-# S_IFLNK   0120000  symbolic link
-# S_IFREG   0100000  regular file
-# S_IFBLK   0060000  block device
-# S_IFDIR   0040000  directory
-# S_IFCHR   0020000  character device
-# S_IFIFO   0010000  FIFO
-# S_ISUID   0004000  set UID bit
-# S_ISGID   0002000  set-group-ID bit (see below)
-# S_ISVTX   0001000  sticky bit (see below)
+# Octal representation for files modes:
+#
+#  S_IRWXU     00700  mask for file owner permissions
+#  S_IRUSR     00400  owner has read permission
+#  S_IWUSR     00200  owner has write permission
+#  S_IXUSR     00100  owner has execute permission
+#  S_IRWXG     00070  mask for group permissions
+#  S_IRGRP     00040  group has read permission
+#  S_IWGRP     00020  group has write permission
+#  S_IXGRP     00010  group has execute permission
+#  S_IRWXO     00007  mask for permissions for others (not in group)
+#  S_IROTH     00004  others have read permission
+#  S_IWOTH     00002  others have write permission
+#  S_IXOTH     00001  others have execute permission
+#  S_IFMT    0170000  bitmask for the file type bitfields
+#  S_IFSOCK  0140000  socket
+#  S_IFLNK   0120000  symbolic link
+#  S_IFREG   0100000  regular file
+#  S_IFBLK   0060000  block device
+#  S_IFDIR   0040000  directory
+#  S_IFCHR   0020000  character device
+#  S_IFIFO   0010000  FIFO
+#  S_ISUID   0004000  set UID bit
+#  S_ISGID   0002000  set-group-ID bit (see below)
+#  S_ISVTX   0001000  sticky bit (see below)
 
 class Filesystem(object):
     def __init__(self, verbose=False):
@@ -54,15 +56,6 @@ class Filesystem(object):
         self.enabled = (self.cfg.get('enable', 1) == 1)
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
         self.procfilesystem = self.cfg.get('procfilesystem', '/proc')
-
-        self.mod_dir = stat.S_IFDIR
-        self.mod_chdev = stat.S_IFCHR
-        self.mod_stickybit = stat.S_ISVTX
-        self.mod_0550 = 360
-        self.mod_0666 = 438
-        self.mod_0700 = 448
-        self.mod_0755 = 493
-        self.mod_0777 = 511
 
     def configuration(self): return self.cfg
     def enabled(self): return self.enabled
@@ -93,26 +86,25 @@ class UnixFile(object):
             self.owner = self.group = None
 
     def check_mode(self, shouldbe):
-        try:
-            iter(shouldbe)
-        except TypeError:
-            shouldbe = [shouldbe]
-
-        shouldbe_str = ''
+        """check if the file object has mode 'shouldbe'.
+           'shouldbe' must be a string representaing the octal desired value.
+           see on the top of this file. """
+        if not isinstance(shouldbe, list ): shouldbe = [shouldbe]
         for mode in shouldbe:
-            if not isbasestring(mode): mode = str(oct(mode))
-            shouldbe_str += (mode + ' or ')
-        shouldbe_str = shouldbe_str[:-len(' or ')]
-
-        for mode in shouldbe:
-            # trasform octal strings into integers
-            if isbasestring(mode): mode = int(mode, 8)
+            if isbasestring(mode):
+                mode = int(mode, 8)
+            else:
+                mode = str(oct(mode))
             if self.mode == oct(mode):
-                return (True, shouldbe_str, self.mode)
-        return (False, shouldbe_str, self.mode)
+                return (True, self.mode)
 
-    def check_owner(self, shouldbe_usr, shouldbe_grp):
-        return (self.owner == shouldbe_usr) and (self.group == shouldbe_grp)
+        return (False, self.mode)
+
+    def check_owner(self, shouldbe_usr):
+        return (self.owner == shouldbe_usr)
+
+    def check_group(self, shouldbe_grp):
+        return (self.group == shouldbe_grp)
 
     def name(self): return self.filename
     def basename(self): return os.path.basename(self.filename)
@@ -213,47 +205,41 @@ def check_filesystem(verbose=False):
     message('Checking the permissions of some system folders',
             header=True, dots=True)
 
-    filemodes = {
-        '/dev/null'  : fs.mod_chdev|fs.mod_0666,
-        '/dev/random': fs.mod_chdev|fs.mod_0666,
-        '/dev/random': fs.mod_chdev|fs.mod_0666,
-        '/'          : fs.mod_dir|fs.mod_0755,
-        '/home'      : fs.mod_dir|fs.mod_0755,
-        '/root'      : fs.mod_dir|fs.mod_0550,
-        '/tmp'       : fs.mod_dir|fs.mod_stickybit|fs.mod_0777,
-        '/var/tmp'   : fs.mod_dir|fs.mod_stickybit|fs.mod_0777,
-    }
-
     cfg = fs.configuration()
+    permissions = cfg.get('permissions', [])
 
-    for f in sorted(filemodes.keys()):
-        fp = UnixFile(f)
+    for file in sorted(permissions.keys()):
+       values = permissions[file]
+       req_owner = values[0]
+       req_group = values[1]
+       # multiple different modes are allowed
+       req_modes = values[2:]
 
-        req_mode_cfg = cfg.get(f+"-modes", [])
-        if req_mode_cfg: req_mode = req_mode_cfg
-        else: req_mode = filemodes[f]
-
-        (match, val_req, val_found) = fp.check_mode(req_mode)
-        if not match:
-            message_alert(fp.name(), reason = val_found +
-                          ' instead of ' + val_req,
-                          level='critical')
-        elif verbose:
+       fp = UnixFile(file)
+       match_mode, val_found = fp.check_mode(req_modes)
+       match_perms = fp.check_owner(req_owner) and fp.check_group(req_group)
+       if not (match_mode and match_perms):
+           message_alert(fp.name(), reason='invalid permissions, ' +
+                         'should be: ' + req_owner + ':' + req_group +
+                         ' ' + unlist(req_modes, sep=' or '),
+                         level='critical')
+       elif verbose:
             message_ok(fp.name())
 
     message("Checking the mode of the /home subdirs", header=True, dots=True)
 
     home = UnixFile('/home')
     for subdir in home.subdirs():
-        req_mode = fs.mod_dir|fs.mod_0700
         sdname = join('/home', subdir)
-
         fp = UnixFile(sdname)
-        (match, val_req, val_found) = fp.check_mode(req_mode)
-        if not match:
+        req_mode = '040700'
+        match_mode, val_found = fp.check_mode(req_mode)
+        if not match_mode:
             message_alert(fp.name(),
-                reason = val_found +
-                ' instead of ' + val_req, level='warning')
+                          reason=val_found + ' instead of ' + req_mode,
+                          level='warning')
+        elif verbose:
+            message_ok(fp.name())
 
     message('Checking for file permissions in /etc/profile.d',
             header=True, dots=True)
@@ -262,7 +248,7 @@ def check_filesystem(verbose=False):
     for file in dp.filelist():
         fname = join(dp.name(), file)
         fp = UnixFile(fname)
-        match = fp.check_owner('root', 'root')
+        match = fp.check_owner('root') and fp.check_group('root')
         if not match:
             message_alert(fp.name(),
                 reason = quote(fp.owner() + '.' + fp.group()) +
