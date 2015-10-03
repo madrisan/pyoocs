@@ -202,7 +202,7 @@ def check_filesystem(verbose=False):
                           ' (disabled in the configuration)', level='note')
         return
 
-    message('Checking the permissions of some system folders',
+    message('Checking the permissions of some system folders and files',
             header=True, dots=True)
 
     cfg = fs.configuration()

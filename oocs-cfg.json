@@ -11,7 +11,13 @@
                                 "/home"      : ["root", "root", "040755"],
                                 "/root"      : ["root", "root", "040750", "040550"],
                                 "/tmp"       : ["root", "root", "041777"],
-                                "/var/tmp"   : ["root", "root", "041777"]
+                                "/var/tmp"   : ["root", "root", "041777"],
+                                "/etc/crontab"     : ["root", "root", "100644"],
+                                "/etc/cron.d"      : ["root", "root", "040700"],
+                                "/etc/cron.hourly" : ["root", "root", "040755"],
+                                "/etc/cron.daily"  : ["root", "root", "040755"],
+                                "/etc/cron.weekly" : ["root", "root", "040755"],
+                                "/etc/cron.monthly": ["root", "root", "040755"]
                         }
 		},
 		"kernel": {
@@ -76,6 +82,7 @@
                                 "syslogd|/sbin/rsyslogd|/lib/systemd/systemd-journald"
                         ],
                         "must-be-stopped": [
+                                "xinetd"
                         ]
                 },
 		"sudo": {
