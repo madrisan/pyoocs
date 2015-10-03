@@ -129,7 +129,7 @@ class Service(Services):
     def owner(self):
         owners = []
         for uid in self.uid():
-            owners.append(getpwuid(uid).pw_name)
+            owners.append(getpwuid(int(uid)).pw_name)
         return owners
 
     def threads(self):
