@@ -43,7 +43,8 @@ class Partitions(object):
             if mountpoint == cols[1]:
                 mount_opts = cols[3]
                 mount_opts_list = cols[3].split(',')
-                opts_match = set(opts).issubset(set(mount_opts_list))
+                opts_list = opts.split(',')
+                opts_match = set(opts_list).issubset(set(mount_opts_list))
                 return (opts_match, mount_opts)
 
         return (False, None)
