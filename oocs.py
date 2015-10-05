@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Out of compliance scanner (currently just a POC)
+# Out of compliance scanner for Linux hosts
 # Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
 
 __author__ = "Davide Madrisan"

@@ -22,5 +22,5 @@ This project is at an early stage of development and only a few modules are curr
 > License | GPL v3+
 > Operating System | Linux
 > Implementation | Python 2.4+
-> Current status | alpha
+> Current status | beta
 
