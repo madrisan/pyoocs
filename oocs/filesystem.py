@@ -217,6 +217,10 @@ def check_filesystem(verbose=False):
 
        fp = UnixFile(file)
        match_mode, val_found = fp.check_mode(req_modes)
+       if not val_found:
+            message_alert(fp.name(), reason='no such file or directory',
+                          level='warning')
+            continue
        match_perms = fp.check_owner(req_owner) and fp.check_group(req_group)
        if not (match_mode and match_perms):
            message_alert(fp.name(), reason='invalid permissions, ' +
