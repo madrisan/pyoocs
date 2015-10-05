@@ -252,8 +252,9 @@ def check_filesystem(verbose=False):
     for file in dp.filelist():
         fname = join(dp.name(), file)
         fp = UnixFile(fname)
-        match = fp.check_owner('root') and fp.check_group('root')
-        if not match:
+        match_mode, val_found = fp.check_mode(["100755", "100644"])
+        match_perms = fp.check_owner('root') and fp.check_group('root')
+        if not (match_mode and match_perms):
             message_alert(fp.name(),
                 reason = quote(fp.owner() + '.' + fp.group()) +
                 ' instead of ' + quote('root.root'), level='critical')
