@@ -73,8 +73,14 @@ class UnixFile(object):
             self.mode = oct(stat_info[stat.ST_MODE])
             self.uid = stat_info.st_uid
             self.gid = stat_info.st_gid
-            self.owner = pwd.getpwuid(self.uid)[0]
-            self.group = grp.getgrgid(self.gid)[0]
+            try:
+               self.owner = pwd.getpwuid(self.uid)[0]
+            except KeyError:
+               self.owner = None
+            try:
+               self.group = grp.getgrgid(self.gid)[0]
+            except KeyError:
+               self.group = None
         except OSError:
             if abort_on_error and not self.exists:
                 die(1, "file not found: " + self.filename)
@@ -101,9 +107,13 @@ class UnixFile(object):
         return (False, self.mode)
 
     def check_owner(self, shouldbe_usr):
+        if not self.owner:
+            raise KeyError('uid not found: %s' % self.uid)
         return (self.owner == shouldbe_usr)
 
     def check_group(self, shouldbe_grp):
+        if not self.group:
+            raise KeyError('gid not found: %s' % self.gid)
         return (self.group == shouldbe_grp)
 
     def name(self): return self.filename
@@ -221,7 +231,13 @@ def check_filesystem(verbose=False):
             message_alert(fp.name(), reason='no such file or directory',
                           level='warning')
             continue
-       match_perms = fp.check_owner(req_owner) and fp.check_group(req_group)
+       try:
+            match_perms = (
+                fp.check_owner(req_owner) and fp.check_group(req_group))
+       except:
+            message_alert(fp.name(), reason='no such user or group ' +
+                          quote(req_owner + ':' + req_group), level='warning')
+            match_perms = False
        if not (match_mode and match_perms):
            message_alert(fp.name(), reason='invalid permissions, ' +
                          'should be: ' + req_owner + ':' + req_group +
