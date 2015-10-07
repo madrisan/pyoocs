@@ -4,6 +4,26 @@
 			"enable": 1,
 			"verbose": 0,
 			"procfilesystem": "/proc",
+                        "mandatory": [
+				{
+					"mountpoint": "/dev/shm",
+					"opts": "nodev,noexec,nosuid"
+				},
+				{
+					"mountpoint": "/home",
+					"opts": "nodev"
+				},
+				{
+					"mountpoint": "/tmp",
+					"opts": "nodev,noexec,nosuid"
+				},
+				{
+					"mountpoint": "/var"
+				},
+				{
+					"mountpoint": "/var/log"
+				}
+                        ],
                         "permissions": {
 				"/dev/null"  : ["root", "root", "020666"],
 				"/dev/random": ["root", "root", "020666"],
@@ -51,30 +71,6 @@
 				"net.ipv6.conf.default.accept_ra": 0,
 				"net.ipv6.conf.default.accept_redirect": 0
 			}
-		},
-		"partitions": {
-			"enable": 1,
-			"verbose": 0,
-			"required": [
-				{
-					"mountpoint": "/dev/shm",
-					"opts": "nodev,noexec,nosuid"
-				},
-				{
-					"mountpoint": "/home",
-					"opts": "nodev"
-				},
-				{
-					"mountpoint": "/tmp",
-					"opts": "nodev,noexec,nosuid"
-				},
-				{
-					"mountpoint": "/var"
-				},
-				{
-					"mountpoint": "/var/log"
-				}
-			]
 		},
                 "services": {
                         "enable": 1,

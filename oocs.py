@@ -16,14 +16,12 @@ import sys
 from oocs.filesystem import check_filesystem
 from oocs.kernel import check_kernel
 from oocs.output import die, message
-from oocs.partitions import check_partitions
 from oocs.services import check_services
 from oocs.sudo import check_sudo
 
 def main():
     message("Host: %s" % socket.getfqdn())
     check_kernel()
-    check_partitions()
     check_filesystem()
     check_sudo(verbose=True)
     check_services()

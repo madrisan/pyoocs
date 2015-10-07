@@ -57,10 +57,60 @@ class Filesystem(object):
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
         self.procfilesystem = self.cfg.get('procfilesystem', '/proc')
 
+        self.mandatory = self.cfg.get('mandatory', {})
+        if not self.mandatory:
+            message_alert(self.module +
+                ':mandatory not found in the configuration file',
+                level='warning')
+
+        self.proc_mountsfile = join(self.procfilesystem, 'mounts')
+        self.filesystems = self._parse_proc_mounts()
+
+    def _parse_proc_mounts(self):
+        input = UnixFile(self.proc_mountsfile, abort_on_error=True)
+        return input.readlines() or []
+
     def configuration(self): return self.cfg
     def enabled(self): return self.enabled
     def module_name(self): return self.module
     def procfilesystem(self): return self.procfilesystem
+
+    def mounted(self, mountpoint):
+        for line in self.filesystems:
+            if mountpoint in line.split(): return True
+        return False
+
+    def check_mandatory(self):
+        for part in self.mandatory:
+            mountpoint = part['mountpoint']
+            req_opts = part.get('opts', '')
+
+            mounted = self.mounted(mountpoint)
+            if not mounted:
+                message_alert(mountpoint + ": no such filesystem",
+                              level="critical")
+                continue
+
+            (match, opts) = self.check_mount_opts(mountpoint, req_opts)
+            if not match and opts:
+                message_alert(mountpoint + ": mount options "
+                    + quote(opts) + ", required: " + quote(req_opts))
+            elif not opts:
+                message_alert(mountpoint + ": no such filesystem")
+            elif self.verbose:
+                message_ok(mountpoint + ' (' + opts + ')')
+
+    def check_mount_opts(self, mountpoint, opts=''):
+        for line in self.filesystems:
+            cols = line.split()
+            if mountpoint == cols[1]:
+                mount_opts = cols[3]
+                mount_opts_list = cols[3].split(',')
+                opts_list = opts.split(',')
+                opts_match = set(opts_list).issubset(set(mount_opts_list))
+                return (opts_match, mount_opts)
+
+        return (False, None)
 
 class UnixFile(object):
     def __init__(self, filename, abort_on_error=False):
@@ -211,6 +261,9 @@ def check_filesystem(verbose=False):
             message_alert('Skipping ' + quote(fs.module_name()) +
                           ' (disabled in the configuration)', level='note')
         return
+
+    message('Checking for mandatory filesystems', header=True, dots=True)
+    fs.check_mandatory()
 
     message('Checking the permissions of some system folders and files',
             header=True, dots=True)
