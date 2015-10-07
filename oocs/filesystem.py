@@ -95,7 +95,7 @@ class UnixFile(object):
         """check if the file object has mode 'shouldbe'.
            'shouldbe' must be a string representaing the octal desired value.
            see on the top of this file. """
-        if not isinstance(shouldbe, list ): shouldbe = [shouldbe]
+        if not isinstance(shouldbe, list): shouldbe = [shouldbe]
         for mode in shouldbe:
             if isbasestring(mode):
                 mode = int(mode, 8)
@@ -223,7 +223,7 @@ def check_filesystem(verbose=False):
        req_owner = values[0]
        req_group = values[1]
        # multiple different modes are allowed
-       req_modes = values[2:]
+       req_modes = values[2].split('|')
 
        fp = UnixFile(file)
        match_mode, val_found = fp.check_mode(req_modes)
