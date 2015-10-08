@@ -66,6 +66,8 @@ class Filesystem(object):
         self.proc_mountsfile = join(self.procfilesystem, 'mounts')
         self.filesystems = self._parse_proc_mounts()
 
+        self.file_permission = self.cfg.get('file-permission', [])
+
     def _parse_proc_mounts(self):
         input = UnixFile(self.proc_mountsfile, abort_on_error=True)
         return input.readlines() or []
@@ -73,7 +75,9 @@ class Filesystem(object):
     def configuration(self): return self.cfg
     def enabled(self): return self.enabled
     def module_name(self): return self.module
+
     def procfilesystem(self): return self.procfilesystem
+    def file_permission(self): return self.file_permission
 
     def mounted(self, mountpoint):
         for line in self.filesystems:
@@ -254,6 +258,36 @@ class UnixCommand(UnixFile):
 
         return (out, err, retcode)
 
+def check_file_permissions(file_permission, verbose=False):
+    for file in sorted(file_permission.keys()):
+        values = file_permission[file]
+        req_owner = values[0]
+        req_group = values[1]
+        # multiple different modes are allowed
+        req_modes = values[2].split('|')
+
+        fp = UnixFile(file)
+        match_mode, val_found = fp.check_mode(req_modes)
+        if not val_found:
+            message_alert(fp.name(), reason='no such file or directory',
+                          level='warning')
+            continue
+        try:
+            match_perms = (
+            fp.check_owner(req_owner) and fp.check_group(req_group))
+        except:
+            message_alert(fp.name(), reason='no such user or group ' +
+                          quote(req_owner + ':' + req_group),
+                          level='warning')
+            match_perms = False
+        if not (match_mode and match_perms):
+            message_alert(fp.name(), reason='invalid permissions, ' +
+                          'should be: ' + req_owner + ':' + req_group +
+                          ' ' + unlist(req_modes, sep=' or '),
+                          level='critical')
+        elif verbose:
+            message_ok(fp.name())
+
 def check_filesystem(verbose=False):
     fs = Filesystem(verbose=verbose)
     if not fs.enabled:
@@ -267,40 +301,9 @@ def check_filesystem(verbose=False):
 
     message('Checking the permissions of some system folders and files',
             header=True, dots=True)
-
-    cfg = fs.configuration()
-    permissions = cfg.get('permissions', [])
-
-    for file in sorted(permissions.keys()):
-       values = permissions[file]
-       req_owner = values[0]
-       req_group = values[1]
-       # multiple different modes are allowed
-       req_modes = values[2].split('|')
-
-       fp = UnixFile(file)
-       match_mode, val_found = fp.check_mode(req_modes)
-       if not val_found:
-            message_alert(fp.name(), reason='no such file or directory',
-                          level='warning')
-            continue
-       try:
-            match_perms = (
-                fp.check_owner(req_owner) and fp.check_group(req_group))
-       except:
-            message_alert(fp.name(), reason='no such user or group ' +
-                          quote(req_owner + ':' + req_group), level='warning')
-            match_perms = False
-       if not (match_mode and match_perms):
-           message_alert(fp.name(), reason='invalid permissions, ' +
-                         'should be: ' + req_owner + ':' + req_group +
-                         ' ' + unlist(req_modes, sep=' or '),
-                         level='critical')
-       elif verbose:
-            message_ok(fp.name())
+    check_file_permissions(fs.file_permission, verbose=verbose)
 
     message("Checking the mode of the /home subdirs", header=True, dots=True)
-
     home = UnixFile('/home')
     for subdir in home.subdirs():
         sdname = join('/home', subdir)
@@ -316,7 +319,6 @@ def check_filesystem(verbose=False):
 
     message('Checking for file permissions in /etc/profile.d',
             header=True, dots=True)
-
     dp = UnixFile('/etc/profile.d')
     for file in dp.filelist():
         fname = join(dp.name(), file)
