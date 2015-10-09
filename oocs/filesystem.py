@@ -320,6 +320,16 @@ def check_filesystem(verbose=False):
     message('Checking for mandatory filesystems', header=True, dots=True)
     check_mandatory_filesystems(fs.cfg_mandatory_filesystems(), verbose=verbose)
 
+    message('Checking for mounted filesystems not in /etc/fstab',
+             header=True, dots=True)
+    fstab = UnixFile('/etc/fstab').readlines()
+    for line in fstab:
+        cols = line.split()
+        mountpoint = cols[1]
+        fstabfs = Filesystem(mountpoint)
+        if not fstabfs.is_mounted():
+            message_alert('No such mount point in /etc/fstab: '+ mountpoint)
+
     message('Checking the permissions of some system folders and files',
             header=True, dots=True)
     check_file_permissions(fs.cfg_file_permissions(), verbose=verbose)
