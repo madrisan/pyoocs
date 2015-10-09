@@ -7,7 +7,7 @@ from os.path import join
 from pwd import getpwuid
 
 from oocs.config import Config
-from oocs.filesystem import Filesystem, UnixCommand, UnixFile
+from oocs.filesystem import Filesystems, UnixCommand, UnixFile
 from oocs.output import message, message_alert, message_ok, quote, unlist
 
 class Services(object):
@@ -51,7 +51,7 @@ class Service(Services):
         """
         Services.__init__(self)
         self.service = service
-        self.proc_filesystem = Filesystem().procfilesystem
+        self.proc_filesystem = Filesystems().procfilesystem
         self.state, self.fullstatus = self._status()
 
     def _proc_status_parser(self, pid):

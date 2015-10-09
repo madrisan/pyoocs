@@ -5,7 +5,7 @@ from platform import release as kernel_release
 from os.path import join
 
 from oocs.config import Config
-from oocs.filesystem import Filesystem, UnixFile
+from oocs.filesystem import Filesystems, UnixFile
 from oocs.output import message, message_alert, message_ok, quote
 
 class Kernel(object):
@@ -31,7 +31,7 @@ class Kernel(object):
                 ':parameters not found in the configuration file',
                 level='warning')
 
-        self.proc_filesystem = Filesystem().procfilesystem
+        self.proc_filesystem = Filesystems().procfilesystem
 
     def configuration(self): return self.cfg
     def enabled(self): return self.enabled

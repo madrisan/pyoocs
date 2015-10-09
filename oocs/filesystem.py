@@ -39,7 +39,7 @@ from oocs.py2x3 import isbasestring
 #  S_ISGID   0002000  set-group-ID bit (see below)
 #  S_ISVTX   0001000  sticky bit (see below)
 
-class Filesystem(object):
+class Filesystems(object):
     def __init__(self, verbose=False):
         self.module = 'filesystem'
         self.verbose = verbose
@@ -55,6 +55,7 @@ class Filesystem(object):
 
         self.enabled = (self.cfg.get('enable', 1) == 1)
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
+
         self.procfilesystem = self.cfg.get('procfilesystem', '/proc')
 
         self.mandatory = self.cfg.get('mandatory', {})
@@ -63,58 +64,58 @@ class Filesystem(object):
                 ':mandatory not found in the configuration file',
                 level='warning')
 
+        self.file_permission = self.cfg.get('file-permission', {})
+        if not self.file_permission:
+            message_alert(self.module +
+                ':file-permission not found in the configuration file',
+                level='warning')
+
         self.proc_mountsfile = join(self.procfilesystem, 'mounts')
-        self.filesystems = self._parse_proc_mounts()
-
-        self.file_permission = self.cfg.get('file-permission', [])
-
-    def _parse_proc_mounts(self):
-        input = UnixFile(self.proc_mountsfile, abort_on_error=True)
-        return input.readlines() or []
 
     def configuration(self): return self.cfg
     def enabled(self): return self.enabled
     def module_name(self): return self.module
 
     def procfilesystem(self): return self.procfilesystem
-    def file_permission(self): return self.file_permission
 
-    def mounted(self, mountpoint):
-        for line in self.filesystems:
-            if mountpoint in line.split(): return True
-        return False
+    def cfg_file_permissions(self): return self.file_permission
+    def cfg_mandatory_filesystems(self): return self.mandatory
 
-    def check_mandatory(self):
-        for part in self.mandatory:
-            mountpoint = part['mountpoint']
-            req_opts = part.get('opts', '')
+    def dump_proc_mounts(self):
+        input = UnixFile(self.proc_mountsfile)
+        return input.readlines() or []
 
-            mounted = self.mounted(mountpoint)
-            if not mounted:
-                message_alert(mountpoint + ": no such filesystem",
-                              level="critical")
-                continue
+class Filesystem(Filesystems):
+    def __init__(self, mountpoint):
+        Filesystems.__init__(self)
+        self.mountpoint = mountpoint
 
-            (match, opts) = self.check_mount_opts(mountpoint, req_opts)
-            if not match and opts:
-                message_alert(mountpoint + ": mount options "
-                    + quote(opts) + ", required: " + quote(req_opts))
-            elif not opts:
-                message_alert(mountpoint + ": no such filesystem")
-            elif self.verbose:
-                message_ok(mountpoint + ' (' + opts + ')')
+        self.filesystems = self.dump_proc_mounts()
+        self.mounted, self.mount_opts = self._is_mounted()
 
-    def check_mount_opts(self, mountpoint, opts=''):
+    def _is_mounted(self):
+        """ Return the tuple (True, list-of-mount-options) or (False, None) """
+        self.filesystems = self.dump_proc_mounts()
         for line in self.filesystems:
             cols = line.split()
-            if mountpoint == cols[1]:
-                mount_opts = cols[3]
-                mount_opts_list = cols[3].split(',')
-                opts_list = opts.split(',')
-                opts_match = set(opts_list).issubset(set(mount_opts_list))
-                return (opts_match, mount_opts)
-
+            if self.mountpoint == cols[1]:
+                return (True, cols[3].split(','))
         return (False, None)
+
+    def is_mounted(self):
+        """ Return True if mounted otherwise False """
+        return self.mounted
+
+    def mount_opts(self):
+        """ Return the list of the mount options """
+        return self.mount_opts
+
+    def check_mount_opts(self, req_opts):
+        if not self.mounted:
+            return (False, None)
+        req_opts_list = req_opts.split(',')
+        opts_match = set(req_opts_list).issubset(set(self.mount_opts))
+        return (opts_match, ', '.join(self.mount_opts))
 
 class UnixFile(object):
     def __init__(self, filename, abort_on_error=False):
@@ -288,8 +289,28 @@ def check_file_permissions(file_permission, verbose=False):
         elif verbose:
             message_ok(fp.name())
 
+def check_mandatory_filesystems(mandatory_filesystems, verbose=False):
+    for part in mandatory_filesystems:
+        mountpoint = part['mountpoint']
+        req_opts = part.get('opts', '')
+
+        fs = Filesystem(mountpoint)
+        if not fs.is_mounted():
+            message_alert(mountpoint + ": no such filesystem",
+                          level="critical")
+            continue
+
+        (match, opts) = fs.check_mount_opts(req_opts)
+        if not match and req_opts:
+            message_alert(mountpoint + ": mount options " +
+                          quote(opts) + ", required: " + quote(req_opts))
+        elif not opts:
+            message_alert(mountpoint + ": no such filesystem")
+        elif verbose:
+            message_ok(mountpoint + ' (' + opts + ')')
+
 def check_filesystem(verbose=False):
-    fs = Filesystem(verbose=verbose)
+    fs = Filesystems(verbose=verbose)
     if not fs.enabled:
         if verbose:
             message_alert('Skipping ' + quote(fs.module_name()) +
@@ -297,11 +318,11 @@ def check_filesystem(verbose=False):
         return
 
     message('Checking for mandatory filesystems', header=True, dots=True)
-    fs.check_mandatory()
+    check_mandatory_filesystems(fs.cfg_mandatory_filesystems(), verbose=verbose)
 
     message('Checking the permissions of some system folders and files',
             header=True, dots=True)
-    check_file_permissions(fs.file_permission, verbose=verbose)
+    check_file_permissions(fs.cfg_file_permissions(), verbose=verbose)
 
     message("Checking the mode of the /home subdirs", header=True, dots=True)
     home = UnixFile('/home')

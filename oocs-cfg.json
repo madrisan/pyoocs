@@ -24,7 +24,7 @@
 					"mountpoint": "/var/log"
 				}
                         ],
-                        "permissions": {
+                        "file-permission": {
 				"/dev/null"  : ["root", "root", "020666"],
 				"/dev/random": ["root", "root", "020666"],
 				"/"          : ["root", "root", "040755|040555"],
