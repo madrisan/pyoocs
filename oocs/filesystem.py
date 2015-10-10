@@ -324,6 +324,7 @@ def check_filesystem(verbose=False):
              header=True, dots=True)
     fstab = UnixFile('/etc/fstab').readlines()
     for line in fstab:
+        if line.startswith('#'): continue
         cols = line.split()
         mountpoint = cols[1]
         fstabfs = Filesystem(mountpoint)
