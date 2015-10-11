@@ -13,6 +13,7 @@ __status__ = "Alpha"
 import socket
 import sys
 
+from oocs.environment import check_environment
 from oocs.filesystem import check_filesystem
 from oocs.kernel import check_kernel
 from oocs.output import die, message
@@ -21,6 +22,7 @@ from oocs.sudo import check_sudo
 
 def main():
     message("Host: %s" % socket.getfqdn())
+    check_environment()
     check_kernel()
     check_filesystem()
     check_sudo(verbose=True)
