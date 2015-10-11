@@ -34,7 +34,6 @@ class Kernel(object):
         self.proc_filesystem = Filesystems().procfilesystem
 
     def configuration(self): return self.cfg
-    def enabled(self): return self.enabled
     def module_name(self): return self.module
 
     def version(self):

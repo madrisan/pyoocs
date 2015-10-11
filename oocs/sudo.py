@@ -260,17 +260,6 @@ class SudoParser(object):
     def enabled(self): return self.enabled
     def module_name(self): return self.module
 
-    def get_cmnd_aliases(self):
-        return self.cmnd_aliases
-    def get_user_aliases(self):
-        return self.user_aliases
-    def get_group_specs(self):
-        return self.group_specs
-    def get_user_specs(self):
-        return self.user_specs
-    def get_exclude_list(self):
-        return self.user_exclude_list
-
     def catch_root_escalation(self):
         exclude_list = self.user_exclude_list
 
@@ -344,19 +333,19 @@ def check_sudo(verbose=False):
     if geteuid() != 0:
         message_alert("This check (" + __name__ + ") must be run as root" +
                       " ... skip", level='warning')
-    return
+        return
 
     (super_users, cmnd_warning, cmnd_normal) = sudocfg.catch_root_escalation()
 
     if verbose:
-        for user in sudocfg.get_exclude_list():
-            message_alert('ignoring user/group ' + quote(user) +
+        for usr in sudocfg.user_exclude_list:
+            message_alert('ignoring user/group ' + quote(usr) +
                           ' (see configuration)', level="note")
 
-    #print("\n[CMND_ALIAS]\n" + str(sudocfg.get_cmnd_aliases()))
-    #print("\n[USER_ALIAS]\n" + str(sudocfg.get_user_aliases()))
-    #print("\n[GROUPS]\n"     + str(sudocfg.get_group_specs()))
-    #print("\n[USERS]\n"      + str(sudocfg.get_user_specs()) + "\n")
+    #print("\n[CMND_ALIAS]\n" + str(sudocfg.cmnd_aliases()))
+    #print("\n[USER_ALIAS]\n" + str(sudocfg.user_aliases()))
+    #print("\n[GROUPS]\n"     + str(sudocfg.group_specs()))
+    #print("\n[USERS]\n"      + str(sudocfg.user_specs()) + "\n")
 
     for usr in super_users:
         message_alert(quote(usr) + ' can become super user',

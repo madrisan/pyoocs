@@ -73,7 +73,6 @@ class Filesystems(object):
         self.proc_mountsfile = join(self.procfilesystem, 'mounts')
 
     def configuration(self): return self.cfg
-    def enabled(self): return self.enabled
     def module_name(self): return self.module
 
     def procfilesystem(self): return self.procfilesystem
@@ -91,7 +90,10 @@ class Filesystem(Filesystems):
         self.mountpoint = mountpoint
 
         self.filesystems = self.dump_proc_mounts()
-        self.mounted, self.fstype, self.mount_opts = self._is_mounted()
+        """ self.is_mounted: True if mounted otherwise False
+            self.fstype: filesystem type
+            self.mount_opts: list of the mount options """
+        self.is_mounted, self.fstype, self.mount_opts = self._is_mounted()
 
     def _is_mounted(self):
         """ Return the tuple (True, list-of-mount-options) or (False, None) """
@@ -102,20 +104,8 @@ class Filesystem(Filesystems):
                 return (True, cols[2], cols[3].split(','))
         return (False, None, None)
 
-    def fstype(self):
-        """ Return the filesystem type """
-        return self.fstype
-
-    def mount_opts(self):
-        """ Return the list of the mount options """
-        return self.mount_opts
-
-    def is_mounted(self):
-        """ Return True if mounted otherwise False """
-        return self.mounted
-
     def check_mount_opts(self, req_opts):
-        if not self.mounted:
+        if not self.is_mounted:
             return (False, None)
         req_opts_list = req_opts.split(',')
         opts_match = set(req_opts_list).issubset(set(self.mount_opts))
@@ -180,13 +170,6 @@ class UnixFile(object):
     def dirname(self): return os.path.dirname(self.filename)
 
     def mode(self): return str(self.mode)
-
-    def uid(self): return self.uid
-    def gid(self): return self.gid
-    def owner(self): return self.owner
-    def group(self): return self.group
-
-    def exists(self): return self.exists
 
     def isdir(self): return os.path.isdir(self.filename)
     def isfile(self): return os.path.isfile(self.filename)
@@ -299,7 +282,7 @@ def check_mandatory_filesystems(mandatory_filesystems, verbose=False):
         req_opts = part.get('opts', '')
 
         fs = Filesystem(mountpoint)
-        if not fs.is_mounted():
+        if not fs.is_mounted:
             message_alert(mountpoint + ": no such filesystem",
                           level="critical")
             continue
@@ -334,7 +317,7 @@ def check_filesystem(verbose=False):
         fstype = cols[2]
         if fstype == 'swap': continue
         checkfs = Filesystem(mountpoint)
-        if not checkfs.is_mounted():
+        if not checkfs.is_mounted:
             message_alert('No such mount point in /etc/fstab: '+ mountpoint)
 
     message('Checking the permissions of some system folders and files',

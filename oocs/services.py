@@ -31,10 +31,7 @@ class Services(object):
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
 
     def configuration(self): return self.cfg
-    def enabled(self): return self.enabled
     def module_name(self): return self.module
-    def must_be_running(self): return self.must_be_running
-    def must_be_stopped(self): return self.must_be_stopped
 
     def runlevel(self):
         rl = UnixCommand('/sbin/runlevel')
