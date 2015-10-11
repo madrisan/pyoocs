@@ -71,10 +71,8 @@ class SudoParser(object):
         return collapsed
 
     def _read_files(self):
-        if geteuid() != 0:
-            die(2, "This check (" + __name__ + ") must be run as root")
-
         self.lines = []
+
         try:
             for f in [ self.mainfile ] + self.modules:
                 for line in open(f, 'r'):
@@ -342,6 +340,12 @@ def check_sudo(verbose=False):
         return
 
     message('Checking the sudo configuration', header=True, dots=True)
+
+    if geteuid() != 0:
+        message_alert("This check (" + __name__ + ") must be run as root" +
+                      " ... skip", level='warning')
+    return
+
     (super_users, cmnd_warning, cmnd_normal) = sudocfg.catch_root_escalation()
 
     if verbose:
