@@ -22,4 +22,5 @@ class Config(object):
         except ValueError:
             die(1, 'Invalid json file: ' + self.configfile)
 
-        return data.get("oocs-module", {}).get(module, {})
+        #return data.get("oocs-module", {}).get(module, {})
+        return data.get("oocs-module", {})[module]
