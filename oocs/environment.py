@@ -9,24 +9,22 @@ from oocs.output import die, message, message_alert, quote
 
 class Environment(object):
     def __init__(self, verbose=False):
-        self.module = 'environment'
+        self.module_name = 'environment'
         self.verbose = verbose
 
         try:
-            self.cfg = Config().read(self.module)
+            self.cfg = Config().read(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_alert(self.module +
+            message_alert(self.module_name +
                           ' directive not found in the configuration file',
                           level='warning')
             self.cfg = {}
 
         self.enabled = (self.cfg.get('enable', 1) == 1)
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
-        self.verbose = True
 
     def configuration(self): return self.cfg
-    def module_name(self): return self.module
 
     def getenv(self, variable): return getenv(variable, '')
     def check_ld_library_path(self):
@@ -84,7 +82,7 @@ def check_environment(verbose=False):
     environment = Environment(verbose=verbose)
     if not environment.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(environment.module_name()) +
+            message_alert('Skipping ' + quote(environment.module_name) +
                           ' (disabled in the configuration)', level='note')
         return
 

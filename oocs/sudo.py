@@ -14,13 +14,13 @@ from oocs.py2x3 import Scanner
 
 class SudoParser(object):
     def __init__(self, verbose=False):
-        self.module = 'sudo'
+        self.module_name = 'sudo'
         self.verbose = verbose
 
         try:
-            self.cfg = Config().read(self.module)
+            self.cfg = Config().read(self.module_name)
         except KeyError:
-            message_alert(self.module +
+            message_alert(self.module_name +
                           ' directive not found in the configuration file',
                           level='warning')
             self.cfg = {}
@@ -258,7 +258,6 @@ class SudoParser(object):
 
     def configuration(self): return self.cfg
     def enabled(self): return self.enabled
-    def module_name(self): return self.module
 
     def catch_root_escalation(self):
         exclude_list = self.user_exclude_list
@@ -324,7 +323,7 @@ def check_sudo(verbose=False):
 
     if not sudocfg.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(sudocfg.module_name()) +
+            message_alert('Skipping ' + quote(sudocfg.module_name) +
                           ' (disabled in the configuration)', level='note')
         return
 

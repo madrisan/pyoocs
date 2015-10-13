@@ -12,14 +12,14 @@ from oocs.output import message, message_alert, message_ok, quote, unlist
 
 class Services(object):
     def __init__(self, verbose=False):
-        self.module = 'services'
+        self.module_name = 'services'
         self.verbose = verbose
 
         try:
-           self.cfg = Config().read(self.module)
+           self.cfg = Config().read(self.module_name)
            self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_alert(self.module +
+            message_alert(self.module_name +
                           ' directive not found in the configuration file',
                           level='warning')
             self.cfg = {}
@@ -31,7 +31,6 @@ class Services(object):
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
 
     def configuration(self): return self.cfg
-    def module_name(self): return self.module
 
     def runlevel(self):
         rl = UnixCommand('/sbin/runlevel')
@@ -139,7 +138,7 @@ def check_services(verbose=False):
     services = Services(verbose=verbose)
     if not services.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(module_name()) +
+            message_alert('Skipping ' + quote(module_name) +
                           ' (disabled in the configuration)', level='note')
         return
 

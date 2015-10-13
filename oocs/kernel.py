@@ -10,14 +10,14 @@ from oocs.output import message, message_alert, message_ok, quote
 
 class Kernel(object):
     def __init__(self, verbose=False):
-        self.module = 'kernel'
+        self.module_name = 'kernel'
         self.verbose = verbose
 
         try:
-            self.cfg = Config().read(self.module)
+            self.cfg = Config().read(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_alert(self.module +
+            message_alert(self.module_name +
                           ' directive not found in the configuration file',
                           level='warning')
             self.cfg = {}
@@ -27,14 +27,13 @@ class Kernel(object):
         
         self.runtime_params = self.cfg.get("parameters", {})
         if not self.runtime_params:
-            message_alert(self.module +
+            message_alert(self.module_name +
                 ':parameters not found in the configuration file',
                 level='warning')
 
         self.proc_filesystem = Filesystems().procfilesystem
 
     def configuration(self): return self.cfg
-    def module_name(self): return self.module
 
     def version(self):
         release = kernel_release()
@@ -74,7 +73,7 @@ def check_kernel(verbose=False):
     kernel = Kernel(verbose=verbose)
     if not kernel.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(kernel.module_name()) +
+            message_alert('Skipping ' + quote(kernel.module_name) +
                           ' (disabled in the configuration)', level='note')
         return
 

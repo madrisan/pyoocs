@@ -41,14 +41,14 @@ from oocs.py2x3 import isbasestring
 
 class Filesystems(object):
     def __init__(self, verbose=False):
-        self.module = 'filesystem'
+        self.module_name = 'filesystem'
         self.verbose = verbose
 
         try:
-            self.cfg = Config().read(self.module)
+            self.cfg = Config().read(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_alert(self.module +
+            message_alert(self.module_name +
                           ' directive not found in the configuration file',
                           level='warning')
             self.cfg = {}
@@ -60,23 +60,20 @@ class Filesystems(object):
 
         self.mandatory = self.cfg.get('mandatory', {})
         if not self.mandatory:
-            message_alert(self.module +
+            message_alert(self.module_name +
                 ':mandatory not found in the configuration file',
                 level='warning')
 
         self.file_permission = self.cfg.get('file-permission', {})
         if not self.file_permission:
-            message_alert(self.module +
+            message_alert(self.module_name +
                 ':file-permission not found in the configuration file',
                 level='warning')
 
         self.proc_mountsfile = join(self.procfilesystem, 'mounts')
 
     def configuration(self): return self.cfg
-    def module_name(self): return self.module
-
     def procfilesystem(self): return self.procfilesystem
-
     def cfg_file_permissions(self): return self.file_permission
     def cfg_mandatory_filesystems(self): return self.mandatory
 
@@ -300,7 +297,7 @@ def check_filesystem(verbose=False):
     fs = Filesystems(verbose=verbose)
     if not fs.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(fs.module_name()) +
+            message_alert('Skipping ' + quote(fs.module_name) +
                           ' (disabled in the configuration)', level='note')
         return
 
