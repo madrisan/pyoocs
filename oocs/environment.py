@@ -1,3 +1,6 @@
+# This python module is part of the oocs scanner for Linux.
+# Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
+
 from os import getenv, geteuid
 
 from oocs.config import Config
@@ -20,53 +23,62 @@ class Environment(object):
 
         self.enabled = (self.cfg.get('enable', 1) == 1)
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
+        self.verbose = True
 
     def configuration(self): return self.cfg
     def module_name(self): return self.module
 
-def check_root_path_variable(verbose=False):
-    if geteuid() != 0:
-        message_alert("This check (" + __name__ + ") must be run as root" +
-                      " ... skip", level='warning')
-        return
+    def getenv(self, variable): return getenv(variable, '')
+    def check_ld_library_path(self):
+        env_var = 'LD_LIBRARY_PATH'
+        env_ld_library_path = self.getenv(env_var)
+        if self.verbose:
+            message(env_var + ' is ' + quote(env_ld_library_path))
+        if env_ld_library_path:
+            message_alert(env_var + ' is not empty: (' +
+                          quote(env_ld_library_path), level='warning')
 
-    env_path_root = getenv('PATH', '')
-    if verbose:
-        message('root PATH is: ' + quote(env_path_root))
+    def check_path(self):
+        env_var = 'PATH'
+        env_path = self.getenv(env_var)
+        if self.verbose:
+            message(env_var + ' is ' + quote(env_path))
+        #env_path = "/usr/bin::./bin:.:/dev/null:/no/such/dir:/var/tmp:"
+        if '::' in env_path:
+            message_alert('PATH contains an empty directory (::)',
+                          level='warning')
+        if env_path[-1] == ':':
+            message_alert('PATH has a trailing :', level='warning')
+        for ptok in env_path.split(':'):
+            ptok_stripped = ptok.lstrip().rstrip()
+            # ignore empty pathes already catched by a previous check
+            if not ptok_stripped: continue
 
-    #env_path_root = "/usr/bin::./bin:.:/dev/null:/no/such/dir:/var/tmp:"
-    if '::' in env_path_root:
-        message_alert('root PATH contains an empty directory (::)',
-                      level='warning')
-    if env_path_root[-1] == ':':
-        message_alert('root PATH has a trailing :', level='warning')
-    for ptok in env_path_root.split(':'):
-        ptok_stripped = ptok.lstrip().rstrip()
-        # ignore empty pathes already catched by a previous check
-        if not ptok_stripped: continue
+            if ptok_stripped == '.':
+                message_alert('PATH contains .', level='critical')
+            elif not ptok_stripped.startswith('/'):
+                message_alert('PATH contains a non absolute path: ' +
+                              quote(ptok), level='warning')
+            else:
+                fp = UnixFile(ptok)
+                if not fp.exists:
+                    message_alert('PATH contains ' + quote(ptok) +
+                        ' which does not exist', level='warning')
+                    continue
+                if not fp.isdir():
+                    message_alert('PATH contains ' + quote(ptok) +
+                        ' which is not a directory', level='critical')
 
-        if ptok_stripped == '.':
-            message_alert('root PATH contains .', level='critical')
-        elif not ptok_stripped.startswith('/'):
-            message_alert('root PATH contains a non absolute path: ' +
-                          quote(ptok), level='warning')
-        else:
-            fp = UnixFile(ptok)
-            if not fp.exists:
-                message_alert('root PATH contains ' + quote(ptok) +
-                    ' which does not exist', level='warning')
-                continue
-            if not fp.isdir():
-                message_alert('root PATH contains ' + quote(ptok) +
-                    ' which is not a directory', level='critical')
-            if not (fp.check_owner('root') and fp.check_group('root')):
-                message_alert('root PATH contains ' + quote(ptok) +
-                    ' which is not owned by root', level='critical')
-            match_mode, val_found = fp.check_mode(['040700','040750','040755'])
-            if not match_mode:
-                message_alert('root PATH contains ' + quote(ptok) +
-                    ' which has wrong (' + val_found + ') permissions',
-                    level='critical')
+                # FIXME: users can add non root dirs. ex: $HOME/bin
+                if not (fp.check_owner('root') and fp.check_group('root')):
+                    message_alert('PATH contains ' + quote(ptok) +
+                        ' which is not owned by root', level='critical')
+                match_mode, val_found = (
+                    fp.check_mode(['040700','040750','040755']))
+                if not match_mode:
+                    message_alert('PATH contains ' + quote(ptok) +
+                        ' which has wrong (' + val_found + ') permissions',
+                        level='critical')
 
 def check_environment(verbose=False):
     environment = Environment(verbose=verbose)
@@ -77,4 +89,11 @@ def check_environment(verbose=False):
         return
 
     message('Checking root environment', header=True, dots=True)
-    check_root_path_variable(verbose=verbose)
+
+    if geteuid() != 0:
+        message_alert("This check (" + __name__ + ") must be run as root" +
+                      " ... skip", level='warning')
+        return
+
+    environment.check_path()
+    environment.check_ld_library_path()
