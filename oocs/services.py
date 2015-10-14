@@ -47,11 +47,11 @@ class Service(Services):
         """
         Services.__init__(self)
         self.service = service
-        self.proc_filesystem = Filesystems().procfilesystem
+        self.procfs = Filesystems().procfs
         self.state, self.fullstatus = self._status()
 
     def _proc_status_parser(self, pid):
-        procfile = glob.glob(join(self.proc_filesystem, str(pid), 'status'))[0]
+        procfile = glob.glob(join(self.procfs, str(pid), 'status'))[0]
         rawdata = UnixFile(procfile).readlines() or []
         data = {}
         for line in rawdata:
@@ -72,7 +72,7 @@ class Service(Services):
                                      process whith pid equal to pidnum
         """
 
-        cmdlines = glob.glob(join(self.proc_filesystem, '*', 'cmdline'))
+        cmdlines = glob.glob(join(self.procfs, '*', 'cmdline'))
         srv_state = 'down'
         srv_full_status = {}
 

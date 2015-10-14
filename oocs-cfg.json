@@ -8,6 +8,7 @@
 			"enable": 1,
 			"verbose": 0,
 			"procfilesystem": "/proc",
+			"sysfilesystem": "/sys",
                         "mandatory": [
 				{
 					"mountpoint": "/dev/shm",
@@ -51,6 +52,15 @@
 		"kernel": {
 			"enable": 1,
 			"verbose": 0,
+			"unloaded-modules": [
+				"cramfs",
+				"freevxfs",
+				"jffs2",
+				"hfs",
+				"hfsplus",
+				"squashfs",
+				"udf"
+			],
 			"parameters": {
 				"kernel.exec-shield": 1,
 				"kernel.randomize_va_space": 2,

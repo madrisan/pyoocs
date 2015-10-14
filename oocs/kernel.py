@@ -31,13 +31,26 @@ class Kernel(object):
                 ':parameters not found in the configuration file',
                 level='warning')
 
-        self.proc_filesystem = Filesystems().procfilesystem
+        # list of kernel modules that must not be loaded
+        self.unloaded_modules = self.cfg.get("unloaded-modules", [])
+
+        self.procfs = Filesystems().procfs
+        self.sysfs = Filesystems().sysfs
 
     def configuration(self): return self.cfg
 
     def version(self):
         release = kernel_release()
         return release
+
+    def loaded_modules(self):
+        # The module name will always show up if the module is loaded as a
+        # dynamic module.  If it is built directly into the kernel, it will
+        # only show up if it has a version or at least one parameter.
+        # The conditions of creation in the built-in case are not by design
+        # and may be removed in the future.
+        modulesdir = UnixFile(join(self.sysfs, 'module'))
+        return sorted(modulesdir.subdirs())
 
     def version_numeric(self):
         release = self.version()
@@ -53,7 +66,7 @@ class Kernel(object):
 
     def check_runtime_parameters(self):
         for kparameter in self.runtime_params:
-            filename = join(self.proc_filesystem, 'sys',
+            filename = join(self.procfs, 'sys',
                             kparameter.replace('.', '/'))
             f = UnixFile(filename)
             if not f.exists:
@@ -69,6 +82,15 @@ class Kernel(object):
             elif self.verbose:
                 message_ok(kparameter + ' = ' + quote(curr_value))
 
+    def check_unloaded_modules(self):
+        loaded_kernel_modules = self.loaded_modules()
+        for mod in self.unloaded_modules:
+            if mod in loaded_kernel_modules:
+                message_alert('The kernel module ' + quote(mod) + ' is loaded',
+                              level="warning")
+            elif self.verbose:
+                message_ok('The kernel module ' + quote(mod) + ' is not loaded')
+
 def check_kernel(verbose=False):
     kernel = Kernel(verbose=verbose)
     if not kernel.enabled:
@@ -81,3 +103,4 @@ def check_kernel(verbose=False):
 
     message('Kernel version: ' + kernel.version())
     kernel.check_runtime_parameters()
+    kernel.check_unloaded_modules()

@@ -56,7 +56,8 @@ class Filesystems(object):
         self.enabled = (self.cfg.get('enable', 1) == 1)
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
 
-        self.procfilesystem = self.cfg.get('procfilesystem', '/proc')
+        self.procfs = self.cfg.get('procfilesystem', '/proc')
+        self.sysfs = self.cfg.get('sysfilesystem', '/sys')
 
         self.mandatory = self.cfg.get('mandatory', {})
         if not self.mandatory:
@@ -70,10 +71,9 @@ class Filesystems(object):
                 ':file-permission not found in the configuration file',
                 level='warning')
 
-        self.proc_mountsfile = join(self.procfilesystem, 'mounts')
+        self.proc_mountsfile = join(self.procfs, 'mounts')
 
     def configuration(self): return self.cfg
-    def procfilesystem(self): return self.procfilesystem
     def cfg_file_permissions(self): return self.file_permission
     def cfg_mandatory_filesystems(self): return self.mandatory
 
