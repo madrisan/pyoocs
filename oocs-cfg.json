@@ -86,6 +86,15 @@
 				"net.ipv6.conf.default.accept_redirects": 0
 			}
 		},
+		"packages": {
+			"enable": 1,
+			"verbose": 0,
+			"package-manager": "rpm",
+			"forbidden": [
+				"telnet",
+				"telnet-server"
+			]
+		},
 		"services": {
 			"enable": 1,
 			"verbose": 1,

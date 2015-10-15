@@ -17,6 +17,7 @@ from oocs.environment import check_environment
 from oocs.filesystem import check_filesystem
 from oocs.kernel import check_kernel
 from oocs.output import die, message
+from oocs.packages import check_packages
 from oocs.services import check_services
 from oocs.sudo import check_sudo
 
@@ -27,6 +28,7 @@ def main():
     check_filesystem()
     check_sudo(verbose=True)
     check_services()
+    check_packages()
 
 if __name__ == '__main__':
     exitcode = 0
