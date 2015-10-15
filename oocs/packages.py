@@ -26,7 +26,7 @@ class Packages(object):
         self.package_manager = self.cfg.get('package-manager')
         self.forbidden = self.cfg.get('forbidden')
         
-    def installed_packages(self):
+    def installed_packages(self, nameonly=False):
         if not self.package_manager == 'rpm':
             return None
         ts = rpm.TransactionSet()
@@ -35,7 +35,11 @@ class Packages(object):
         for hdr in iterator:
             # note: hdr[rpm.RPMTAG_VERSION]
             #       hdr[rpm.RPMTAG_RELEASE]
-            pcks.append(hdr[rpm.RPMTAG_NAME])
+            if nameonly:
+                pcks.append(hdr[rpm.RPMTAG_NAME])
+            else:
+                pcks.append(hdr[rpm.RPMTAG_NAME] + '@' + hdr[rpm.RPMTAG_ARCH])
+
         return pcks
 
 def check_packages(verbose=False):
@@ -53,6 +57,6 @@ def check_packages(verbose=False):
                       ' ... skip', level='warning')
         return
 
-    installed_packages = pck.installed_packages()
+    installed_packages = pck.installed_packages(nameonly=True)
     for pck in list(set(pck.forbidden) & set(installed_packages)):
         message_alert('forbidden package found: ' + quote(pck), level='warning')
