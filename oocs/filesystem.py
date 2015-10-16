@@ -114,7 +114,8 @@ class UnixFile(object):
         self.exists = False
         try:
             self.exists = os.path.exists(self.filename)
-            #self.mode = oct(os.stat(filename)[stat.ST_MODE])
+            # note: os.stat follows symbolic links
+            # we have to use os.lstat instead if we do not want this behaviour
             stat_info = os.stat(self.filename)
             self.mode = oct(stat_info[stat.ST_MODE])
             self.uid = stat_info.st_uid
@@ -271,7 +272,7 @@ def check_file_permissions(file_permission, verbose=False):
                           ' ' + unlist(req_modes, sep=' or '),
                           level='critical')
         elif verbose:
-            message_ok(fp.name())
+            message_ok(fp.name() + '  (' + fp.mode + ')')
 
 def check_mandatory_filesystems(mandatory_filesystems, verbose=False):
     for part in mandatory_filesystems:
@@ -302,7 +303,8 @@ def check_filesystem(verbose=False):
         return
 
     message('Checking for mandatory filesystems', header=True, dots=True)
-    check_mandatory_filesystems(fs.cfg_mandatory_filesystems(), verbose=verbose)
+    check_mandatory_filesystems(fs.cfg_mandatory_filesystems(),
+                                verbose=fs.verbose)
 
     message('Checking for mounted filesystems not in /etc/fstab',
              header=True, dots=True)
@@ -319,7 +321,7 @@ def check_filesystem(verbose=False):
 
     message('Checking the permissions of some system folders and files',
             header=True, dots=True)
-    check_file_permissions(fs.cfg_file_permissions(), verbose=verbose)
+    check_file_permissions(fs.cfg_file_permissions(), verbose=fs.verbose)
 
     message("Checking the mode of the /home subdirs", header=True, dots=True)
     home = UnixFile('/home')
