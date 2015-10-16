@@ -11,6 +11,7 @@ This project is at an early stage of development and only a few modules are curr
 * *environment*: checks the root environment
 * *filesystem*: checks for mandatory filesystems and mount options and for system files permissions
 * *kernel*: check the kernel runtime configuration
+* *packages*: make some checks on installed packages and rpm database
 * *services*: check whether a list of services are running or not
 * *sudo*: checks for root rights given to users and security issues
 
