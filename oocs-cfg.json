@@ -9,7 +9,7 @@
 			"verbose": 0,
 			"procfilesystem": "/proc",
 			"sysfilesystem": "/sys",
-			"mandatory": [
+			"required": [
 				{
 					"mountpoint": "/dev/shm",
 					"opts": "nodev,noexec,nosuid"
@@ -29,7 +29,7 @@
 					"mountpoint": "/var/log"
 				}
 			],
-			"file-permission": {
+			"file-permissions": {
 				"/dev/null"  : ["root", "root", "020666"],
 				"/dev/random": ["root", "root", "020666"],
 				"/"          : ["root", "root", "040755|040555"],
@@ -53,7 +53,7 @@
 		"kernel": {
 			"enable": 1,
 			"verbose": 0,
-			"unloaded-modules": [
+			"forbidden-modules": [
 				"cramfs",
 				"freevxfs",
 				"jffs2",
@@ -62,7 +62,7 @@
 				"squashfs",
 				"udf"
 			],
-			"parameters": {
+			"runtime-parameters": {
 				"kernel.exec-shield": 1,
 				"kernel.randomize_va_space": 2,
 				"net.ipv4.icmp_echo_ignore_broadcasts": 0,
@@ -99,13 +99,13 @@
 		"services": {
 			"enable": 1,
 			"verbose": 1,
-			"must-be-running": [
+			"required": [
 				"/usr/sbin/atd",
 				"/usr/sbin/sshd",
 				"ntpd|/lib/systemd/systemd-timesyncd",
 				"syslogd|/sbin/rsyslogd|/lib/systemd/systemd-journald"
 			],
-			"must-be-stopped": [
+			"forbidden": [
 				"xinetd"
 			]
 		},
@@ -114,7 +114,7 @@
 			"verbose": 1,
 			"conf-mainfile": "/etc/sudoers",
 			"conf-modulesdir": "/etc/sudoers.d",
-			"exclude-users": ["root"]
+			"excluded-users": ["root"]
 		}
 	}
 }

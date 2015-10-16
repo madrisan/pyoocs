@@ -24,8 +24,8 @@ class Services(object):
                           level='warning')
             self.cfg = {}
 
-        self.must_be_running = self.cfg.get("must-be-running", [])
-        self.must_be_stopped = self.cfg.get("must-be-stopped", [])
+        self.required = self.cfg.get("required", [])
+        self.forbidden = self.cfg.get("forbidden", [])
 
         self.enabled = (self.cfg.get('enable', 1) == 1)
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
@@ -146,7 +146,7 @@ def check_services(verbose=False):
 
     #message('runlevel: ' + services.runlevel())
 
-    for srv in services.must_be_running:
+    for srv in services.required:
         service = Service(srv)
         pids = service.pid()
         owners = service.owner()
@@ -159,7 +159,7 @@ def check_services(verbose=False):
             message_alert('the service ' + quote(service.name()) +
                           ' is not running', level='critical')
 
-    for srv in services.must_be_stopped:
+    for srv in services.forbidden:
         service = Service(srv)
         pids = service.pid()
         if pids:

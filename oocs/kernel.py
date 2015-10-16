@@ -25,14 +25,14 @@ class Kernel(object):
         self.enabled = (self.cfg.get('enable', 1) == 1)
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
         
-        self.runtime_params = self.cfg.get("parameters", {})
+        self.runtime_params = self.cfg.get("runtime-parameters", {})
         if not self.runtime_params:
             message_alert(self.module_name +
-                ':parameters not found in the configuration file',
+                ':runtime-parameters not found in the configuration file',
                 level='warning')
 
         # list of kernel modules that must not be loaded
-        self.unloaded_modules = self.cfg.get("unloaded-modules", [])
+        self.forbidden_modules = self.cfg.get("forbidden-modules", [])
 
         self.procfs = Filesystems().procfs
         self.sysfs = Filesystems().sysfs
@@ -82,9 +82,9 @@ class Kernel(object):
             elif self.verbose:
                 message_ok(kparameter + ' = ' + quote(curr_value))
 
-    def check_unloaded_modules(self):
+    def check_forbidden_modules(self):
         loaded_kernel_modules = self.loaded_modules()
-        for mod in self.unloaded_modules:
+        for mod in self.forbidden_modules:
             if mod in loaded_kernel_modules:
                 message_alert('The kernel module ' + quote(mod) + ' is loaded',
                               level="warning")
@@ -103,4 +103,4 @@ def check_kernel(verbose=False):
 
     message('Kernel version: ' + kernel.version())
     kernel.check_runtime_parameters()
-    kernel.check_unloaded_modules()
+    kernel.check_forbidden_modules()

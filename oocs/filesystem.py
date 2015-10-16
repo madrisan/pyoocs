@@ -59,23 +59,21 @@ class Filesystems(object):
         self.procfs = self.cfg.get('procfilesystem', '/proc')
         self.sysfs = self.cfg.get('sysfilesystem', '/sys')
 
-        self.mandatory = self.cfg.get('mandatory', {})
-        if not self.mandatory:
+        self.required_filesystems = self.cfg.get('required', {})
+        if not self.required_filesystems:
             message_alert(self.module_name +
-                ':mandatory not found in the configuration file',
+                ':required not found in the configuration file',
                 level='warning')
 
-        self.file_permission = self.cfg.get('file-permission', {})
-        if not self.file_permission:
+        self.file_permissions = self.cfg.get('file-permissions', {})
+        if not self.file_permissions:
             message_alert(self.module_name +
-                ':file-permission not found in the configuration file',
+                ':file-permissions not found in the configuration file',
                 level='warning')
 
         self.proc_mountsfile = join(self.procfs, 'mounts')
 
     def configuration(self): return self.cfg
-    def cfg_file_permissions(self): return self.file_permission
-    def cfg_mandatory_filesystems(self): return self.mandatory
 
     def dump_proc_mounts(self):
         input = UnixFile(self.proc_mountsfile)
@@ -244,9 +242,9 @@ class UnixCommand(UnixFile):
 
         return (out, err, retcode)
 
-def check_file_permissions(file_permission, verbose=False):
-    for file in sorted(file_permission.keys()):
-        values = file_permission[file]
+def check_file_permissions(file_permissions, verbose=False):
+    for file in sorted(file_permissions.keys()):
+        values = file_permissions[file]
         req_owner = values[0]
         req_group = values[1]
         # multiple different modes are allowed
@@ -274,8 +272,8 @@ def check_file_permissions(file_permission, verbose=False):
         elif verbose:
             message_ok(fp.name() + '  (' + fp.mode + ')')
 
-def check_mandatory_filesystems(mandatory_filesystems, verbose=False):
-    for part in mandatory_filesystems:
+def check_required_filesystems(required_filesystems, verbose=False):
+    for part in required_filesystems:
         mountpoint = part['mountpoint']
         req_opts = part.get('opts', '')
 
@@ -302,9 +300,9 @@ def check_filesystem(verbose=False):
                           ' (disabled in the configuration)', level='note')
         return
 
-    message('Checking for mandatory filesystems', header=True, dots=True)
-    check_mandatory_filesystems(fs.cfg_mandatory_filesystems(),
-                                verbose=fs.verbose)
+    message('Checking for required filesystems', header=True, dots=True)
+    check_required_filesystems(fs.required_filesystems,
+                               verbose=fs.verbose)
 
     message('Checking for mounted filesystems not in /etc/fstab',
              header=True, dots=True)
@@ -321,7 +319,7 @@ def check_filesystem(verbose=False):
 
     message('Checking the permissions of some system folders and files',
             header=True, dots=True)
-    check_file_permissions(fs.cfg_file_permissions(), verbose=fs.verbose)
+    check_file_permissions(fs.file_permissions, verbose=fs.verbose)
 
     message("Checking the mode of the /home subdirs", header=True, dots=True)
     home = UnixFile('/home')
