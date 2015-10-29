@@ -13,6 +13,7 @@ __status__ = "Alpha"
 import socket
 import sys
 
+from oocs.distribution import Distribution
 from oocs.environment import check_environment
 from oocs.filesystem import check_filesystem
 from oocs.kernel import check_kernel
@@ -22,7 +23,10 @@ from oocs.services import check_services
 from oocs.sudo import check_sudo
 
 def main():
+    distro = Distribution()
     message("Host: %s" % socket.getfqdn())
+    message("Linux Distribution: %s" % distro.description)
+
     check_environment()
     check_kernel()
     check_filesystem()
