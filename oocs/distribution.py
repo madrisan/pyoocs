@@ -19,7 +19,7 @@ class Distribution(object):
 
         self.arch = sysarch()
 
-        fp = UnixFile("/etc/os-release")
+        fp = UnixFile('/etc/os-release--')
         if fp.exists:
             # example:
             #  NAME="CentOS Linux"
@@ -35,6 +35,7 @@ class Distribution(object):
             for line in fp.readlines():
                 key = re.findall('^[^=]+', line)[0]
                 value = re.findall('=["]*([^"]*)["]*', line)[0].rstrip()
+
                 if key == 'ID':
                     self.vendor = value
                 elif key == 'VERSION_ID':
@@ -45,67 +46,72 @@ class Distribution(object):
                     self.description = value
             return
 
+        fp = UnixFile('/etc/lsb-release--')
+        if fp.exists:
+            # example:
+            #  DISTRIB_ID=openmamba
+            #  DISTRIB_RELEASE=2.90.0
+            #  DISTRIB_CODENAME=rolling
+            #  DISTRIB_DESCRIPTION="openmamba 2.90.0"
+            #  LSB_VERSION=core-4.1-x86-64:core-4.1-noarch
+            for line in fp.readlines():
+                key = re.findall('^[^=]+', line)[0]
+                value = re.findall('=["]*([^"]*)["]*', line)[0].rstrip()
+
+                if key == 'DISTRIB_ID':
+                    self.vendor = value
+                if key == 'DISTRIB_RELEASE':
+                    self.version = value
+                if key == 'DISTRIB_CODENAME':
+                    self.codename = value
+                if key == 'DISTRIB_DESCRIPTION':
+                    self.product = value
+
+            self.majversion = self.version.split('.')[0]
+            self.patch_release = '.'.join(self.version.split('.')[1:])
+            self.description = self.product + ' (' + self.codename + ')'
+
+            return
+
         # check for some other legacy and per-distribution release files
-        for fname in ["/etc/lsb-release",
-                      "/etc/redhat-release", "/etc/SuSE-release"]:
-            fp = UnixFile(fname)
-            if fp.exists:
-                if fname == "/etc/lsb-release":
-                    # example:
-                    #  DISTRIB_ID=openmamba
-                    #  DISTRIB_RELEASE=2.90.0
-                    #  DISTRIB_CODENAME=rolling
-                    #  DISTRIB_DESCRIPTION="openmamba 2.90.0"
-                    #  LSB_VERSION=core-4.1-x86-64:core-4.1-noarch
-                    self.vendor = fp.grep('DISTRIB_ID').split('=')[1].strip()
-                    self.version = (
-                        fp.grep('DISTRIB_RELEASE').split('=')[1].strip())
-                    self.majversion = self.version.split('.')[0]
-                    self.patch_release = '.'.join(self.version.split('.')[1:])
-                    self.codename = (
-                        fp.grep('DISTRIB_CODENAME').split('=')[1].strip())
-                    self.product = (
-                        fp.grep('DISTRIB_DESCRIPTION')
-                            .split('=')[1].strip().replace('"',''))
-                    self.description = self.product + ' (' + self.codename + ')'
-                elif fname == "/etc/redhat-release":
-                    # examples:
-                    #  Red Hat Enterprise Linux ES release 4 (Nahant Update 8)
-                    #  Red Hat Enterprise Linux Server release 5.10 (Tikanga)
-                    #  Red Hat Enterprise Linux Server release 6.5 (Santiago)
-                    #  CentOS Linux release 7.0.1406 (Core)
-                    self.description = fp.readlines()[0].rstrip('\n')
+        fp = UnixFile('/etc/redhat-release--')
+        if fp.exists:
+            # examples:
+            #  Red Hat Enterprise Linux ES release 4 (Nahant Update 8)
+            #  Red Hat Enterprise Linux Server release 5.10 (Tikanga)
+            #  Red Hat Enterprise Linux Server release 6.5 (Santiago)
+            #  CentOS Linux release 7.0.1406 (Core)
+            self.description = fp.readlines()[0].rstrip('\n')
 
-                    tokens = self.description.split()
-                    pivot = tokens.index('release')
+            tokens = self.description.split()
+            pivot = tokens.index('release')
 
-                    self.vendor = 'Red Hat'
-                    self.version = tokens[pivot+1]
-                    self.codename = ' '.join(tokens[pivot+2:])
-                    self.product = ' '.join(tokens[:pivot])
-                    self.majversion = self.version.split('.')[0]
-                    self.patch_release = '.'.join(self.version.split('.')[1:])
-                elif fname == "/etc/SuSE-release":
-                    # examples:
-                    #  SUSE Linux Enterprise Server 11 (x86_64)
-                    #  VERSION = 11
-                    #  PATCHLEVEL = 3
-                    self.infos = fp.readlines()
-                    self.description = self.infos[0].rstrip('\n')
+            self.vendor = 'Red Hat'
+            self.version = tokens[pivot+1]
+            self.codename = ' '.join(tokens[pivot+2:])
+            self.product = ' '.join(tokens[:pivot])
+            self.majversion = self.version.split('.')[0]
+            self.patch_release = '.'.join(self.version.split('.')[1:])
 
-                    self.vendor = 'SUSE'
-                    self.codename = ''
-                    self.product = ' '.join(self.description.split()[:-2])
-                    self.majversion = fp.grep('VERSION =').split()[2]
-                    self.patch_release = (
-                        fp.grep('PATCHLEVEL =').split()[2] )
-                    self.version = '.'.join(
-                        [self.majversion, self.patch_release])
+            return
 
-                    print "version:  " + self.version
-                    print "codename: " + self.codename
-                    print "product:  " + self.product
-                    print "major:    " + self.majversion
-                    print "patch:    " + self.patch_release
-                else:
-                    die(2, 'this is a bug: ' + __name__ + ': __init__')
+        fp = UnixFile('/etc/SuSE-release')
+        if fp.exists:
+            # examples:
+            #  SUSE Linux Enterprise Server 11 (x86_64)
+            #  VERSION = 11
+            #  PATCHLEVEL = 3
+            for line in fp.readlines():
+                line = line.rstrip('\n')
+                if line.startswith('SUSE'):
+                    self.description = line
+                elif line.startswith('VERSION = '):
+                    self.majversion = line.split()[2]
+                elif line.startswith('PATCHLEVEL = '):
+                    self.patch_release = line.split()[2]
+
+            self.vendor = 'SUSE'
+            self.codename = ''
+            self.product = ' '.join(self.description.split()[:-2])
+            self.version = '.'.join(
+                [self.majversion, self.patch_release])

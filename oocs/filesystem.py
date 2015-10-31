@@ -190,15 +190,6 @@ class UnixFile(object):
             content = []
         return content
 
-    def grep(self, pattern):
-        "Return the first line starting by the given pattern"
-        content = self.readlines()
-        if not content: return None
-        for line in content:
-            if line.startswith(pattern):
-                return line
-        return None
-
     # owned by root and not writable by others
     def owned_by_root(self):
         if not self.mode: return False  # the file does not exist
