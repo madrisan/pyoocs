@@ -2,6 +2,7 @@
 # Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
 
 from platform import machine as sysarch
+import re
 
 from oocs.filesystem import UnixFile
 from oocs.output import die
@@ -18,16 +19,44 @@ class Distribution(object):
 
         self.arch = sysarch()
 
-        for fname in ["/etc/lsb-release", "/etc/os-release",
+        fp = UnixFile("/etc/os-release")
+        if fp.exists:
+            # example:
+            #  NAME="CentOS Linux"
+            #  VERSION="7 (Core)"
+            #  ID="centos"
+            #  ID_LIKE="rhel fedora"
+            #  VERSION_ID="7"
+            #  PRETTY_NAME="CentOS Linux 7 (Core)"
+            #  ANSI_COLOR="0;31"
+            #  CPE_NAME="cpe:/o:centos:centos:7"
+            #  HOME_URL="https://www.centos.org/"
+            #  BUG_REPORT_URL="https://bugs.centos.org/"
+            for line in fp.readlines():
+                key = re.findall('^[^=]+', line)[0]
+                value = re.findall('=["]*([^"]*)["]*', line)[0].rstrip()
+                if key == 'ID':
+                    self.vendor = value
+                elif key == 'VERSION_ID':
+                    self.version = value
+                elif key == 'NAME':
+                    self.product = value
+                elif key == 'PRETTY_NAME':
+                    self.description = value
+            return
+
+        # check for some other legacy and per-distribution release files
+        for fname in ["/etc/lsb-release",
                       "/etc/redhat-release", "/etc/SuSE-release"]:
             fp = UnixFile(fname)
             if fp.exists:
                 if fname == "/etc/lsb-release":
-                    # DISTRIB_ID=openmamba
-                    # DISTRIB_RELEASE=2.90.0
-                    # DISTRIB_CODENAME=rolling
-                    # DISTRIB_DESCRIPTION="openmamba 2.90.0"
-                    # LSB_VERSION=core-4.1-x86-64:core-4.1-noarch
+                    # example:
+                    #  DISTRIB_ID=openmamba
+                    #  DISTRIB_RELEASE=2.90.0
+                    #  DISTRIB_CODENAME=rolling
+                    #  DISTRIB_DESCRIPTION="openmamba 2.90.0"
+                    #  LSB_VERSION=core-4.1-x86-64:core-4.1-noarch
                     self.vendor = fp.grep('DISTRIB_ID').split('=')[1].strip()
                     self.version = (
                         fp.grep('DISTRIB_RELEASE').split('=')[1].strip())
