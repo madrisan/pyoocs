@@ -19,7 +19,7 @@ class Distribution(object):
 
         self.arch = sysarch()
 
-        fp = UnixFile('/etc/os-release--')
+        fp = UnixFile('/etc/os-release')
         if fp.exists:
             # example:
             #  NAME="CentOS Linux"
@@ -46,7 +46,7 @@ class Distribution(object):
                     self.description = value
             return
 
-        fp = UnixFile('/etc/lsb-release--')
+        fp = UnixFile('/etc/lsb-release')
         if fp.exists:
             # example:
             #  DISTRIB_ID=openmamba
@@ -74,7 +74,7 @@ class Distribution(object):
             return
 
         # check for some other legacy and per-distribution release files
-        fp = UnixFile('/etc/redhat-release--')
+        fp = UnixFile('/etc/redhat-release')
         if fp.exists:
             # examples:
             #  Red Hat Enterprise Linux ES release 4 (Nahant Update 8)
