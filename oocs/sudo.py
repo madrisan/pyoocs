@@ -34,7 +34,9 @@ class SudoParser(object):
 
         self.modulesdir = self.cfg.get("conf-modulesdir", None)
         if self.modulesdir and not UnixFile(self.modulesdir).isdir():
-            die(2, 'No such directory: ' + self.modulesdir)
+            message_alert('no such directory: ' + self.modulesdir,
+                          level='warning')
+            self.modulesdir = None
 
         self.modules = []
         try:
