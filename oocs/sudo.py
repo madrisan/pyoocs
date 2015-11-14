@@ -50,6 +50,7 @@ class SudoParser(object):
 
         self.lines = []
         self.tokens = []
+        self.currline = None
 
         self.cmnd_aliases = {}
         self.user_aliases = {}
@@ -155,7 +156,8 @@ class SudoParser(object):
         if optional == False:
             (curr_token, curr_value) = self._token_get()
             raise SyntaxError("Unexpected token " + curr_token +
-                              " while looking for " + rule)
+                              " while looking for " + rule + '\n' +
+                              "Current line: " + self.currline)
         return (None, None)
 
     def _parse_cmnd_list(self):
@@ -216,6 +218,7 @@ class SudoParser(object):
         #self._printcfg()
 
         for line in self.lines:
+            self.currline = line
             self.tokens = self._tokenize(line)
             #stdout.write('DEBUG: LINE: ' + str(line) + '\n')
             #stdout.write('DEBUG:   --> ' + str(self.tokens) + '\n')
