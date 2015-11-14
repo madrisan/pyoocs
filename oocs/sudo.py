@@ -6,6 +6,7 @@
 
 from os import listdir, geteuid
 from os.path import isfile, join
+from sys import stdout
 
 from oocs.config import Config
 from oocs.filesystem import UnixFile, UnixCommand
@@ -81,7 +82,7 @@ class SudoParser(object):
                     stripped_line = line.strip().replace('\n', '')
                     if stripped_line and not stripped_line.startswith("#"):
                         self.lines.append(stripped_line)
-           
+
             self.lines = self._collapse_lines()
         except:
             pass
@@ -206,17 +207,18 @@ class SudoParser(object):
         
     def _printcfg(self):
         """ Print the whole sudo configuration files (for debug only)"""
-        self._read_flies()
-        print('[sudo configuration]')
-        for line in self.lines: print(line)
+        self._read_files()
+        stdout.write('[sudo configuration]\n')
+        for line in self.lines: stdout.write(line + '\n')
 
     def _parse(self):
         self._read_files()
+        #self._printcfg()
 
         for line in self.lines:
             self.tokens = self._tokenize(line)
-            #print "DEBUG: LINE: " + str(line)
-            #print "DEBUG:   --> " + str(self.tokens)
+            #stdout.write('DEBUG: LINE: ' + str(line) + '\n')
+            #stdout.write('DEBUG:   --> ' + str(self.tokens) + '\n')
             (token, value) = self._token_pop()
             if token == "TOK_CMND_ALIAS":
                 aliases = self._token_match("Alias_List")
@@ -343,10 +345,10 @@ def check_sudo(verbose=False):
             message_alert('ignoring user/group ' + quote(usr) +
                           ' (see configuration)', level="note")
 
-    #print("\n[CMND_ALIAS]\n" + str(sudocfg.cmnd_aliases()))
-    #print("\n[USER_ALIAS]\n" + str(sudocfg.user_aliases()))
-    #print("\n[GROUPS]\n"     + str(sudocfg.group_specs()))
-    #print("\n[USERS]\n"      + str(sudocfg.user_specs()) + "\n")
+    #stdout.write("\n[CMND_ALIAS]\n" + str(sudocfg.cmnd_aliases()) + '\n')
+    #stdout.write("\n[USER_ALIAS]\n" + str(sudocfg.user_aliases()) + '\n')
+    #stdout.write("\n[GROUPS]\n"     + str(sudocfg.group_specs()) + '\n')
+    #stdout.write("\n[USERS]\n"      + str(sudocfg.user_specs()) + '\n\n')
 
     for usr in super_users:
         message_alert(quote(usr) + ' can become super user',
