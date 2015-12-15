@@ -175,14 +175,28 @@ class SudoParser(object):
         groups[group] = { "cmnd": cmnd_list, "runas": runas_list }
         return groups
 
-    def _parse_users(self, user):
+    def _parse_users(self, first_user):
         users = {}
+        ids = [ first_user ]
+
+        (token, value) = self._token_pop()
+        # list of users
+        # ex: N2,N3 ALL=(root) NOPASSWD: /bin/su
+        while token == "TOK_COMMA":
+            (token, value) = self._token_pop()
+            ids.append(value)
+            (token, value) = self._token_pop()
+
+        self._token_push(token, value)
+
         (token, value) = self._token_match("TOK_HOST")
         self._token_match("TOK_EQUAL")
         runas_list = self._parse_runas_specs()
         tag_specs  = self._parse_tag_specs()
         cmnd_list  = self._parse_cmnd_list()
-        users[user] = { "cmnd": cmnd_list, "runas": runas_list }
+
+        for user in ids:
+            users[user] = { "cmnd": cmnd_list, "runas": runas_list }
         return users
 
     def _parse_runas_specs(self):
