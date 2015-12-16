@@ -8,6 +8,7 @@ from oocs.filesystem import UnixFile
 from oocs.output import die
 
 class Distribution(object):
+
     def __init__(self):
         self.vendor = None
         self.description = None

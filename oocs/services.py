@@ -11,8 +11,10 @@ from oocs.filesystem import Filesystems, UnixCommand, UnixFile
 from oocs.output import message, message_alert, message_ok, quote, unlist
 
 class Services(object):
+
+    module_name = 'services'
+
     def __init__(self, verbose=False):
-        self.module_name = 'services'
         self.verbose = verbose
 
         try:

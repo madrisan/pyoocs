@@ -9,8 +9,10 @@ from oocs.filesystem import Filesystems, UnixFile
 from oocs.output import message, message_alert, message_ok, quote
 
 class Kernel(object):
+
+    module_name = 'kernel'
+
     def __init__(self, verbose=False):
-        self.module_name = 'kernel'
         self.verbose = verbose
 
         try:

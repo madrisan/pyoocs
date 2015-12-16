@@ -14,8 +14,10 @@ from oocs.output import die, message, message_alert, message_ok, quote
 from oocs.py2x3 import Scanner
 
 class SudoParser(object):
+
+    module_name = 'sudo'
+
     def __init__(self, verbose=False):
-        self.module_name = 'sudo'
         self.verbose = verbose
 
         try:

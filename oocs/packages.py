@@ -7,8 +7,10 @@ from oocs.config import Config
 from oocs.output import message, message_alert, message_ok, quote
 
 class Packages(object):
+
+    module_name = 'packages'
+
     def __init__(self, verbose=False):
-        self.module_name = 'packages'
         self.verbose = verbose
 
         try:

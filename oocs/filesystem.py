@@ -40,8 +40,10 @@ from oocs.py2x3 import isbasestring
 #  S_ISVTX   0001000  sticky bit (see below)
 
 class Filesystems(object):
+
+    module_name = 'filesystem'
+
     def __init__(self, verbose=False):
-        self.module_name = 'filesystem'
         self.verbose = verbose
 
         try:
@@ -80,6 +82,7 @@ class Filesystems(object):
         return input.readlines() or []
 
 class Filesystem(Filesystems):
+
     def __init__(self, mountpoint):
         Filesystems.__init__(self)
         self.mountpoint = mountpoint
@@ -107,6 +110,7 @@ class Filesystem(Filesystems):
         return (opts_match, ', '.join(self.mount_opts))
 
 class UnixFile(object):
+
     def __init__(self, filename, abort_on_error=False):
         self.filename = filename
         self.exists = False
@@ -217,6 +221,7 @@ class UnixFile(object):
             return []
 
 class UnixCommand(UnixFile):
+
     """Derived class for commands: binary [options]"""
     def __init__(self, cmdline):
         UnixFile.__init__(self, cmdline.split()[0])

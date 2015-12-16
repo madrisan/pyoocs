@@ -8,8 +8,10 @@ from oocs.filesystem import UnixFile
 from oocs.output import die, message, message_alert, quote
 
 class Environment(object):
+
+    module_name = 'environment'
+
     def __init__(self, verbose=False):
-        self.module_name = 'environment'
         self.verbose = verbose
 
         try:
