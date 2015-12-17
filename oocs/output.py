@@ -4,7 +4,9 @@
 # Simple output primitives
 
 import sys
+
 import oocs.config
+from oocs.py2x3 import json
 
 TABSTR = '   '
 
@@ -71,6 +73,11 @@ def _output_console(scan, status):
             for entry in scan_block.get('info', []):
                 writeln('(i) ' + entry)
 
+def _output_json(scan, status):
+    "Scan output in json format"
+    for d in [status, scan]:
+        writeln(json.dumps(d, sort_keys=True, indent=4, separators=(',', ': ')))
+
 def output_dump(scan, status):
     try:
         otype = oocs.config.Config().variable('oocs-output')
@@ -79,5 +86,7 @@ def output_dump(scan, status):
 
     if otype == 'console':
         _output_console(scan, status)
+    elif otype == 'json':
+        _output_json(scan, status)
     else:
         die(1, 'unsupported output (see configuration file): ' + quote(otype))
