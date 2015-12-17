@@ -17,7 +17,7 @@ from oocs.distribution import Distribution
 from oocs.environment import check_environment
 from oocs.filesystem import check_filesystem
 from oocs.kernel import check_kernel
-from oocs.output import die, message, output_console
+from oocs.output import die, message, output_dump
 from oocs.packages import check_packages
 from oocs.services import check_services
 from oocs.sudo import check_sudo
@@ -37,7 +37,7 @@ def main():
 
     for test in tests:
         (scan, status) = test()
-        output_console(scan, status)
+        output_dump(scan, status)
 
 if __name__ == '__main__':
     exitcode = 0

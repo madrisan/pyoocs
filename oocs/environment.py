@@ -5,7 +5,7 @@ from os import getenv, geteuid
 
 from oocs.config import Config
 from oocs.filesystem import UnixFile
-from oocs.output import die, message_add, output_console, quote
+from oocs.output import die, message_add, quote
 
 class Environment(object):
 
@@ -21,7 +21,7 @@ class Environment(object):
         self.status = {}
 
         try:
-            self.cfg = Config().read(self.module_name)
+            self.cfg = Config().module(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
             message_add(self.status, 'warning',

@@ -4,6 +4,7 @@
 # Simple output primitives
 
 import sys
+import oocs.config
 
 TABSTR = '   '
 
@@ -49,7 +50,7 @@ def message_ok(message):
 def writeln(line):
     sys.stdout.write(line + '\n')
 
-def output_console(scan, status):
+def _output_console(scan, status):
     "Display on the console the scan and status messages"
     writeln('\n* executing the scan module ' + quote(scan['module']) + ' ...')
 
@@ -69,3 +70,14 @@ def output_console(scan, status):
                 writeln('(w) ' + entry)
             for entry in scan_block.get('info', []):
                 writeln('(i) ' + entry)
+
+def output_dump(scan, status):
+    try:
+        otype = oocs.config.Config().variable('oocs-output')
+    except KeyError:
+        die(quote('oocs-output') + ' unset in the configuration file')
+
+    if otype == 'console':
+        _output_console(scan, status)
+    else:
+        die(1, 'unsupported output (see configuration file): ' + quote(otype))

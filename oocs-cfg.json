@@ -1,4 +1,5 @@
 {
+	"oocs-output": "console",
 	"oocs-module": {
 		"environment": {
 			"enable": 1,

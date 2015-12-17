@@ -27,7 +27,7 @@ class SudoParser(object):
         self.status = {}
 
         try:
-            self.cfg = Config().read(self.module_name)
+            self.cfg = Config().module(self.module_name)
         except KeyError:
             message_add(self.status, 'warning',
                 self.module_name +

@@ -53,7 +53,7 @@ class Filesystems(object):
         self.status = {}
 
         try:
-            self.cfg = Config().read(self.module_name)
+            self.cfg = Config().module(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
             message_add(self.status, 'warning',

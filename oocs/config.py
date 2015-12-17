@@ -12,7 +12,7 @@ class Config(object):
         if not path.isfile(self.configfile):
             die(1, "Configuration file not found: " + self.configfile)
 
-    def read(self, module):
+    def _read(self):
         cfgfile = open(self.configfile, 'r')
         try:
             data = json.load(cfgfile)
@@ -22,5 +22,13 @@ class Config(object):
         except ValueError:
             die(1, 'Invalid json file: ' + self.configfile)
 
+        return data
+
+    def variable(self, var):
+        data = self._read()
+        return data.get(var)
+
+    def module(self, module):
+        data = self._read()
         #return data.get("oocs-module", {}).get(module, {})
-        return data.get("oocs-module", {})[module]
+        return data.get('oocs-module', {})[module]
