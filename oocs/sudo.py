@@ -10,7 +10,7 @@ from sys import stdout
 
 from oocs.config import Config
 from oocs.filesystem import UnixFile, UnixCommand
-from oocs.output import die, message, message_alert, message_ok, quote
+from oocs.output import die, message_add, quote
 from oocs.py2x3 import Scanner
 
 class SudoParser(object):
@@ -20,12 +20,18 @@ class SudoParser(object):
     def __init__(self, verbose=False):
         self.verbose = verbose
 
+        self.scan = {
+            'module' : self.module_name,
+            'checks' : {}
+        }
+        self.status = {}
+
         try:
             self.cfg = Config().read(self.module_name)
         except KeyError:
-            message_alert(self.module_name +
-                          ' directive not found in the configuration file',
-                          level='warning')
+            message_add(self.status, 'warning',
+                self.module_name +
+                 ' directive not found in the configuration file')
             self.cfg = {}
 
         self.enabled = (self.cfg.get('enable', 1) == 1)
@@ -37,8 +43,8 @@ class SudoParser(object):
 
         self.modulesdir = self.cfg.get("conf-modulesdir", None)
         if self.modulesdir and not UnixFile(self.modulesdir).isdir():
-            message_alert('no such directory: ' + self.modulesdir,
-                          level='warning')
+            message_add(self.status, 'warning',
+                'no such directory: ' + self.modulesdir)
             self.modulesdir = None
 
         self.modules = []
@@ -343,26 +349,26 @@ class SudoParser(object):
 
 def check_sudo(verbose=False):
     sudocfg = SudoParser(verbose=verbose)
+    localscan = {}
 
     if not sudocfg.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(sudocfg.module_name) +
-                          ' (disabled in the configuration)', level='note')
+            message_add(sudocfg.status, 'info',
+                'Skipping ' + quote(sudocfg.module_name) +
+                ' (disabled in the configuration)')
         return
 
-    message('Checking the sudo configuration', header=True, dots=True)
-
     if geteuid() != 0:
-        message_alert("This check (" + __name__ + ") must be run as root" +
-                      " ... skip", level='warning')
+        message_add(sudocfg.status, 'warning',
+            'This check (' + __name__ + ') must be run as root' + ' ... skip')
         return
 
     (super_users, cmnd_warning, cmnd_normal) = sudocfg.catch_root_escalation()
 
     if verbose:
         for usr in sudocfg.user_exclude_list:
-            message_alert('ignoring user/group ' + quote(usr) +
-                          ' (see configuration)', level="note")
+            message_add(localscan, 'info',
+                'ignoring user/group ' + quote(usr) + ' (see configuration)')
 
     #stdout.write("\n[CMND_ALIAS]\n" + str(sudocfg.cmnd_aliases()) + '\n')
     #stdout.write("\n[USER_ALIAS]\n" + str(sudocfg.user_aliases()) + '\n')
@@ -370,13 +376,19 @@ def check_sudo(verbose=False):
     #stdout.write("\n[USERS]\n"      + str(sudocfg.user_specs()) + '\n\n')
 
     for usr in super_users:
-        message_alert(quote(usr) + ' can become super user',
-                      level='critical')
+        message_add(localscan, 'critical',
+            quote(usr) + ' can become super user')
 
     for key in sorted(cmnd_warning.keys()):
-        message_alert('to be checked: ' + quote(key) + ' can execute ' +
-                       str(cmnd_warning[key]), level="critical")
+        message_add(localscan, 'critical',
+            'to be checked: ' + quote(key) + ' can execute ' +
+            str(cmnd_warning[key]))
+
     if verbose:
         for key in sorted(cmnd_normal.keys()):
-            message_ok(quote(key) + ' can run ' + str(cmnd_normal[key]))
+            message_add(localscan, 'info',
+                quote(key) + ' can run ' + str(cmnd_normal[key]))
 
+    message_add(sudocfg.scan['checks'], 'sudo configuration', localscan)
+
+    return (sudocfg.scan, sudocfg.status)

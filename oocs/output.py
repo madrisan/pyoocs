@@ -31,6 +31,13 @@ def message(message, **options):
 
     sys.stdout.write(tab*TABSTR + prefix + str(message) + dots + end)
 
+def message_add(d, key, message):
+    "Add the message 'message' to the key 'key' of the dictionary 'd'"
+    if not key in d:
+        d[key] = [message]
+    else:
+        d[key].append(message)
+
 def message_alert(message, **options):
     extra_message = options.get('reason') or ''
     level = options.get('level') or 'warning'
@@ -38,3 +45,27 @@ def message_alert(message, **options):
 
 def message_ok(message):
     print('OK: ' + message)
+
+def writeln(line):
+    sys.stdout.write(line + '\n')
+
+def output_console(scan, status):
+    "Display on the console the scan and status messages"
+    writeln('\n* executing the scan module ' + quote(scan['module']) + ' ...')
+
+    for severity in status:
+        for message in status[severity]:
+            writeln(severity.upper() + ': ' + message)
+
+    for line in scan.get('infos', []): writeln('(i) ' + line)
+
+    checks = scan.get('checks')
+    for check in checks:
+        writeln('[' + check + ']')
+        for scan_block in checks[check]:
+            for entry in scan_block.get('critical', []):
+                writeln('(c) ' + entry)
+            for entry in scan_block.get('warning', []):
+                writeln('(w) ' + entry)
+            for entry in scan_block.get('info', []):
+                writeln('(i) ' + entry)

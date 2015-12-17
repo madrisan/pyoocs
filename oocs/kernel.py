@@ -6,7 +6,7 @@ from os.path import join
 
 from oocs.config import Config
 from oocs.filesystem import Filesystems, UnixFile
-from oocs.output import message, message_alert, message_ok, quote
+from oocs.output import message_add, quote
 
 class Kernel(object):
 
@@ -15,13 +15,19 @@ class Kernel(object):
     def __init__(self, verbose=False):
         self.verbose = verbose
 
+        self.scan = {
+            'module' : self.module_name,
+            'checks' : {}
+        }
+        self.status = {}
+
         try:
             self.cfg = Config().read(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_alert(self.module_name +
-                          ' directive not found in the configuration file',
-                          level='warning')
+            message_add(self.status, 'warning',
+                self.module_name +
+                 ' directive not found in the configuration file')
             self.cfg = {}
 
         self.enabled = (self.cfg.get('enable', 1) == 1)
@@ -29,9 +35,9 @@ class Kernel(object):
         
         self.runtime_params = self.cfg.get("runtime-parameters", {})
         if not self.runtime_params:
-            message_alert(self.module_name +
-                ':runtime-parameters not found in the configuration file',
-                level='warning')
+            message_add(self.status, 'warning',
+                self.module_name +
+                 ':runtime-parameters not found in the configuration file')
 
         # list of kernel modules that must not be loaded
         self.forbidden_modules = self.cfg.get("forbidden-modules", [])
@@ -67,42 +73,54 @@ class Kernel(object):
         return (((maj) << 16) + ((min) << 8) + (patch))
 
     def check_runtime_parameters(self):
+        localscan = {}
         for kparameter in self.runtime_params:
             filename = join(self.procfs, 'sys',
                             kparameter.replace('.', '/'))
             f = UnixFile(filename)
             if not f.exists:
-                message_alert("no such file: " + filename, level="warning")
+                message_add(localscan, 'warning',
+                            'no such file: ' + filename)
                 continue
 
             curr_value = int(f.readfile().rstrip())
             req_value = self.runtime_params.get(kparameter, 'N/A')
             if curr_value != req_value:
-                message_alert(kparameter + " is " + quote(curr_value) +
-                              ", required: " + quote(req_value),
-                              level="warning")
+                message_add(localscan, 'warning',
+                            kparameter + ' is ' + quote(curr_value) +
+                            ', required: ' + quote(req_value))
             elif self.verbose:
-                message_ok(kparameter + ' = ' + quote(curr_value))
+                message_add(localscan, 'info',
+                            kparameter + ' = ' + quote(curr_value))
+
+        message_add(self.scan['checks'], 'kernel runtime parameters', localscan)
 
     def check_forbidden_modules(self):
         loaded_kernel_modules = self.loaded_modules()
+
+        localscan = {}
         for mod in self.forbidden_modules:
             if mod in loaded_kernel_modules:
-                message_alert('The kernel module ' + quote(mod) + ' is loaded',
-                              level="warning")
+                message_add(localscan, 'warning',
+                            'The kernel module ' + quote(mod) + ' is loaded')
             elif self.verbose:
-                message_ok('The kernel module ' + quote(mod) + ' is not loaded')
+                message_add(localscan, 'info',
+                            'The kernel module ' + quote(mod) + ' is not loaded')
+
+        message_add(self.scan['checks'], 'kernel forbidden modules', localscan)
 
 def check_kernel(verbose=False):
     kernel = Kernel(verbose=verbose)
     if not kernel.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(kernel.module_name) +
-                          ' (disabled in the configuration)', level='note')
+            message_add(kernel.status, 'info',
+                        'Skipping ' + quote(kernel.module_name) +
+                        ' (disabled in the configuration)')
         return
 
-    message('Checking kernel runtime parameters', header=True, dots=True)
+    message_add(kernel.scan, 'infos', 'Kernel version: ' + kernel.version())
 
-    message('Kernel version: ' + kernel.version())
     kernel.check_runtime_parameters()
     kernel.check_forbidden_modules()
+
+    return (kernel.scan, kernel.status)

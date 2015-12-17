@@ -5,7 +5,7 @@ from os import getenv, geteuid
 
 from oocs.config import Config
 from oocs.filesystem import UnixFile
-from oocs.output import die, message, message_alert, quote
+from oocs.output import die, message_add, output_console, quote
 
 class Environment(object):
 
@@ -14,13 +14,19 @@ class Environment(object):
     def __init__(self, verbose=False):
         self.verbose = verbose
 
+        self.scan = {
+            'module' : self.module_name,
+            'checks' : {}
+        }
+        self.status = {}
+
         try:
             self.cfg = Config().read(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_alert(self.module_name +
-                          ' directive not found in the configuration file',
-                          level='warning')
+            message_add(self.status, 'warning',
+                self.module_name +
+                 ' directive not found in the configuration file')
             self.cfg = {}
 
         self.enabled = (self.cfg.get('enable', 1) == 1)
@@ -29,71 +35,91 @@ class Environment(object):
     def configuration(self): return self.cfg
 
     def getenv(self, variable): return getenv(variable, '')
+
     def check_ld_library_path(self):
         env_var = 'LD_LIBRARY_PATH'
         env_ld_library_path = self.getenv(env_var)
+        localscan = {}
+
         if self.verbose:
-            message(env_var + ' is ' + quote(env_ld_library_path))
+            message_add(localscan, 'info',
+                        env_var + ' is ' + quote(env_ld_library_path))
         if env_ld_library_path:
-            message_alert(env_var + ' is not empty: (' +
-                          quote(env_ld_library_path), level='warning')
+            message_add(localscan, 'warning',
+                self.module_name +
+                env_var + ' is not empty: (' + quote(env_ld_library_path))
+
+        message_add(self.scan['checks'], 'root environment -- LD_LIBRARY_PATH',
+                    localscan)
 
     def check_path(self):
         env_var = 'PATH'
         env_path = self.getenv(env_var)
+        localscan = {}
+
         if self.verbose:
-            message(env_var + ' is ' + quote(env_path))
-        #env_path = "/usr/bin::./bin:.:/dev/null:/no/such/dir:/var/tmp:"
+            message_add(localscan, 'info', env_var + ' is ' + quote(env_path))
+
+        # 'env_path' for code DEBUG:
+        # env_path = "/usr/bin::./bin:.:/dev/null:/no/such/dir:/var/tmp:"
         if '::' in env_path:
-            message_alert('PATH contains an empty directory (::)',
-                          level='warning')
+            message_add(localscan, 'warning',
+                        'PATH contains an empty directory (::)')
         if env_path[-1] == ':':
-            message_alert('PATH has a trailing :', level='warning')
+            message_add(localscan, 'warning', 'PATH has a trailing :')
+
         for ptok in env_path.split(':'):
             ptok_stripped = ptok.lstrip().rstrip()
             # ignore empty pathes already catched by a previous check
             if not ptok_stripped: continue
 
             if ptok_stripped == '.':
-                message_alert('PATH contains .', level='critical')
+                message_add(localscan, 'critical', 'PATH contains .')
             elif not ptok_stripped.startswith('/'):
-                message_alert('PATH contains a non absolute path: ' +
-                              quote(ptok), level='warning')
+                message_add(localscan, 'warning',
+                    'PATH contains a non absolute path: ' + quote(ptok))
             else:
                 fp = UnixFile(ptok)
                 if not fp.exists:
-                    message_alert('PATH contains ' + quote(ptok) +
-                        ' which does not exist', level='warning')
+                    message_add(localscan, 'warning',
+                        'PATH contains ' + quote(ptok) +
+                        ' which does not exist')
                     continue
                 if not fp.isdir():
-                    message_alert('PATH contains ' + quote(ptok) +
-                        ' which is not a directory', level='critical')
+                    message_add(localscan, 'critical',
+                        'PATH contains ' + quote(ptok) +
+                        ' which is not a directory')
 
                 # FIXME: users can add non root dirs. ex: $HOME/bin
                 if not (fp.check_owner('root') and fp.check_group('root')):
-                    message_alert('PATH contains ' + quote(ptok) +
-                        ' which is not owned by root', level='critical')
+                    message_add(localscan, 'critical',
+                                'PATH contains ' + quote(ptok) +
+                                ' which is not owned by root')
                 match_mode, val_found = (
                     fp.check_mode(['040700','040750','040755']))
                 if not match_mode:
-                    message_alert('PATH contains ' + quote(ptok) +
-                        ' which has wrong (' + val_found + ') permissions',
-                        level='critical')
+                    message_add(localscan, 'critical',
+                        'PATH contains ' + quote(ptok) +
+                        ' which has wrong (' + val_found + ') permissions')
+
+        message_add(self.scan['checks'], 'root environment -- PATH', localscan)
 
 def check_environment(verbose=False):
     environment = Environment(verbose=verbose)
     if not environment.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(environment.module_name) +
-                          ' (disabled in the configuration)', level='note')
+            message_add(environment.status, 'info',
+                        'Skipping ' + quote(environment.module_name) +
+                        ' (disabled in the configuration)')
         return
 
-    message('Checking root environment', header=True, dots=True)
-
     if geteuid() != 0:
-        message_alert("This check (" + __name__ + ") must be run as root" +
-                      " ... skip", level='warning')
+        message_add(environment.status, 'warning',
+                    'This check (' + __name__ + ') must be run as root' +
+                    ' ... skip')
         return
 
     environment.check_path()
     environment.check_ld_library_path()
+
+    return (environment.scan, environment.status)

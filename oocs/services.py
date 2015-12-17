@@ -8,7 +8,7 @@ from pwd import getpwuid
 
 from oocs.config import Config
 from oocs.filesystem import Filesystems, UnixCommand, UnixFile
-from oocs.output import message, message_alert, message_ok, quote, unlist
+from oocs.output import message_add, quote, unlist
 
 class Services(object):
 
@@ -17,13 +17,19 @@ class Services(object):
     def __init__(self, verbose=False):
         self.verbose = verbose
 
+        self.scan = {
+            'module' : self.module_name,
+            'checks' : {}
+        }
+        self.status = {}
+
         try:
            self.cfg = Config().read(self.module_name)
            self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_alert(self.module_name +
-                          ' directive not found in the configuration file',
-                          level='warning')
+            message_add(self.status, 'warning',
+                self.module_name +
+                 ' directive not found in the configuration file')
             self.cfg = {}
 
         self.required = self.cfg.get("required", [])
@@ -138,13 +144,14 @@ class Service(Services):
 
 def check_services(verbose=False):
     services = Services(verbose=verbose)
+    localscan = {}
+
     if not services.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(module_name) +
-                          ' (disabled in the configuration)', level='note')
+            message_add(localscan, 'info',
+                'Skipping ' + quote(module_name) +
+                ' (disabled in the configuration)')
         return
-
-    message('Checking services', header=True, dots=True)
 
     #message('runlevel: ' + services.runlevel())
 
@@ -152,21 +159,29 @@ def check_services(verbose=False):
         service = Service(srv)
         pids = service.pid()
         owners = service.owner()
+
         if pids and services.verbose:
-            message_ok(
+            message_add(localscan, 'info',
                 'the service ' + quote(service.name()) +
                 ' is running (with pid:%s owner:%s)' % (
                 unlist(pids,sep=','), unlist(owners,sep=',')))
         else:
-            message_alert('the service ' + quote(service.name()) +
-                          ' is not running', level='critical')
+            message_add(localscan, 'critical',
+                'the service ' + quote(service.name()) + ' is not running')
 
     for srv in services.forbidden:
         service = Service(srv)
         pids = service.pid()
+
         if pids:
-            message_alert('the service ' + quote(service.name()) +
-                          ' should not be running', level='critical')
+            message_add(localscan, 'critical',
+                'the service ' + quote(service.name()) +
+                ' should not be running')
         elif services.verbose:
-            message_ok('the service ' + quote(service.name()) +
-                       ' is not running as required')
+            message_add(localscan, 'info',
+                'the service ' + quote(service.name()) +
+                ' is not running as required')
+
+    message_add(services.scan['checks'], 'running services', localscan)
+
+    return (services.scan, services.status)

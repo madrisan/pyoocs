@@ -4,7 +4,7 @@
 import rpm
 
 from oocs.config import Config
-from oocs.output import message, message_alert, message_ok, quote
+from oocs.output import message_add, quote
 
 class Packages(object):
 
@@ -13,13 +13,19 @@ class Packages(object):
     def __init__(self, verbose=False):
         self.verbose = verbose
 
+        self.scan = {
+            'module' : self.module_name,
+            'checks' : {}
+        }
+        self.status = {}
+
         try:
             self.cfg = Config().read(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_alert(self.module_name +
-                          ' directive not found in the configuration file',
-                          level='warning')
+            message_add(self.status, 'warning',
+                self.module_name +
+                 ' directive not found in the configuration file')
             self.cfg = {}
 
         self.enabled = (self.cfg.get('enable', 1) == 1)
@@ -31,6 +37,7 @@ class Packages(object):
     def installed_packages(self, nameonly=False):
         if not self.package_manager == 'rpm':
             return None
+
         ts = rpm.TransactionSet()
         iterator = ts.dbMatch()
         pcks = []
@@ -45,20 +52,27 @@ class Packages(object):
         return pcks
 
 def check_packages(verbose=False):
+    localscan = {}
     pck = Packages(verbose=verbose)
+
     if not pck.enabled:
         if verbose:
-            message_alert('Skipping ' + quote(pck.module_name) +
-                          ' (disabled in the configuration)', level='note')
+            message_add(pck.status, 'info',
+                'skipping ' + quote(pck.module_name) +
+                ' (disabled in the configuration)')
         return
-
-    message('Checking software packages', header=True, dots=True)
+ 
     if not pck.package_manager == "rpm":
-        message_alert('unsupported package manager ' +
-                      quote(pck.package_manager) +
-                      ' ... skip', level='warning')
+        message_add(pck.status, 'warning',
+            'unsupported package manager ' + quote(pck.package_manager) +
+            ' ... skip')
         return
 
     installed_packages = pck.installed_packages(nameonly=True)
-    for pck in list(set(pck.forbidden) & set(installed_packages)):
-        message_alert('forbidden package found: ' + quote(pck), level='warning')
+    for pk in list(set(pck.forbidden) & set(installed_packages)):
+        message_add(localscan, 'warning',
+            'forbidden package found: ' + quote(pk))
+
+    message_add(pck.scan['checks'], 'software packages', localscan)
+
+    return (pck.scan, pck.status)

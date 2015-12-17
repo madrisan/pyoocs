@@ -2,7 +2,7 @@
 	"oocs-module": {
 		"environment": {
 			"enable": 1,
-			"verbose": 0
+			"verbose": 1
 		},
 		"filesystem": {
 			"enable": 1,

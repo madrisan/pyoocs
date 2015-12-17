@@ -10,7 +10,7 @@ import subprocess
 from os.path import isdir, join
 
 from oocs.config import Config
-from oocs.output import message, message_alert, message_ok, quote, unlist
+from oocs.output import message_add, quote, unlist
 from oocs.py2x3 import isbasestring
 
 # Octal representation for files modes:
@@ -46,13 +46,19 @@ class Filesystems(object):
     def __init__(self, verbose=False):
         self.verbose = verbose
 
+        self.scan = {
+            'module' : self.module_name,
+            'checks' : {}
+        }
+        self.status = {}
+
         try:
             self.cfg = Config().read(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_alert(self.module_name +
-                          ' directive not found in the configuration file',
-                          level='warning')
+            message_add(self.status, 'warning',
+                self.module_name +
+                 ' directive not found in the configuration file')
             self.cfg = {}
 
         self.enabled = (self.cfg.get('enable', 1) == 1)
@@ -63,15 +69,15 @@ class Filesystems(object):
 
         self.required_filesystems = self.cfg.get('required', {})
         if not self.required_filesystems:
-            message_alert(self.module_name +
-                ':required not found in the configuration file',
-                level='warning')
+            message_add(self.status, 'warning',
+                self.module_name +
+                ':required not found in the configuration file')
 
         self.file_permissions = self.cfg.get('file-permissions', {})
         if not self.file_permissions:
-            message_alert(self.module_name +
-                ':file-permissions not found in the configuration file',
-                level='warning')
+            message_add(self.status, 'warning',
+                self.module_name +
+                ':file-permissions not found in the configuration file')
 
         self.proc_mountsfile = join(self.procfs, 'mounts')
 
@@ -248,6 +254,8 @@ class UnixCommand(UnixFile):
         return (out, err, retcode)
 
 def check_file_permissions(file_permissions, verbose=False):
+    localscan = {}
+
     for file in sorted(file_permissions.keys()):
         values = file_permissions[file]
         req_owner = values[0]
@@ -257,61 +265,53 @@ def check_file_permissions(file_permissions, verbose=False):
 
         fp = UnixFile(file)
         match_mode, val_found = fp.check_mode(req_modes)
+
         if not val_found:
-            message_alert(fp.name(), reason='no such file or directory',
-                          level='warning')
+            message_add(localscan, 'warning',
+                fp.name() + ': no such file or directory')
             continue
+
         try:
             match_perms = (
             fp.check_owner(req_owner) and fp.check_group(req_group))
         except:
-            message_alert(fp.name(), reason='no such user or group ' +
-                          quote(req_owner + ':' + req_group),
-                          level='warning')
+            message_add(localscan, 'warning',
+                fp.name() + ': no such user or group ' +
+                quote(req_owner + ':' + req_group))
             match_perms = False
+
         if not (match_mode and match_perms):
-            message_alert(fp.name(), reason='invalid permissions, ' +
-                          'should be: ' + req_owner + ':' + req_group +
-                          ' ' + unlist(req_modes, sep=' or '),
-                          level='critical')
+            message_add(localscan, 'warning',
+                fp.name() + ': invalid permissions, ' +
+                'should be: ' + req_owner + ':' + req_group +
+                ' ' + unlist(req_modes, sep=' or '))
         elif verbose:
-            message_ok(fp.name() + '  (' + fp.mode + ')')
+            message_add(localscan, 'info',
+                fp.name() + '  (' + fp.mode + ')')
 
-def check_required_filesystems(required_filesystems, verbose=False):
-    for part in required_filesystems:
-        mountpoint = part['mountpoint']
-        req_opts = part.get('opts', '')
+        return localscan
 
-        fs = Filesystem(mountpoint)
-        if not fs.is_mounted:
-            message_alert(mountpoint + ": no such filesystem",
-                          level="critical")
-            continue
+def check_mode_of_home_subdirs(verbose=False):
+    localscan = {}
+    home = UnixFile('/home')
 
-        (match, opts) = fs.check_mount_opts(req_opts)
-        if not match and req_opts:
-            message_alert(mountpoint + ": mount options " +
-                          quote(opts) + ", required: " + quote(req_opts))
-        elif not opts:
-            message_alert(mountpoint + ": no such filesystem")
+    for subdir in home.subdirs():
+        sdname = join('/home', subdir)
+        fp = UnixFile(sdname)
+        req_mode = '040700'
+        match_mode, val_found = fp.check_mode(req_mode)
+        if not match_mode:
+            message_add(localscan, 'critical',
+                fp.name() + ': ' + val_found + ' instead of ' + req_mode)
         elif verbose:
-            message_ok(mountpoint + ' (' + opts + ')')
+            message_add(localscan, 'info', fp.name())
 
-def check_filesystem(verbose=False):
-    fs = Filesystems(verbose=verbose)
-    if not fs.enabled:
-        if verbose:
-            message_alert('Skipping ' + quote(fs.module_name) +
-                          ' (disabled in the configuration)', level='note')
-        return
+    return localscan
 
-    message('Checking for required filesystems', header=True, dots=True)
-    check_required_filesystems(fs.required_filesystems,
-                               verbose=fs.verbose)
-
-    message('Checking for mounted filesystems not in /etc/fstab',
-             header=True, dots=True)
+def check_mounted_filesystems_not_in_fstab(verbose=False):
+    localscan = {}
     fstab = UnixFile('/etc/fstab').readlines()
+
     for line in fstab:
         if line.startswith('#'): continue
         cols = line.split()
@@ -320,36 +320,80 @@ def check_filesystem(verbose=False):
         if fstype == 'swap': continue
         checkfs = Filesystem(mountpoint)
         if not checkfs.is_mounted:
-            message_alert('No such mount point in /etc/fstab: '+ mountpoint)
+            message_add(localscan, 'critical',
+                'No such mount point in /etc/fstab: ' + mountpoint)
 
-    message('Checking the permissions of some system folders and files',
-            header=True, dots=True)
-    check_file_permissions(fs.file_permissions, verbose=fs.verbose)
+    return localscan
 
-    message("Checking the mode of the /home subdirs", header=True, dots=True)
-    home = UnixFile('/home')
-    for subdir in home.subdirs():
-        sdname = join('/home', subdir)
-        fp = UnixFile(sdname)
-        req_mode = '040700'
-        match_mode, val_found = fp.check_mode(req_mode)
-        if not match_mode:
-            message_alert(fp.name(),
-                          reason=val_found + ' instead of ' + req_mode,
-                          level='warning')
-        elif verbose:
-            message_ok(fp.name())
-
-    message('Checking for file permissions in /etc/profile.d',
-            header=True, dots=True)
+def check_profiled_permissions(verbose=False):
+    localscan = {}
     dp = UnixFile('/etc/profile.d')
+
     for file in dp.filelist():
         fname = join(dp.name(), file)
         fp = UnixFile(fname)
         match_mode, val_found = fp.check_mode(["100755", "100644"])
         match_perms = fp.check_owner('root') and fp.check_group('root')
         if not (match_mode and match_perms):
-            message_alert(fp.name(),
-                reason = quote(fp.owner() + '.' + fp.group()) +
-                ' instead of ' + quote('root.root'), level='critical')
+            message_add(localscan, 'critical',
+                fp.name() + ': ' + quote(fp.owner() + '.' + fp.group()) +
+                ' instead of ' + quote('root.root'))
 
+    return localscan
+
+def check_required_filesystems(required_filesystems, verbose=False):
+    localscan = {}
+
+    for part in required_filesystems:
+        mountpoint = part['mountpoint']
+        req_opts = part.get('opts', '')
+
+        fs = Filesystem(mountpoint)
+        if not fs.is_mounted:
+            message_add(localscan, 'critical',
+                mountpoint + ': no such filesystem')
+            continue
+
+        (match, opts) = fs.check_mount_opts(req_opts)
+        if not match and req_opts:
+            message_add(localscan, 'warning',
+                mountpoint + ": mount options " +
+                quote(opts) + ", required: " + quote(req_opts))
+        elif not opts:
+            message_add(localscan, 'warning',
+                mountpoint + ": no such filesystem")
+        elif verbose:
+            message_add(localscan, 'info', mountpoint + ' (' + opts + ')')
+
+        return localscan
+
+def check_filesystem(verbose=False):
+    fs = Filesystems(verbose=verbose)
+    if not fs.enabled:
+        if verbose:
+            message_add(self.status, 'info',
+                'Skipping ' + quote(fs.module_name) +
+                ' (disabled in the configuration)')
+        return
+
+    scan_result = \
+        check_required_filesystems(fs.required_filesystems, verbose=fs.verbose)
+    message_add(fs.scan['checks'], 'required filesystems', scan_result)
+
+    scan_result = check_mounted_filesystems_not_in_fstab(verbose=fs.verbose)
+    message_add(fs.scan['checks'], 'mounted filesystems not in /etc/fstab',
+        scan_result)
+
+    scan_result = \
+        check_file_permissions(fs.file_permissions, verbose=fs.verbose)
+    message_add(fs.scan['checks'], 
+        'permissions of some system folders and files', scan_result)
+
+    scan_result = check_mode_of_home_subdirs(verbose=fs.verbose)
+    message_add(fs.scan['checks'], 'mode of the /home subdirs', scan_result)
+
+    scan_result = check_profiled_permissions(verbose=fs.verbose)
+    message_add(fs.scan['checks'], 'file permissions in /etc/profile.d',
+        scan_result)
+
+    return (fs.scan, fs.status)
