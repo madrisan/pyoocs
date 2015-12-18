@@ -48,15 +48,15 @@ class Filesystems(object):
 
         self.scan = {
             'module' : self.module_name,
-            'checks' : {}
+            'checks' : {},
+            'status' : {}
         }
-        self.status = {}
 
         try:
             self.cfg = Config().module(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_add(self.status, 'warning',
+            message_add(self.scan['status'], 'warning',
                 self.module_name +
                  ' directive not found in the configuration file')
             self.cfg = {}
@@ -69,13 +69,13 @@ class Filesystems(object):
 
         self.required_filesystems = self.cfg.get('required', {})
         if not self.required_filesystems:
-            message_add(self.status, 'warning',
+            message_add(self.scan['status'], 'warning',
                 self.module_name +
                 ':required not found in the configuration file')
 
         self.file_permissions = self.cfg.get('file-permissions', {})
         if not self.file_permissions:
-            message_add(self.status, 'warning',
+            message_add(self.scan['status'], 'warning',
                 self.module_name +
                 ':file-permissions not found in the configuration file')
 
@@ -371,7 +371,7 @@ def check_filesystem(verbose=False):
     fs = Filesystems(verbose=verbose)
     if not fs.enabled:
         if verbose:
-            message_add(self.status, 'info',
+            message_add(fs.scan['status'], 'info',
                 'Skipping ' + quote(fs.module_name) +
                 ' (disabled in the configuration)')
         return
@@ -396,4 +396,4 @@ def check_filesystem(verbose=False):
     message_add(fs.scan['checks'], 'file permissions in /etc/profile.d',
         scan_result)
 
-    return (fs.scan, fs.status)
+    return fs.scan

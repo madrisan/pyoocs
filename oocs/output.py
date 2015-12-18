@@ -52,17 +52,17 @@ def message_ok(message):
 def writeln(line):
     sys.stdout.write(line + '\n')
 
-def _output_console(scan, status):
+def _output_console(scan):
     "Display on the console the scan and status messages"
     writeln('\n* executing the scan module ' + quote(scan['module']) + ' ...')
 
-    for severity in status:
-        for message in status[severity]:
+    for severity in scan.get('status', []):
+        for message in scan['status'].get(severity, []):
             writeln(severity.upper() + ': ' + message)
 
     for line in scan.get('infos', []): writeln('(i) ' + line)
 
-    checks = scan.get('checks')
+    checks = scan['checks']
     for check in checks:
         writeln('[' + check + ']')
         for scan_block in checks[check]:
@@ -73,20 +73,19 @@ def _output_console(scan, status):
             for entry in scan_block.get('info', []):
                 writeln('(i) ' + entry)
 
-def _output_json(scan, status):
+def _output_json(scan):
     "Scan output in json format"
-    for d in [status, scan]:
-        writeln(json.dumps(d, sort_keys=True, indent=4, separators=(',', ': ')))
+    writeln(json.dumps(scan, sort_keys=True, indent=4, separators=(',', ': ')))
 
-def output_dump(scan, status):
+def output_dump(scan):
     try:
         otype = oocs.config.Config().variable('oocs-output')
     except KeyError:
         die(quote('oocs-output') + ' unset in the configuration file')
 
     if otype == 'console':
-        _output_console(scan, status)
+        _output_console(scan)
     elif otype == 'json':
-        _output_json(scan, status)
+        _output_json(scan)
     else:
         die(1, 'unsupported output (see configuration file): ' + quote(otype))

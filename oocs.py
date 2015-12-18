@@ -36,8 +36,8 @@ def main():
               check_packages ]
 
     for test in tests:
-        (scan, status) = test()
-        output_dump(scan, status)
+        scan_result = test()
+        output_dump(scan_result)
 
 if __name__ == '__main__':
     exitcode = 0

@@ -19,15 +19,15 @@ class Services(object):
 
         self.scan = {
             'module' : self.module_name,
-            'checks' : {}
+            'checks' : {},
+            'status' : {}
         }
-        self.status = {}
 
         try:
            self.cfg = Config().module(self.module_name)
            self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_add(self.status, 'warning',
+            message_add(self.scan['status'], 'warning',
                 self.module_name +
                  ' directive not found in the configuration file')
             self.cfg = {}
@@ -184,4 +184,4 @@ def check_services(verbose=False):
 
     message_add(services.scan['checks'], 'running services', localscan)
 
-    return (services.scan, services.status)
+    return services.scan

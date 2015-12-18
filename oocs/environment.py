@@ -16,15 +16,15 @@ class Environment(object):
 
         self.scan = {
             'module' : self.module_name,
-            'checks' : {}
+            'checks' : {},
+            'status' : {}
         }
-        self.status = {}
 
         try:
             self.cfg = Config().module(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_add(self.status, 'warning',
+            message_add(self.scan['status'], 'warning',
                 self.module_name +
                  ' directive not found in the configuration file')
             self.cfg = {}
@@ -108,13 +108,13 @@ def check_environment(verbose=False):
     environment = Environment(verbose=verbose)
     if not environment.enabled:
         if verbose:
-            message_add(environment.status, 'info',
+            message_add(environment.scan['status'], 'info',
                         'Skipping ' + quote(environment.module_name) +
                         ' (disabled in the configuration)')
         return
 
     if geteuid() != 0:
-        message_add(environment.status, 'warning',
+        message_add(environment.scan['status'], 'warning',
                     'This check (' + __name__ + ') must be run as root' +
                     ' ... skip')
         return
@@ -122,4 +122,4 @@ def check_environment(verbose=False):
     environment.check_path()
     environment.check_ld_library_path()
 
-    return (environment.scan, environment.status)
+    return environment.scan

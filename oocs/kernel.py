@@ -17,15 +17,15 @@ class Kernel(object):
 
         self.scan = {
             'module' : self.module_name,
-            'checks' : {}
+            'checks' : {},
+            'status' : {}
         }
-        self.status = {}
 
         try:
             self.cfg = Config().module(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_add(self.status, 'warning',
+            message_add(self.scan['status'], 'warning',
                 self.module_name +
                  ' directive not found in the configuration file')
             self.cfg = {}
@@ -35,7 +35,7 @@ class Kernel(object):
         
         self.runtime_params = self.cfg.get("runtime-parameters", {})
         if not self.runtime_params:
-            message_add(self.status, 'warning',
+            message_add(self.scan['status'], 'warning',
                 self.module_name +
                  ':runtime-parameters not found in the configuration file')
 
@@ -113,7 +113,7 @@ def check_kernel(verbose=False):
     kernel = Kernel(verbose=verbose)
     if not kernel.enabled:
         if verbose:
-            message_add(kernel.status, 'info',
+            message_add(kernel.scan['status'], 'info',
                         'Skipping ' + quote(kernel.module_name) +
                         ' (disabled in the configuration)')
         return
@@ -123,4 +123,4 @@ def check_kernel(verbose=False):
     kernel.check_runtime_parameters()
     kernel.check_forbidden_modules()
 
-    return (kernel.scan, kernel.status)
+    return kernel.scan

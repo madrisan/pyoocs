@@ -15,15 +15,15 @@ class Packages(object):
 
         self.scan = {
             'module' : self.module_name,
-            'checks' : {}
+            'checks' : {},
+            'status' : {}
         }
-        self.status = {}
 
         try:
             self.cfg = Config().module(self.module_name)
             self.enabled = (self.cfg.get('enable', 1) == 1)
         except KeyError:
-            message_add(self.status, 'warning',
+            message_add(self.scan['status'], 'warning',
                 self.module_name +
                  ' directive not found in the configuration file')
             self.cfg = {}
@@ -57,13 +57,13 @@ def check_packages(verbose=False):
 
     if not pck.enabled:
         if verbose:
-            message_add(pck.status, 'info',
+            message_add(pck.scan['status'], 'info',
                 'skipping ' + quote(pck.module_name) +
                 ' (disabled in the configuration)')
         return
  
     if not pck.package_manager == "rpm":
-        message_add(pck.status, 'warning',
+        message_add(pck.scan['status'], 'warning',
             'unsupported package manager ' + quote(pck.package_manager) +
             ' ... skip')
         return
@@ -75,4 +75,4 @@ def check_packages(verbose=False):
 
     message_add(pck.scan['checks'], 'software packages', localscan)
 
-    return (pck.scan, pck.status)
+    return pck.scan

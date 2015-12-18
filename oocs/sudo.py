@@ -22,14 +22,14 @@ class SudoParser(object):
 
         self.scan = {
             'module' : self.module_name,
-            'checks' : {}
+            'checks' : {},
+            'status' : {}
         }
-        self.status = {}
 
         try:
             self.cfg = Config().module(self.module_name)
         except KeyError:
-            message_add(self.status, 'warning',
+            message_add(self.scan['status'], 'warning',
                 self.module_name +
                  ' directive not found in the configuration file')
             self.cfg = {}
@@ -43,7 +43,7 @@ class SudoParser(object):
 
         self.modulesdir = self.cfg.get("conf-modulesdir", None)
         if self.modulesdir and not UnixFile(self.modulesdir).isdir():
-            message_add(self.status, 'warning',
+            message_add(self.scan['status'], 'warning',
                 'no such directory: ' + self.modulesdir)
             self.modulesdir = None
 
@@ -353,13 +353,13 @@ def check_sudo(verbose=False):
 
     if not sudocfg.enabled:
         if verbose:
-            message_add(sudocfg.status, 'info',
+            message_add(sudocfg.scan['status'], 'info',
                 'Skipping ' + quote(sudocfg.module_name) +
                 ' (disabled in the configuration)')
         return
 
     if geteuid() != 0:
-        message_add(sudocfg.status, 'warning',
+        message_add(sudocfg.scan['status'], 'warning',
             'This check (' + __name__ + ') must be run as root' + ' ... skip')
         return
 
@@ -391,4 +391,4 @@ def check_sudo(verbose=False):
 
     message_add(sudocfg.scan['checks'], 'sudo configuration', localscan)
 
-    return (sudocfg.scan, sudocfg.status)
+    return sudocfg.scan
