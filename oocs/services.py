@@ -153,8 +153,6 @@ def check_services(verbose=False):
                 ' (disabled in the configuration)')
         return
 
-    #message('runlevel: ' + services.runlevel())
-
     for srv in services.required:
         service = Service(srv)
         pids = service.pid()

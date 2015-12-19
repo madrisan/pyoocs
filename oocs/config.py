@@ -3,7 +3,7 @@
 
 from os import path
 
-from oocs.output import die, message
+from oocs.output import die
 from oocs.py2x3 import json
 
 class Config(object):

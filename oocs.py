@@ -17,7 +17,7 @@ from oocs.distribution import Distribution
 from oocs.environment import check_environment
 from oocs.filesystem import check_filesystem
 from oocs.kernel import check_kernel
-from oocs.output import die, message, output_dump
+from oocs.output import die, output_dump, writeln
 from oocs.packages import check_packages
 from oocs.services import check_services
 from oocs.sudo import check_sudo
@@ -25,8 +25,8 @@ from oocs.sudo import check_sudo
 def main():
     distro = Distribution()
 
-    message("Host: %s" % socket.getfqdn())
-    message("Linux Distribution: %s" % distro.description)
+    writeln("Host: %s" % socket.getfqdn())
+    writeln("Linux Distribution: %s" % distro.description)
 
     tests = [ check_environment,
               check_kernel,
