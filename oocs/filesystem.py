@@ -9,8 +9,7 @@ import shlex
 import subprocess
 from os.path import isdir, join
 
-from oocs.config import Config
-from oocs.output import message_add, quote, unlist
+from oocs.io import Config, message_add, quote, unlist
 from oocs.py2x3 import isbasestring
 
 # Octal representation for files modes:

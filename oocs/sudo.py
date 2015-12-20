@@ -8,9 +8,8 @@ from os import listdir, geteuid
 from os.path import isfile, join
 from sys import stdout
 
-from oocs.config import Config
 from oocs.filesystem import UnixFile, UnixCommand
-from oocs.output import die, message_add, quote
+from oocs.io import Config, die, message_add, quote
 from oocs.py2x3 import Scanner
 
 class SudoParser(object):

@@ -6,9 +6,8 @@ from os import sep
 from os.path import join
 from pwd import getpwuid
 
-from oocs.config import Config
 from oocs.filesystem import Filesystems, UnixCommand, UnixFile
-from oocs.output import message_add, quote, unlist
+from oocs.io import Config, message_add, quote, unlist
 
 class Services(object):
 

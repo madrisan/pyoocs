@@ -5,7 +5,7 @@ from platform import machine as sysarch
 import re
 
 from oocs.filesystem import UnixFile
-from oocs.output import die
+from oocs.io import die
 
 class Distribution(object):
 

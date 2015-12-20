@@ -10,24 +10,17 @@ __version__ = "0"
 __email__ = "davide.madrisan.gmail.com"
 __status__ = "Alpha"
 
-import socket
 import sys
 
-from oocs.distribution import Distribution
 from oocs.environment import check_environment
 from oocs.filesystem import check_filesystem
+from oocs.io import die, output_dump
 from oocs.kernel import check_kernel
-from oocs.output import die, output_dump, writeln
 from oocs.packages import check_packages
 from oocs.services import check_services
 from oocs.sudo import check_sudo
 
 def main():
-    distro = Distribution()
-
-    writeln("Host: %s" % socket.getfqdn())
-    writeln("Linux Distribution: %s" % distro.description)
-
     tests = [ check_environment,
               check_kernel,
               check_filesystem,
@@ -35,9 +28,10 @@ def main():
               check_services,
               check_packages ]
 
+    scan_result = []
     for test in tests:
-        scan_result = test()
-        output_dump(scan_result)
+        scan_result.append(test())
+    output_dump(scan_result)
 
 if __name__ == '__main__':
     exitcode = 0

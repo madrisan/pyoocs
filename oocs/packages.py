@@ -3,8 +3,7 @@
 
 import rpm
 
-from oocs.config import Config
-from oocs.output import message_add, quote
+from oocs.io import Config, message_add, quote
 
 class Packages(object):
 

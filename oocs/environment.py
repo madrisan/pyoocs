@@ -3,9 +3,8 @@
 
 from os import getenv, geteuid
 
-from oocs.config import Config
 from oocs.filesystem import UnixFile
-from oocs.output import die, message_add, quote
+from oocs.io import Config, die, message_add, quote
 
 class Environment(object):
 

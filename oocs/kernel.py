@@ -4,9 +4,8 @@
 from platform import release as kernel_release
 from os.path import join
 
-from oocs.config import Config
 from oocs.filesystem import Filesystems, UnixFile
-from oocs.output import message_add, quote
+from oocs.io import Config, message_add, quote
 
 class Kernel(object):
 
