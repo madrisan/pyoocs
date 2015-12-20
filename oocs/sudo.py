@@ -118,7 +118,8 @@ class SudoParser(object):
             (r"[A-Za-z_/]+[A-Za-z_0-9/\-\[\]*. ]*",
                              lambda scanner,token:("TOK_COMMAND", token)),
             (r"#[0-9]+",     lambda scanner,token:("TOK_UID", token)),
-            (r"%[A-Za-z]+",  lambda scanner,token:("TOK_GROUP", token)),
+            (r"%[A-Za-z]+[A-Za-z0-9]*",
+                             lambda scanner,token:("TOK_GROUP", token)),
             (r"%#[0-9]+",    lambda scanner,token:("TOK_GID", token)),
              # NOTE: we ignore +netgroup, %:nonunix_group, %:#nonunix_gid
              #       see sudoers manpage
