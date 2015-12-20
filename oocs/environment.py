@@ -48,7 +48,7 @@ class Environment(object):
                 self.module_name +
                 env_var + ' is not empty: (' + quote(env_ld_library_path))
 
-        message_add(self.scan['checks'], 'root environment -- LD_LIBRARY_PATH',
+        message_add(self.scan['checks'], 'root LD_LIBRARY_PATH',
                     localscan)
 
     def check_path(self):
@@ -101,7 +101,7 @@ class Environment(object):
                         'PATH contains ' + quote(ptok) +
                         ' which has wrong (' + val_found + ') permissions')
 
-        message_add(self.scan['checks'], 'root environment -- PATH', localscan)
+        message_add(self.scan['checks'], 'root PATH', localscan)
 
 def check_environment(verbose=False):
     environment = Environment(verbose=verbose)

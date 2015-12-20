@@ -94,7 +94,20 @@ def _output_console(scan_result):
 
 def _output_json(scan_result):
     "Scan output in json format"
-    writeln(json.dumps(scan, sort_keys=True, indent=4, separators=(',', ': ')))
+    hostname = socket.getfqdn()
+    json_merge = { 'host' : hostname }
+
+    for scan in scan_result:
+        module_name = scan.pop('module', None)
+        checks = scan.pop('checks', None)
+        status = scan.pop('status', None)
+
+        json_merge[module_name] = dict()
+        json_merge[module_name]['checks'] = checks
+        json_merge[module_name]['status'] = status
+
+    writeln(json.dumps(json_merge,
+                       sort_keys=True, indent=2, separators=(',', ': ')))
 
 def output_dump(scan):
     cfg = Config()
