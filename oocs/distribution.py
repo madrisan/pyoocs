@@ -10,18 +10,28 @@ from oocs.io import die
 class Distribution(object):
 
     def __init__(self):
-        self.vendor = None
-        self.description = None
-        self.version = None
-        self.codename = None
-        self.product = None
-        self.majversion = None
-        self.patch_release = None
+        self.vendor = ''
+        self.description = ''
+        self.version = ''
+        self.codename = ''
+        self.product = ''
+        self.majversion = ''
+        self.patch_release = ''
 
         self.arch = sysarch()
 
-        fp = UnixFile('/etc/os-release')
-        if fp.exists:
+        fp1 = UnixFile('/etc/os-release')
+        fp2 = UnixFile('/usr/lib/os-release')
+        # according to freedesktop man page:
+        #  The file /etc/os-release takes precedence over /usr/lib/os-release.
+        #  Applications should check for the former, and exclusively use its
+        #  data if it exists, and only fall back to /usr/lib/os-release if it
+        #  is missing.
+        if fp1.exists: fp = fp1
+        elif fp2.exists: fp = fp2
+        else: fp = None
+
+        if fp:
             # example:
             #  NAME="CentOS Linux"
             #  VERSION="7 (Core)"
@@ -36,7 +46,6 @@ class Distribution(object):
             for line in fp.readlines():
                 key = re.findall('^[^=]+', line)[0]
                 value = re.findall('=["]*([^"]*)["]*', line)[0].rstrip()
-
                 if key == 'ID':
                     self.vendor = value
                 elif key == 'VERSION_ID':
