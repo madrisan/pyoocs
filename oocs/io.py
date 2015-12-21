@@ -34,10 +34,7 @@ class Config(object):
 
 # Simple output primitives
 
-import socket
 import sys
-
-#import oocs.distribution
 
 def colonize(message):
     #return ": %s" % message if message else ''
@@ -55,6 +52,9 @@ def quote(message):
 def unlist(list, sep=', '):
     return sep.join(map(str, list))
 
+def writeln(line):
+    sys.stdout.write(line + '\n')
+
 def message_add(d, key, message):
     "Add the message 'message' to the key 'key' of the dictionary 'd'"
     if not key in d:
@@ -62,13 +62,9 @@ def message_add(d, key, message):
     else:
         d[key].append(message)
 
-def writeln(line):
-    sys.stdout.write(line + '\n')
+import socket
 
 def _output_console(scan_result):
-    #distro = Distribution()
-    #writeln("Linux Distribution: %s" % distro.description)
-
     hostname = socket.getfqdn()
 
     for scan in scan_result:
@@ -92,10 +88,25 @@ def _output_console(scan_result):
                 for entry in scan_block.get('info', []):
                     writeln('(i) ' + entry)
 
+
 def _output_json(scan_result):
     "Scan output in json format"
+
+    from oocs.distribution import Distribution
+    distro = Distribution()
+
     hostname = socket.getfqdn()
-    json_merge = { 'host' : hostname }
+    json_merge = {
+        'host' : hostname,
+        'distribution' : {
+            'codename' : distro.codename,
+            'description' : distro.description,
+            'majversion' : distro.majversion,
+            'patch_release' : distro.patch_release,
+            'vendor' :  distro.vendor,
+            'version' : distro.version
+        }
+    }
 
     for scan in scan_result:
         module_name = scan.pop('module', None)
