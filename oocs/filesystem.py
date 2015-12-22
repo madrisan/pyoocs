@@ -2,6 +2,7 @@
 # Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
 
 import os
+import re
 import stat
 import grp
 import pwd
@@ -252,6 +253,42 @@ class UnixCommand(UnixFile):
 
         return (out, err, retcode)
 
+def _check_files_attr(rootdir, owner, group, modes, importance, verbose=False):
+    localscan = {}
+    dp = UnixFile(rootdir)
+
+    for file in dp.filelist():
+        fname = join(dp.name(), file)
+        fp = UnixFile(fname)
+        match_mode, val_found = fp.check_mode(modes)
+        match_perms = fp.check_owner(owner) and fp.check_group(group)
+        if not (match_mode and match_perms):
+            message_add(localscan, importance,
+                fp.name() + ': ' + quote(fp.owner() + '.' + fp.group()) +
+                ' instead of ' + quote('root.root'))
+        elif verbose:
+            message_add(localscan, 'info',
+                fp.name() + ' (' + owner + ':' + group + ')')
+
+    return localscan
+
+def _check_subdirs_modes(rootdir, modes, importance, verbose=False):
+    localscan = {}
+    rootdirp = UnixFile(rootdir)
+
+    for subdir in rootdirp.subdirs():
+        sdname = join(rootdir, subdir)
+        fp = UnixFile(sdname)
+        match_mode, val_found = fp.check_mode(modes)
+        if not match_mode:
+            message_add(localscan, importance,
+                fp.name() + ': ' + val_found + ' instead of ' + unlist(modes))
+        elif verbose:
+            message_add(localscan, 'info',
+                        fp.name() + ' (' + val_found + ')')
+
+    return localscan
+
 def check_file_permissions(file_permissions, verbose=False):
     localscan = {}
 
@@ -262,12 +299,30 @@ def check_file_permissions(file_permissions, verbose=False):
         # multiple different modes are allowed
         req_modes = values[2].split('|')
 
+        special = re.search('^(files|subdirs)-in:(.*)', file)
+        if special:
+            if special.group(1) == 'files':
+                rootdir = special.group(2)
+                special_scan = _check_files_attr(rootdir,
+                                   req_owner, req_group, req_modes,
+                                   'critical', verbose)
+            elif special.group(1) == 'subdirs':
+                rootdir = special.group(2)
+                special_scan = _check_subdirs_modes(rootdir, req_modes,
+                                   'critical', verbose)
+
+            for key in special_scan.keys():
+                for message in special_scan[key]:
+                    message_add(localscan, key, message)
+            continue
+
         fp = UnixFile(file)
         match_mode, val_found = fp.check_mode(req_modes)
 
         if not val_found:
             message_add(localscan, 'warning',
                 fp.name() + ': no such file or directory')
+
             continue
 
         try:
@@ -288,23 +343,6 @@ def check_file_permissions(file_permissions, verbose=False):
             message_add(localscan, 'info',
                 fp.name() + '  (' + fp.mode + ')')
 
-        return localscan
-
-def check_mode_of_home_subdirs(verbose=False):
-    localscan = {}
-    home = UnixFile('/home')
-
-    for subdir in home.subdirs():
-        sdname = join('/home', subdir)
-        fp = UnixFile(sdname)
-        req_mode = '040700'
-        match_mode, val_found = fp.check_mode(req_mode)
-        if not match_mode:
-            message_add(localscan, 'critical',
-                fp.name() + ': ' + val_found + ' instead of ' + req_mode)
-        elif verbose:
-            message_add(localscan, 'info', fp.name())
-
     return localscan
 
 def check_mounted_filesystems_not_in_fstab(verbose=False):
@@ -321,22 +359,6 @@ def check_mounted_filesystems_not_in_fstab(verbose=False):
         if not checkfs.is_mounted:
             message_add(localscan, 'critical',
                 'No such mount point in /etc/fstab: ' + mountpoint)
-
-    return localscan
-
-def check_profiled_permissions(verbose=False):
-    localscan = {}
-    dp = UnixFile('/etc/profile.d')
-
-    for file in dp.filelist():
-        fname = join(dp.name(), file)
-        fp = UnixFile(fname)
-        match_mode, val_found = fp.check_mode(["100755", "100644"])
-        match_perms = fp.check_owner('root') and fp.check_group('root')
-        if not (match_mode and match_perms):
-            message_add(localscan, 'critical',
-                fp.name() + ': ' + quote(fp.owner() + '.' + fp.group()) +
-                ' instead of ' + quote('root.root'))
 
     return localscan
 
@@ -364,7 +386,7 @@ def check_required_filesystems(required_filesystems, verbose=False):
         elif verbose:
             message_add(localscan, 'info', mountpoint + ' (' + opts + ')')
 
-        return localscan
+    return localscan
 
 def check_filesystem(verbose=False):
     fs = Filesystems(verbose=verbose)
@@ -387,12 +409,5 @@ def check_filesystem(verbose=False):
         check_file_permissions(fs.file_permissions, verbose=fs.verbose)
     message_add(fs.scan['checks'], 
         'permissions of some system folders and files', scan_result)
-
-    scan_result = check_mode_of_home_subdirs(verbose=fs.verbose)
-    message_add(fs.scan['checks'], 'mode of the /home subdirs', scan_result)
-
-    scan_result = check_profiled_permissions(verbose=fs.verbose)
-    message_add(fs.scan['checks'], 'file permissions in /etc/profile.d',
-        scan_result)
 
     return fs.scan

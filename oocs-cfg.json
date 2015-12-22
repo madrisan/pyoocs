@@ -48,7 +48,9 @@
 				"/etc/grub.conf" : ["root", "root", "100600"],
 				"/etc/passwd": ["root", "root", "100644"],
 				"/etc/shadow": ["root", "root", "100400|100000"],
-				"/etc/ssh/sshd_config": ["root", "root", "100640|100600"]
+				"/etc/ssh/sshd_config": ["root", "root", "100640|100600"],
+				"files-in:/etc/profile.d/": ["root", "root", "100755|100644"],
+				"subdirs-in:/home/": ["", "", "040700"]
 			}
 		},
 		"kernel": {
