@@ -88,7 +88,6 @@ def _output_console(scan_result):
                 for entry in scan_block.get('info', []):
                     writeln('(i) ' + entry)
 
-
 def _output_json(scan_result):
     "Scan output in json format"
 
@@ -97,7 +96,7 @@ def _output_json(scan_result):
 
     hostname = socket.getfqdn()
     json_merge = {
-        'host' : hostname,
+        'host' : [ hostname ],
         'distribution' : {
             'codename' : distro.codename,
             'description' : distro.description,
