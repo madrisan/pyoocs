@@ -65,6 +65,7 @@ def message_add(d, key, message):
 import socket
 
 def _output_console(scan_result):
+    "Scan with output sent to the console"
     hostname = socket.getfqdn()
 
     for scan in scan_result:
@@ -88,36 +89,52 @@ def _output_console(scan_result):
                 for entry in scan_block.get('info', []):
                     writeln('(i) ' + entry)
 
-def _output_json(scan_result):
-    "Scan output in json format"
-
+def _create_json(scan_result):
     from oocs.distribution import Distribution
     distro = Distribution()
 
     hostname = socket.getfqdn()
-    json_merge = {
-        'host' : [ hostname ],
-        'distribution' : {
-            'codename' : distro.codename,
-            'description' : distro.description,
-            'majversion' : distro.majversion,
-            'patch_release' : distro.patch_release,
-            'vendor' :  distro.vendor,
-            'version' : distro.version
+    json = {
+        'scan' : {
+            hostname : {
+                'distribution' : {
+                    'codename'      : distro.codename,
+                    'description'   : distro.description,
+                    'majversion'    : distro.majversion,
+                    'patch_release' : distro.patch_release,
+                    'vendor'        : distro.vendor,
+                    'version'       : distro.version
+                },
+                'modules' : {}
+            }
         }
     }
+
+    modules_branch = json['scan'][hostname]['modules'];
 
     for scan in scan_result:
         module_name = scan.pop('module', None)
         checks = scan.pop('checks', None)
         status = scan.pop('status', None)
 
-        json_merge[module_name] = dict()
-        json_merge[module_name]['checks'] = checks
-        json_merge[module_name]['status'] = status
+        modules_branch[module_name] = dict()
+        modules_branch[module_name]['checks'] = checks
+        modules_branch[module_name]['status'] = status
 
-    writeln(json.dumps(json_merge,
+    return json
+
+def _output_json(scan_result):
+    "Scan output in json format"
+
+    jsondata = _create_json(scan_result)
+    writeln(json.dumps(jsondata,
                        sort_keys=True, indent=2, separators=(',', ': ')))
+
+def _output_html(scan_result):
+    "Scan output in html format"
+
+    json_output = _output_json(scan_result);
+    # FIXME: write output to file ...
 
 def output_dump(scan):
     cfg = Config()
@@ -128,6 +145,8 @@ def output_dump(scan):
 
     if otype == 'console':
         _output_console(scan)
+    elif otype == 'html':
+        _output_html(scan)
     elif otype == 'json':
         _output_json(scan)
     else:

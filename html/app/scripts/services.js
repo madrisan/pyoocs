@@ -1,7 +1,12 @@
 angular.module('oocsApp')
+       .constant("baseURL","http://localhost:3003/")
+       .service('ScanService', ['$http', 'baseURL', function($http, baseURL) {
 
-       .service('ScanService', function() {
            'use strict';
 
-        })
+           this.getJSONdata = function() {
+                return $http.get(baseURL + 'scan');
+           };
+
+        }])
 ;

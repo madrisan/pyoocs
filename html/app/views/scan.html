@@ -1,7 +1,42 @@
 <div class="container" ng-controller="ScanController">
-    <div class="row row-content">
+    <div class="row row-content col-xs-12" ng-if="!showScan">
+        <h3>{{message}}</h3>
+    </div>
+    <div class="row row-content col-xs-12" ng-if="showScan">
+        <h1><span class="label label-default">Linux host "{{hostname}}"</span></h1>
+        <p style="padding:4px;"></p>
+        <p>{{distribution.description}}</p>
+        <p style="padding:10px;"></p>
 
-        <p>Add here the scan output</p>
+        <div ng-repeat="module in modules">
+            <p><i class="fa fa-chevron-right"></i> <strong>{{module.toUpperCase()}}</strong></p>
+
+            <div class="panel panel-default"
+                 ng-repeat="(check, result) in getModuleData(module).checks">
+                <div class="panel-heading"><strong>{{check}}</strong></div>
+                <!--div class="panel-body">
+                    <p>...</p>
+                </div-->
+
+                <ul id="scan-item" class="list-group">
+                    <li class="list-group-item list-group-item-danger"
+                        ng-repeat="entry in result[0].critical">
+                        <span class="label label-danger"><i class="fa fa-exclamation-circle"></i></span>
+                        &nbsp;{{entry}}
+                    </li>
+                    <li class="list-group-item list-group-item-warning"
+                        ng-repeat="entry in result[0].warning">
+                        <span class="label label-warning"><i class="fa fa-question-circle"></i></span>
+                        &nbsp;{{entry}}
+                    </li>
+                    <li class="list-group-item list-group-item-success"
+                        ng-repeat="entry in result[0].info">
+                        <span class="label label-success"><i class="fa fa-info-circle"></i></span>
+                        &nbsp;{{entry}}
+                    </li>
+                </ul>
+            </div>
+        </div>
 
     </div>
 </div>
