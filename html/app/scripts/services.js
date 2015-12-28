@@ -1,5 +1,5 @@
 angular.module('oocsApp')
-       .constant("baseURL","http://localhost:3003/")
+       .constant("baseURL","http://localhost:8000/")
        .service('ScanService', ['$http', 'baseURL', function($http, baseURL) {
 
            'use strict';

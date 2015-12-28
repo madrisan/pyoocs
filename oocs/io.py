@@ -1,7 +1,7 @@
 # This python module is part of the oocs scanner for Linux.
 # Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
 
-from os import path
+from os import chdir, path
 
 from oocs.py2x3 import json
 
@@ -130,11 +130,32 @@ def _output_json(scan_result):
     writeln(json.dumps(jsondata,
                        sort_keys=True, indent=2, separators=(',', ': ')))
 
-def _output_html(scan_result):
+def _output_html(scan_result, home, port):
     "Scan output in html format"
 
-    json_output = _output_json(scan_result);
-    # FIXME: write output to file ...
+    jsondata = _create_json(scan_result);
+    chdir(home)
+
+    # start a simple HTTP server
+    import SimpleHTTPServer
+    import SocketServer
+
+    class JSONRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+        def do_GET(self):
+            """Serve a GET request."""
+
+            if self.path == "/scan" or self.path == '/scan/':
+                self.send_response(200)  # OK
+                self.send_header("Content-type:", "text/html")
+                self.end_headers()
+                # send response:
+                json.dump(jsondata, self.wfile)
+            else:
+                return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+
+    httpd = SocketServer.TCPServer(('', port), JSONRequestHandler)
+    writeln('http server is running...\nhttp://localhost:%d' % port)
+    httpd.serve_forever()
 
 def output_dump(scan):
     cfg = Config()
@@ -146,7 +167,8 @@ def output_dump(scan):
     if otype == 'console':
         _output_console(scan)
     elif otype == 'html':
-        _output_html(scan)
+        # FIXME: path and 8000 should not be hardcoded
+        _output_html(scan, 'html/json-server/public/', 8000)
     elif otype == 'json':
         _output_json(scan)
     else:
