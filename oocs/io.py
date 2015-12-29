@@ -66,6 +66,7 @@ import socket
 
 def _output_console(scan_result):
     "Scan with output sent to the console"
+
     hostname = socket.getfqdn()
 
     for scan in scan_result:
@@ -141,6 +142,9 @@ def _output_html(scan_result, home, port):
     import SocketServer
 
     class JSONRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+        #def end_headers (self):
+        #    self.send_header('Access-Control-Allow-Origin', '*')
+        #    SimpleHTTPServer.SimpleHTTPRequestHandler.end_headers(self)
         def do_GET(self):
             """Serve a GET request."""
             if self.path == "/scan" or self.path == '/scan/':
@@ -152,23 +156,35 @@ def _output_html(scan_result, home, port):
             else:
                 return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
-    httpd = SocketServer.TCPServer(('', port), JSONRequestHandler)
+    httpd = SocketServer.TCPServer(('0.0.0.0', port), JSONRequestHandler)
     writeln('http server is running...\nhttp://localhost:%d' % port)
     httpd.serve_forever()
 
 def output_dump(scan):
     cfg = Config()
+    output_opts = {}
+
     try:
-        otype = cfg.variable('oocs-output')
+        output_type = cfg.variable('oocs-output')
     except KeyError:
         die(quote('oocs-output') + ' unset in the configuration file')
 
-    if otype == 'console':
+    try:
+        output_opts = cfg.variable('oocs-output-opts')
+    except KeyError:
+        pass
+
+    if output_type == 'console':
         _output_console(scan)
-    elif otype == 'html':
-        # FIXME: path and 8000 should not be hardcoded
-        _output_html(scan, 'html/json-server/public/', 8000)
-    elif otype == 'json':
+    elif output_type == 'html':
+        try:
+             port = int(output_opts["port"])
+             home = output_opts["home"]
+        except:
+            die(quote('oocs-output-opts') + ' must provide both port and home')
+        _output_html(scan, home, 8000)
+    elif output_type == 'json':
         _output_json(scan)
     else:
-        die(1, 'unsupported output (see configuration file): ' + quote(otype))
+        die(1, 'unsupported output (see configuration file): '
+            + quote(output_type))

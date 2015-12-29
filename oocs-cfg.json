@@ -1,5 +1,6 @@
 {
-	"oocs-output": "json",
+	"oocs-output": "console",
+	"oocs-output-opts": { },
 	"oocs-module": {
 		"environment": {
 			"enable": 1,
