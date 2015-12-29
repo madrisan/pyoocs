@@ -143,7 +143,6 @@ def _output_html(scan_result, home, port):
     class JSONRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         def do_GET(self):
             """Serve a GET request."""
-
             if self.path == "/scan" or self.path == '/scan/':
                 self.send_response(200)  # OK
                 self.send_header("Content-type:", "text/html")

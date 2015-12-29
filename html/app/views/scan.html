@@ -1,4 +1,12 @@
 <div class="container" ng-controller="ScanController">
+    <div class="row">
+        <div class="col-xs-12">
+            <ul class="breadcrumb">
+                <li class="active">Home</li>
+                <li><a ui-sref="app.about">About</a></li>
+            </ul>
+        </div>
+    </div>
     <div class="row row-content col-xs-12" ng-if="!showScan">
         <h3>{{message}}</h3>
     </div>
