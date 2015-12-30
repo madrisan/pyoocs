@@ -13,7 +13,8 @@ var gulp        = require('gulp'),
     rev         = require('gulp-rev'),
     browserSync = require('browser-sync'),
     ngannotate  = require('gulp-ng-annotate'),
-    del         = require('del');
+    del         = require('del'),
+    less        = require('gulp-less');
 
 gulp.task('jshint', function() {
     return gulp.src('app/scripts/**/*.js')
@@ -28,10 +29,10 @@ gulp.task('clean', function() {
 
 // Default task
 gulp.task('default', ['clean'], function() {
-    gulp.start('usemin', 'copyviews', 'imagemin', 'copyfonts');
+    gulp.start('buildless', 'usemin', 'copyviews', 'imagemin', 'copyfonts');
 });
 
-gulp.task('usemin', ['jshint'], function () {
+gulp.task('usemin', ['buildless', 'jshint'], function () {
     return gulp.src('./app/index.html')
             .pipe(usemin({
                 css:[minifycss(), rev()],
@@ -58,6 +59,7 @@ gulp.task('imagemin', function() {
             .pipe(notify({ message: 'Images task complete' }));
 });
 
+// Fonts
 gulp.task('copyfonts', function() {
     gulp.src('./bower_components/font-awesome/fonts/**/*.{ttf,woff,eof,svg}*')
      .pipe(gulp.dest('json-server/public/fonts'));
@@ -66,10 +68,17 @@ gulp.task('copyfonts', function() {
      .pipe(gulp.dest('json-server/public/fonts'));
 });
 
+// CSS
+gulp.task('buildless', function() {
+    return gulp.src('app/styles/**/*.less')
+     .pipe(less())
+     .pipe(gulp.dest('./app/styles'));
+});
+
 // Watch
 gulp.task('watch', ['browser-sync'], function() {
   // Watch .js .css and .html files
-  gulp.watch('{app/scripts/**/*.js,app/styles/**/*.css,app/**/*.html}', ['usemin']);
+  gulp.watch('{app/scripts/**/*.js,app/styles/**/*.less,app/**/*.html}', ['usemin']);
 
   // Watch views html files
   gulp.watch('app/views/**/*.html', ['copyviews']);
