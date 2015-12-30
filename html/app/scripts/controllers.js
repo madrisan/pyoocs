@@ -52,6 +52,42 @@ angular.module('oocsApp')
                }
            );
 
+           $scope.tab = 1;
+           $scope.issueClass = "";
+
+           $scope.select = function(setTab) {
+               $scope.tab = setTab;
+
+               if (setTab === 2) {
+                   $scope.issueClass = "critical";
+               }
+               else if (setTab === 3) {
+                   $scope.issueClass = "warning";
+               }
+               else if (setTab === 4) {
+                   $scope.issueClass = "passed";
+               }
+               else {
+                   $scope.issueClass = "";
+               }
+
+               //console.log("issueClass: " + $scope.issueClass);
+           };
+
+           $scope.isSelected = function(checkTab) {
+               return ($scope.tab === checkTab);
+           };
+
+           $scope.hideIssues = function(currIssueClass) {
+               if ($scope.issueClass === "")
+                   return false;
+
+               if (currIssueClass != $scope.issueClass)
+                   return true;
+
+               return false;
+           };
+
        }])
 
        .controller('AboutController', ['$scope', function($scope) {
