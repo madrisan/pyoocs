@@ -13,7 +13,7 @@
 
     <div class="row row-content col-xs-12" ng-if="showScan">
 
-        <h1><span class="label label-default">Linux host "{{hostname}}"</span></h1>
+        <h1><span class="label {{max_severity_label()}}">Linux host "{{hostname}}"</span></h1>
         <p style="padding:4px;"></p>
         <p>{{distribution.description}}</p>
 

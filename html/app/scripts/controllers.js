@@ -44,6 +44,20 @@ angular.module('oocsApp')
                        };
                    };
 
+                   $scope.max_severity = jsondata[$scope.hostname].max_severity[0];
+                   console.log('max_severity: ' + $scope.max_severity);
+
+                   $scope.max_severity_label = function() {
+                       var severities = {
+                           'success' : 'label-success',
+                           'warning' : 'label-warning',
+                           'critical': 'label-danger'
+                       };
+
+                       var label = severities[$scope.max_severity];
+                       return label ? label : 'label-default';
+                   };
+
                    $scope.showScan = true;
                },
                function(response) {

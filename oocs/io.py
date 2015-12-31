@@ -113,6 +113,8 @@ def _create_json(scan_result):
 
     modules_branch = json['scan'][hostname]['modules'];
 
+    max_severity = 'success'
+
     for scan in scan_result:
         module_name = scan.pop('module', None)
         checks = scan.pop('checks', None)
@@ -121,6 +123,16 @@ def _create_json(scan_result):
         modules_branch[module_name] = dict()
         modules_branch[module_name]['checks'] = checks
         modules_branch[module_name]['status'] = status
+
+        for check, messages in checks.iteritems():
+            severities = messages[0].keys()
+            if 'critical' in severities:
+                max_severity = 'critical'
+                break
+            elif 'warning' in severities:
+                max_severity = 'warning'
+
+        json['scan'][hostname]['max_severity'] = [ max_severity ]
 
     return json
 
