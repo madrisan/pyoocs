@@ -17,16 +17,17 @@
 .navbar-inverse {
   background: @dark-green;
   color: @white;
-  .navbar-nav>.active>a {
-     background: @dark-green;
-     color: @white;
+
+  .navbar-brand {
      &:hover {
-       background: @dark-green;
        color: @white;
      }
-     &:focus {
-       background: @dark-green;
-       color: @white;
+  }
+
+  #mynavbar > ul > li > a {
+     &:hover {
+       background: @light-gray;
+       color: @dark-green;
      }
   }
 }
