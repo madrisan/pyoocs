@@ -55,21 +55,21 @@
                         <p>...</p>
                     </div-->
 
-                    <ul id="scan-item" class="list-group">
+                    <ul class="list-group">
                         <li class="list-group-item list-group-item-danger" ng-hide="hideIssues('critical')"
                             ng-repeat="entry in result[0].critical">
                             <span class="label label-danger"><i class="fa fa-exclamation-circle"></i></span>
-                            &nbsp;{{entry}}
+                            &nbsp;<span id="scan-item-message">{{entry}}</span>
                         </li>
                         <li class="list-group-item list-group-item-warning" ng-hide="hideIssues('warning')"
                             ng-repeat="entry in result[0].warning">
                             <span class="label label-warning"><i class="fa fa-question-circle"></i></span>
-                            &nbsp;{{entry}}
+                            &nbsp;<span id="scan-item-message">{{entry}}</span>
                         </li>
                         <li class="list-group-item list-group-item-success" ng-hide="hideIssues('passed')"
                             ng-repeat="entry in result[0].info">
                             <span class="label label-success"><i class="fa fa-info-circle"></i></span>
-                            &nbsp;{{entry}}
+                            &nbsp;<span id="scan-item-message">{{entry}}</span>
                         </li>
                     </ul>
 

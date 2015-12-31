@@ -1,17 +1,34 @@
-@light-green: #006600;
-@dark-green: #009900;
+@light-green: #009900;
+@dark-green: darken(@light-green, 12%);
 @light-gray: #dddddd;
+@white: #ffffff;
 
 .jumbotron {
-    padding: 75px 30px 20px 0px;
-    margin: 0px auto;
-    background: @dark-green;
-    color: floralwhite;
+  padding: 75px 30px 20px 0px;
+  margin: 0px auto;
+  background: @light-green;
+  color: @white;
+}
+
+#app-title {
+  font-size: 30px;
 }
 
 .navbar-inverse {
-  background: @light-green;
-  color: floralwhite;
+  background: @dark-green;
+  color: @white;
+  .navbar-nav>.active>a {
+     background: @dark-green;
+     color: @white;
+     &:hover {
+       background: @dark-green;
+       color: @white;
+     }
+     &:focus {
+       background: @dark-green;
+       color: @white;
+     }
+  }
 }
 
 .row-content {
@@ -22,13 +39,14 @@
 }
 
 .row-footer {
-  background-color: @light-green;
+  background-color: @dark-green;
   padding: 10px 0px;
-  color: floralwhite;
+  color: @white;
 }
 
-#scan-item {
+#scan-item-message {
   font-family: monospace;
+  font-size: 12px;
 }
 
 .tab-content {
