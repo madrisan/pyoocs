@@ -20,6 +20,7 @@
         <p style="padding:10px;"></p>
 
         <div class="col-xs-12">
+
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation"
                     ng-class="{active:isSelected(1)}">
@@ -44,37 +45,43 @@
             </ul>
 
             <div class="tab-content">
-
                 <div ng-repeat="module in modules">
-                    <p><i class="fa fa-chevron-right"></i> <strong>{{module.toUpperCase()}}</strong></p>
+                    <p data-toggle="collapse" data-target="#{{module}}"
+                       aria-expanded="false" aria-controls="{{module}}"
+                       class="glyphicon glyphicon-chevron-down"> <strong>{{module.toUpperCase()}}</strong>
+                    </p>
 
-                    <div class="panel panel-default"
-                         ng-repeat="(check, result) in getModuleData(module).checks">
-                    <div class="panel-heading"><strong>{{check}}</strong></div>
-                    <!--div class="panel-body">
-                        <p>...</p>
-                    </div-->
+                    <div class="collapse in" id="{{module}}">
+                        <div class="panel panel-default"
+                             ng-repeat="(check, result) in getModuleData(module).checks">
 
-                    <ul class="list-group">
-                        <li class="list-group-item list-group-item-danger" ng-hide="hideIssues('critical')"
-                            ng-repeat="entry in result[0].critical">
-                            <span class="label label-danger"><i class="fa fa-exclamation-circle"></i></span>
-                            &nbsp;<span id="scan-item-message">{{entry}}</span>
-                        </li>
-                        <li class="list-group-item list-group-item-warning" ng-hide="hideIssues('warning')"
-                            ng-repeat="entry in result[0].warning">
-                            <span class="label label-warning"><i class="fa fa-question-circle"></i></span>
-                            &nbsp;<span id="scan-item-message">{{entry}}</span>
-                        </li>
-                        <li class="list-group-item list-group-item-success" ng-hide="hideIssues('passed')"
-                            ng-repeat="entry in result[0].info">
-                            <span class="label label-success"><i class="fa fa-info-circle"></i></span>
-                            &nbsp;<span id="scan-item-message">{{entry}}</span>
-                        </li>
-                    </ul>
+                            <div class="panel-heading"><strong>{{check}}</strong></div>
+                            <!--div class="panel-body">
+                                <p>...</p>
+                            </div-->
 
+                            <ul class="list-group">
+                                <li class="list-group-item list-group-item-danger" ng-hide="hideIssues('critical')"
+                                    ng-repeat="entry in result[0].critical">
+                                    <span class="label label-danger"><i class="fa fa-exclamation-circle"></i></span>
+                                    &nbsp;<span id={{"scan-item-message-danger-" + module}}>{{entry}}</span>
+                                </li>
+                                <li class="list-group-item list-group-item-warning" ng-hide="hideIssues('warning')"
+                                    ng-repeat="entry in result[0].warning">
+                                    <span class="label label-warning"><i class="fa fa-question-circle"></i></span>
+                                    &nbsp;<span id={{""scan-item-message-warning-" + module}}>{{entry}}</span>
+                                </li>
+                                <li class="list-group-item list-group-item-success" ng-hide="hideIssues('passed')"
+                                    ng-repeat="entry in result[0].info">
+                                    <span class="label label-success"><i class="fa fa-info-circle"></i></span>
+                                    &nbsp;<span id={{""scan-item-message-info-" + module}}>{{entry}}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
 
     </div>
