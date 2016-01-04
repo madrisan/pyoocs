@@ -46,9 +46,12 @@
 
             <div class="tab-content">
                 <div ng-repeat="module in modules">
-                    <p data-toggle="collapse" data-target="#{{module}}"
-                       aria-expanded="false" aria-controls="{{module}}"
-                       class="glyphicon glyphicon-chevron-down"> <strong>{{module.toUpperCase()}}</strong>
+                    <p ng-click="collapsed = !collapsed"
+                       ng-model="collapsed"
+                       ng-class="{'glyphicon glyphicon-chevron-right':collapsed, 'glyphicon glyphicon-chevron-down':!collapsed}"
+                       data-toggle="collapse" data-target="#{{module}}"
+                       aria-expanded="false" aria-controls="{{module}}">
+                       <strong> {{module.toUpperCase()}}</strong>
                     </p>
 
                     <div class="collapse in" id="{{module}}">
