@@ -194,7 +194,7 @@ def output_dump(scan):
              home = output_opts["home"]
         except:
             die(quote('oocs-output-opts') + ' must provide both port and home')
-        _output_html(scan, home, 8000)
+        _output_html(scan, home, port)
     elif output_type == 'json':
         _output_json(scan)
     else:
