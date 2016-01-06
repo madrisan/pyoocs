@@ -171,7 +171,6 @@ class UnixFile(object):
             raise KeyError('gid not found: %s' % self.gid)
         return (self.group == shouldbe_grp)
 
-    def name(self): return self.filename
     def basename(self): return os.path.basename(self.filename)
     def dirname(self): return os.path.dirname(self.filename)
 
@@ -288,7 +287,7 @@ def _check_files_attr(rootdir, zipped_values, importance, verbose=False):
     dp = UnixFile(rootdir)
 
     for file in dp.filelist():
-        fname = join(dp.name(), file)
+        fname = join(dp.filename, file)
         fp = UnixFile(fname)
 
         if not fp.exists:
@@ -301,15 +300,15 @@ def _check_files_attr(rootdir, zipped_values, importance, verbose=False):
 
         if not user_group_found:
             message_add(localscan, importance,
-                        'unknown user and/or group for ' + quote(fp.name()))
+                        'unknown user and/or group for ' + quote(fp.filename))
 
         if not (match_mode and match_perms):
             message_add(localscan, importance,
-                fp.name() + ': invalid permissions, ' +
+                fp.filename + ': invalid permissions, ' +
                 'should be: ' + unlist(zipped_values, sep=' or '))
         elif verbose:
             message_add(localscan, 'info',
-                fp.name() + '  (' + fp.owner + ':' + fp.group + ' ' +
+                fp.filename + '  (' + fp.owner + ':' + fp.group + ' ' +
                 fp.mode + ')')
 
     return localscan
@@ -328,10 +327,10 @@ def _check_subdirs_modes(rootdir, zipped_values, importance, verbose=False):
         # note: we ignore all but match_perms in this check
         if not match_mode:
             message_add(localscan, importance,
-                fp.name() + ': ' + fp.mode + ' instead of ' +
+                fp.filename + ': ' + fp.mode + ' instead of ' +
                 unlist(zipped_values, sep=' or '))
         elif verbose:
-            message_add(localscan, 'info', fp.name() + ' (' + fp.mode + ')')
+            message_add(localscan, 'info', fp.filename + ' (' + fp.mode + ')')
 
     return localscan
 
@@ -360,7 +359,7 @@ def check_file_permissions(file_permissions, verbose=False):
         fp = UnixFile(file)
         if not fp.exists:
             message_add(localscan, 'warning',
-                fp.name() + ': no such file or directory')
+                fp.filename + ': no such file or directory')
             continue
 
         (user_group_found, match_mode, match_perms) = \
@@ -368,15 +367,15 @@ def check_file_permissions(file_permissions, verbose=False):
 
         if not user_group_found:
             message_add(localscan, 'warning',
-                        'unknown user and/or group for ' + quote(fp.name()))
+                        'unknown user and/or group for ' + quote(fp.filename))
 
         if not (match_mode and match_perms):
             message_add(localscan, 'warning',
-                fp.name() + ': invalid permissions, ' +
+                fp.filename + ': invalid permissions, ' +
                 'should be: ' + unlist(zipped_values,  sep=' or '))
         elif verbose:
             message_add(localscan, 'info',
-                fp.name() + '  (' + fp.owner + ':' + fp.group + ' ' +
+                fp.filename + '  (' + fp.owner + ':' + fp.group + ' ' +
                 fp.mode + ')')
 
     return localscan
