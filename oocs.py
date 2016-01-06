@@ -8,7 +8,7 @@ __copyright__ = "Copyright 2015,2016 Davide Madrisan"
 __license__ = "GPL"
 __version__ = "0"
 __email__ = "davide.madrisan.gmail.com"
-__status__ = "Alpha"
+__status__ = "Beta"
 
 import sys
 
