@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
 # Out of compliance scanner for Linux hosts
-# Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
+# Copyright (C) 2015,2016 Davide Madrisan <davide.madrisan.gmail.com>
 
 __author__ = "Davide Madrisan"
-__copyright__ = "Copyright 2015 Davide Madrisan"
+__copyright__ = "Copyright 2015,2016 Davide Madrisan"
 __license__ = "GPL"
 __version__ = "0"
 __email__ = "davide.madrisan.gmail.com"

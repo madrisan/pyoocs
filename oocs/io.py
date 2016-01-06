@@ -1,5 +1,5 @@
 # This python module is part of the oocs scanner for Linux.
-# Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
+# Copyright (C) 2015,2016 Davide Madrisan <davide.madrisan.gmail.com>
 
 from os import chdir, path
 
