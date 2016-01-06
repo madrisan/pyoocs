@@ -253,6 +253,36 @@ class UnixCommand(UnixFile):
 
         return (out, err, retcode)
 
+def _check_file_perms(fp, zipped_values):
+    match_mode = False
+    match_perms = False
+    user_group_found = False
+
+    for zipped_block in zipped_values:
+        try:
+            values = zipped_block.split(':')
+            req_owner = values[0]
+            req_group = values[1]
+            # multiple different modes are allowed
+            req_modes = values[2].split('|')
+        except:
+            die(1, 'Bad syntax in the json configuration file: ' +
+                'file permissions for ' + quote(fp.filename))
+
+        try:
+            match_mode_curr, val_found = fp.check_mode(req_modes)
+            match_mode |= match_mode_curr
+
+            match_perms_curr = (
+                fp.check_owner(req_owner) and fp.check_group(req_group))
+            match_perms |= match_perms_curr
+
+            user_group_found = True
+        except:
+            pass
+
+    return (user_group_found, match_mode, match_perms)
+
 def _check_files_attr(rootdir, zipped_values, importance, verbose=False):
     localscan = {}
     dp = UnixFile(rootdir)
@@ -261,32 +291,13 @@ def _check_files_attr(rootdir, zipped_values, importance, verbose=False):
         fname = join(dp.name(), file)
         fp = UnixFile(fname)
 
-        match_mode = False
-        match_perms = False
-        user_group_found = False
+        if not fp.exists:
+            message_add(localscan, 'warning',
+                fp.filename + ': no such file or directory')
+            continue
 
-        for zipped_block in zipped_values:
-            try:
-                values = zipped_block.split(':')
-                req_owner = values[0]
-                req_group = values[1]
-                # multiple different modes are allowed
-                req_modes = values[2].split('|')
-            except:
-                die(1, 'Bad syntax in the json configuration file: ' +
-                    'file permissions for ' + quote(file))
-
-            try:
-                match_mode_curr, val_found = fp.check_mode(req_modes)
-                match_mode |= match_mode_curr
-
-                match_perms_curr = (
-                    fp.check_owner(req_owner) and fp.check_group(req_group))
-                match_perms |= match_perms_curr
-
-                user_group_found = True
-            except:
-                pass
+        (user_group_found, match_mode, match_perms) = \
+            _check_file_perms(fp, zipped_values)
 
         if not user_group_found:
             message_add(localscan, importance,
@@ -311,25 +322,10 @@ def _check_subdirs_modes(rootdir, zipped_values, importance, verbose=False):
         sdname = join(rootdir, subdir)
         fp = UnixFile(sdname)
 
-        match_mode = False
-        match_perms = False
-        user_group_found = False
+        (user_group_found, match_mode, match_perms) = \
+            _check_file_perms(fp, zipped_values)
 
-        for zipped_block in zipped_values:
-            try:
-                values = zipped_block.split(':')
-                # multiple different modes are allowed
-                req_modes = values[2].split('|')
-            except:
-                die(1, 'Bad syntax in the json configuration file: ' +
-                    'file permissions for ' + quote(file))
-
-            try:
-                match_mode_curr, val_found = fp.check_mode(req_modes)
-                match_mode |= match_mode_curr
-            except:
-                pass
-
+        # note: we ignore all but match_perms in this check
         if not match_mode:
             message_add(localscan, importance,
                 fp.name() + ': ' + fp.mode + ' instead of ' +
@@ -367,32 +363,8 @@ def check_file_permissions(file_permissions, verbose=False):
                 fp.name() + ': no such file or directory')
             continue
 
-        match_mode = False
-        match_perms = False
-        user_group_found = False
-
-        for zipped_block in zipped_values:
-            try:
-                values = zipped_block.split(':')
-                req_owner = values[0]
-                req_group = values[1]
-                # multiple different modes are allowed
-                req_modes = values[2].split('|')
-            except:
-                die(1, 'Bad syntax in the json configuration file: ' +
-                    'file permissions for ' + quote(file))
-
-            try:
-                match_mode_curr, val_found = fp.check_mode(req_modes)
-                match_mode |= match_mode_curr
-
-                match_perms_curr = (
-                    fp.check_owner(req_owner) and fp.check_group(req_group))
-                match_perms |= match_perms_curr
-
-                user_group_found = True
-            except:
-                pass
+        (user_group_found, match_mode, match_perms) = \
+            _check_file_perms(fp, zipped_values)
 
         if not user_group_found:
             message_add(localscan, 'warning',
