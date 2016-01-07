@@ -385,7 +385,8 @@ def check_mounted_filesystems_not_in_fstab(verbose=False):
     fstab = UnixFile('/etc/fstab').readlines()
 
     for line in fstab:
-        if line.startswith('#'): continue
+        # skip comments and blank lines
+        if line.lstrip().startswith('#') or not line.strip(): continue
         cols = line.split()
         mountpoint = cols[1]
         fstype = cols[2]
