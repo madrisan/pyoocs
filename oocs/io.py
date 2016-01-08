@@ -2,6 +2,7 @@
 # Copyright (C) 2015,2016 Davide Madrisan <davide.madrisan.gmail.com>
 
 from os import chdir, path
+from urlparse import urlparse
 
 from oocs.py2x3 import json
 
@@ -143,11 +144,11 @@ def _output_json(scan_result):
     writeln(json.dumps(jsondata,
                        sort_keys=True, indent=2, separators=(',', ': ')))
 
-def _output_html(scan_result, home, port):
+def _output_html(scan_result, publicdir, baseurl):
     "Scan output in html format"
 
     jsondata = _create_json(scan_result);
-    chdir(home)
+    chdir(publicdir)
 
     # start a simple HTTP server
     import SimpleHTTPServer
@@ -168,33 +169,36 @@ def _output_html(scan_result, home, port):
             else:
                 return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
-    httpd = SocketServer.TCPServer(('0.0.0.0', port), JSONRequestHandler)
-    writeln('http server is running...\nhttp://localhost:%d' % port)
+    url = urlparse(baseurl)
+
+    try:
+        httpd = SocketServer.TCPServer(('0.0.0.0', url.port), JSONRequestHandler)
+    except:
+        die(2, "cannot open a TCP socket on port " + str(url.port))
+
+    writeln('http server is running...\nhttp://localhost:%d' % url.port)
     httpd.serve_forever()
 
 def output_dump(scan):
     cfg = Config()
-    output_opts = {}
+    html_opts = {}
 
     try:
         output_type = cfg.variable('oocs-output')
     except KeyError:
         die(quote('oocs-output') + ' unset in the configuration file')
 
-    try:
-        output_opts = cfg.variable('oocs-output-opts')
-    except KeyError:
-        pass
-
     if output_type == 'console':
         _output_console(scan)
     elif output_type == 'html':
         try:
-             port = int(output_opts["port"])
-             home = output_opts["home"]
+             html_opts = cfg.variable('oocs-html-opts')
+             baseurl = html_opts["baseUrl"]
+             publicdir = html_opts["publicDir"]
         except:
-            die(quote('oocs-output-opts') + ' must provide both port and home')
-        _output_html(scan, home, port)
+             die(1, quote('oocs-html-opts') +
+                  ' must provide both baseUrl and publicDir')
+        _output_html(scan, publicdir, baseurl)
     elif output_type == 'json':
         _output_json(scan)
     else:

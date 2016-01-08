@@ -14,12 +14,22 @@ var gulp        = require('gulp'),
     browserSync = require('browser-sync'),
     ngannotate  = require('gulp-ng-annotate'),
     del         = require('del'),
-    less        = require('gulp-less');
+    less        = require('gulp-less'),
+    gutil       = require('gulp-util'),
+    replace     = require('gulp-replace');
 
-var paths = {
-    dist: 'json-server/public/'
+gutil.log('Reading the json configuration file',
+          gutil.colors.cyan('\'oocs-cfg.json\'') + '...');
+var oocs_cfg = require('../oocs-cfg.json');
+gutil.log(' - baseUrl: \'' +
+          gutil.colors.cyan(oocs_cfg['oocs-html-opts'].baseUrl) + '\'');
+
+var cfg = {
+    dist: 'json-server/public/',
+    baseURL: oocs_cfg['oocs-html-opts'].baseUrl
 };
 
+// JavaScript syntax checker
 gulp.task('jshint', function() {
     return gulp.src('app/scripts/**/*.js')
             .pipe(jshint())
@@ -28,7 +38,7 @@ gulp.task('jshint', function() {
 
 // Clean
 gulp.task('clean', function() {
-    return del([paths.dist]);
+    return del([cfg.dist]);
 });
 
 // Default task
@@ -36,40 +46,42 @@ gulp.task('default', ['clean'], function() {
     gulp.start('buildless', 'usemin', 'copyviews', 'imagemin', 'copyfonts');
 });
 
+// Minification and uglification
 gulp.task('usemin', ['buildless', 'jshint'], function () {
     return gulp.src('./app/index.html')
             .pipe(usemin({
                 css:[minifycss(), rev()],
-                js: [ngannotate(), uglify(), rev()]
+                js: [replace('@baseURL@', 'http://localhost:8000/'),
+                     ngannotate(), uglify(), rev()]
             }))
-            .pipe(gulp.dest(paths.dist));
+            .pipe(gulp.dest(cfg.dist));
 });
 
 // Views
 gulp.task('copyviews', function() {
     return gulp.src('app/views/**/*.html')
-            .pipe(gulp.dest(paths.dist + '/views/'));
+            .pipe(gulp.dest(cfg.dist + '/views/'));
 });
 
 // Images
 gulp.task('imagemin', function() {
-    return del([paths.dist + '/images/']), gulp.src('app/images/**/*')
+    return del([cfg.dist + '/images/']), gulp.src('app/images/**/*')
             .pipe(cache(imagemin({
                 optimizationLevel: 3,
                 progressive: true,
                 interlaced: true
             })))
-            .pipe(gulp.dest(paths.dist + '/images/'))
+            .pipe(gulp.dest(cfg.dist + '/images/'))
             .pipe(notify({ message: 'Images task complete' }));
 });
 
 // Fonts
 gulp.task('copyfonts', function() {
     gulp.src('./bower_components/font-awesome/fonts/**/*.{ttf,woff,eof,svg}*')
-     .pipe(gulp.dest(paths.dist + '/fonts/'));
+     .pipe(gulp.dest(cfg.dist + '/fonts/'));
 
     gulp.src('./bower_components/bootstrap/dist/fonts/**/*.{ttf,woff,eof,svg}*')
-     .pipe(gulp.dest(paths.dist + '/fonts/'));
+     .pipe(gulp.dest(cfg.dist + '/fonts/'));
 });
 
 // CSS
@@ -99,16 +111,16 @@ gulp.task('browser-sync', ['default'], function () {
         'app/styles/**/*.css',
         'app/images/**/*.png',
         'app/scripts/**/*.js',
-        paths.dist + '/**/*'
+        cfg.dist + '/**/*'
     ];
 
     browserSync.init(files, {
         server: {
-            baseDir: paths.dist,
+            baseDir: cfg.dist,
             index: "index.html"
         }
     });
 
     // Watch any files in dist/, reload on change
-    gulp.watch([paths.dist + '/**']).on('change', browserSync.reload);
+    gulp.watch([cfg.dist + '/**']).on('change', browserSync.reload);
 });
