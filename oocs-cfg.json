@@ -1,5 +1,5 @@
 {
-	"oocs-output": "html",
+	"oocs-output": "console",
 	"oocs-html-opts": {
 		"baseUrl": "http://localhost:8000/",
 		"publicDir": "html/json-server/public/"
