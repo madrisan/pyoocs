@@ -25,7 +25,7 @@ gutil.log(' - baseUrl: \'' +
           gutil.colors.cyan(oocs_cfg['oocs-html-opts'].baseUrl) + '\'');
 
 var cfg = {
-    dist: 'json-server/public/',
+    dist: 'server/public/',
     baseURL: oocs_cfg['oocs-html-opts'].baseUrl
 };
 

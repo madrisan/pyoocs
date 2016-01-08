@@ -31,7 +31,10 @@ In particular three different output formats are supported:
 * *html*: run an http server for displaying the result of the scan:
 ```json
  "oocs-output" : "html",
- "oocs-output-opts": { "port": 8000, "home": "html/json-server/public/" },
+ "oocs-html-opts": {
+     "baseUrl": "http://localhost:8000/",
+     "publicDir": "html/server/public/"
+ },
 ```
 
 ---
