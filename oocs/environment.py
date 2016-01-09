@@ -95,7 +95,8 @@ class Environment(object):
                                 'PATH contains ' + quote(ptok) +
                                 ' which is not owned by root')
                 match_mode, val_found = (
-                    fp.check_mode(['040700','040750','040755']))
+                    fp.check_mode(['040700','040750','040755',
+                                   '040500','040550','040555']))
                 if not match_mode:
                     message_add(localscan, 'critical',
                         'PATH contains ' + quote(ptok) +
