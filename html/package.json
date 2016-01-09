@@ -15,9 +15,11 @@
     "gulp-ng-annotate": "^1.1.0",
     "gulp-notify": "^2.2.0",
     "gulp-rename": "^1.2.2",
+    "gulp-replace": "~0.5.4",
     "gulp-rev": "^6.0.1",
     "gulp-uglify": "^1.5.1",
-    "gulp-usemin": "^0.3.16",
+    "gulp-usemin": "~0.3.12",
+    "gulp-util": "~3.0.7",
     "jshint": "^2.8.0",
     "jshint-stylish": "^2.1.0"
   },
