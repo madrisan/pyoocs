@@ -125,6 +125,8 @@ def _create_json(scan_result):
         modules_branch[module_name]['checks'] = checks
         modules_branch[module_name]['status'] = status
 
+        if max_severity == 'critical': continue
+
         for check, messages in checks.iteritems():
             severities = messages[0].keys()
             if 'critical' in severities:
@@ -133,7 +135,7 @@ def _create_json(scan_result):
             elif 'warning' in severities:
                 max_severity = 'warning'
 
-        json['scan'][hostname]['max_severity'] = [ max_severity ]
+    json['scan'][hostname]['max_severity'] = [ max_severity ]
 
     return json
 
