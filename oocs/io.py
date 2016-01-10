@@ -112,7 +112,7 @@ def _create_json(scan_result):
         }
     }
 
-    modules_branch = json['scan'][hostname]['modules'];
+    modules_branch = json['scan'][hostname]['modules']
 
     max_severity = 'success'
 
