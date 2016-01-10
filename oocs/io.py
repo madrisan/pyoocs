@@ -157,9 +157,9 @@ def _output_html(scan_result, publicdir, baseurl):
     import SocketServer
 
     class JSONRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
-        #def end_headers (self):
-        #    self.send_header('Access-Control-Allow-Origin', '*')
-        #    SimpleHTTPServer.SimpleHTTPRequestHandler.end_headers(self)
+        def end_headers (self):
+            self.send_header('Access-Control-Allow-Origin', '*')
+            SimpleHTTPServer.SimpleHTTPRequestHandler.end_headers(self)
         def do_GET(self):
             """Serve a GET request."""
             if self.path == "/scan" or self.path == '/scan/':
@@ -167,19 +167,27 @@ def _output_html(scan_result, publicdir, baseurl):
                 self.send_header("Content-type:", "text/html")
                 self.end_headers()
                 # send response:
-                json.dump(jsondata, self.wfile)
+                try:
+                    json.dump(jsondata['scan'], self.wfile)
+                except:
+                    die(2, 'runtime error while getting jsondata[\'scan\']')
             else:
                 return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
     url = urlparse(baseurl)
 
     try:
-        httpd = SocketServer.TCPServer(('0.0.0.0', url.port), JSONRequestHandler)
+        httpd = SocketServer.TCPServer(('localhost', url.port), JSONRequestHandler)
     except:
         die(2, "cannot open a TCP socket on port " + str(url.port))
 
     writeln('http server is running...\nhttp://localhost:%d' % url.port)
-    httpd.serve_forever()
+
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        writeln('\nShutting down the http server...')
+        httpd.server_close()
 
 def output_dump(scan):
     cfg = Config()

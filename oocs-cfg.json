@@ -2,7 +2,7 @@
 	"oocs-output": "console",
 	"oocs-html-opts": {
 		"baseUrl": "http://localhost:8000/",
-		"publicDir": "html/json-server/public/"
+		"publicDir": "html/server/public/"
 	},
 	"oocs-module": {
 		"environment": {
