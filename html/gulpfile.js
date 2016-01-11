@@ -50,8 +50,8 @@ gulp.task('default', ['clean'], function() {
 gulp.task('usemin', ['buildless', 'jshint'], function () {
     return gulp.src('./app/index.html')
             .pipe(usemin({
-                css:[minifycss(), rev()],
-                js: [replace('@baseURL@', 'http://localhost:8000/'),
+                css: [minifycss(), rev()],
+                js: [replace('@baseURL@', cfg.baseURL),
                      ngannotate(), uglify(), rev()]
             }))
             .pipe(gulp.dest(cfg.dist));
