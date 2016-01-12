@@ -64,7 +64,7 @@ class SudoParser(object):
         self.group_specs = {}
         self.user_specs = {}
 
-        self.user_exclude_list = self.cfg.get("exclude-users", [])
+        self.user_exclude_list = self.cfg.get("excluded-users", [])
 
         self._parse()
 
