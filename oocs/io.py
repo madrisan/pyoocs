@@ -68,7 +68,7 @@ import socket
 def _output_console(scan_result):
     "Scan with output sent to the console"
 
-    hostname = socket.getfqdn()
+    hostname = socket.gethostname()
 
     for scan in scan_result:
         "Display on the console the scan and status messages"
@@ -95,7 +95,7 @@ def _create_json(scan_result):
     from oocs.distribution import Distribution
     distro = Distribution()
 
-    hostname = socket.getfqdn()
+    hostname = socket.gethostname()
     json = {
         'scan' : {
             hostname : {
