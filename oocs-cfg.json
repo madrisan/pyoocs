@@ -11,7 +11,7 @@
 		},
 		"filesystem": {
 			"enable": 1,
-			"verbose": 0,
+			"verbose": 1,
 			"procfilesystem": "/proc",
 			"sysfilesystem": "/sys",
 			"required": [
@@ -59,7 +59,7 @@
 		},
 		"kernel": {
 			"enable": 1,
-			"verbose": 0,
+			"verbose": 1,
 			"forbidden-modules": [
 				"cramfs",
 				"freevxfs",
@@ -96,7 +96,7 @@
 		},
 		"packages": {
 			"enable": 1,
-			"verbose": 0,
+			"verbose": 1,
 			"package-manager": "rpm",
 			"forbidden": [
 				"telnet",
