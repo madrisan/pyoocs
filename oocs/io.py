@@ -150,7 +150,10 @@ def _output_html(scan_result, publicdir, baseurl):
     "Scan output in html format"
 
     jsondata = _create_json(scan_result);
-    chdir(publicdir)
+    try:
+        chdir(publicdir)
+    except:
+        die(2, "cannot access to the HTML root directory " + publicdir)
 
     # start a simple HTTP server
     import SimpleHTTPServer
