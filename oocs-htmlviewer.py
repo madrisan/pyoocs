@@ -28,7 +28,7 @@ def usage():
              progname + ' -u <baseurl> -p <publicdir> -s <json-scan>\n' +
              progname + ' -h\n\n' +
             'Example:\n' +
-            '%s -u %s -p %s -s %s' % (progname, baseurl, publicdir, scanfile))
+            '%s -u %s -p %s -s %s\n' % (progname, baseurl, publicdir, scanfile))
 
 def main():
     try:
@@ -37,6 +37,8 @@ def main():
     except getopt.GetoptError:
         usage()
         sys.exit(2)
+
+    baseurl = publicdir = scanjsonfile = None
 
     for o, a in opts:
         if o in ('-h', '--help'):
@@ -50,6 +52,10 @@ def main():
             scanjsonfile = a
         else:
             assert False, 'unhandled option'
+
+    if not baseurl or not publicdir or not scanjsonfile:
+        usage()
+        die(2, 'One of more arguments have not been set.')
 
     if not path.isfile(scanjsonfile):
         die(1, "JSON scan file not found: " + scanjsonfile)
