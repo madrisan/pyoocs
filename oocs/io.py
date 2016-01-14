@@ -146,16 +146,9 @@ def _output_json(scan_result):
     writeln(json.dumps(jsondata,
                        sort_keys=True, indent=2, separators=(',', ': ')))
 
-def _output_html(scan_result, publicdir, baseurl):
-    "Scan output in html format"
+def simple_http_server(baseurl, publicdir, jsondata):
+    "Start a simple HTTP server"
 
-    jsondata = _create_json(scan_result);
-    try:
-        chdir(publicdir)
-    except:
-        die(2, "cannot access to the HTML root directory " + publicdir)
-
-    # start a simple HTTP server
     import SimpleHTTPServer
     import SocketServer
 
@@ -177,6 +170,11 @@ def _output_html(scan_result, publicdir, baseurl):
             else:
                 return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
+    try:
+        chdir(publicdir)
+    except:
+        die(2, "cannot access to the HTML root directory " + publicdir)
+
     url = urlparse(baseurl)
 
     try:
@@ -184,13 +182,21 @@ def _output_html(scan_result, publicdir, baseurl):
     except:
         die(2, "cannot open a TCP socket on port " + str(url.port))
 
-    writeln('http server is running...\nhttp://localhost:%d' % url.port)
+    writeln('The Simple HTTP Server is running...\n\n' +
+            'Resources\nhttp://localhost:%d/scan\n\n' % url.port +
+            'Home\nhttp://localhost:%d\n' % url.port)
 
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         writeln('\nShutting down the http server...')
         httpd.server_close()
+
+def _output_html(scan_result, publicdir, baseurl):
+    "Scan output in html format"
+
+    jsondata = _create_json(scan_result);
+    simple_http_server(baseurl, publicdir, jsondata)
 
 def output_dump(scan):
     cfg = Config()
