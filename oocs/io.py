@@ -126,9 +126,7 @@ def _create_json(scan_result):
 
         if max_severity == 'critical': continue
 
-        #for check, messages in checks.iteritems():
         for check, messages in iteritems(checks):
-            writeln('DEBUG: check: %s\nmessages: %s\n' % (check, messages))
             severities = messages[0].keys()
             if 'critical' in severities:
                 max_severity = 'critical'
