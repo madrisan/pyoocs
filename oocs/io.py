@@ -2,9 +2,8 @@
 # Copyright (C) 2015,2016 Davide Madrisan <davide.madrisan.gmail.com>
 
 from os import chdir, path
-from urlparse import urlparse
 
-from oocs.py2x3 import json
+from oocs.py2x3 import iteritems, json, urlparse
 
 class Config(object):
     def __init__(self):
@@ -127,7 +126,9 @@ def _create_json(scan_result):
 
         if max_severity == 'critical': continue
 
-        for check, messages in checks.iteritems():
+        #for check, messages in checks.iteritems():
+        for check, messages in iteritems(checks):
+            writeln('DEBUG: check: %s\nmessages: %s\n' % (check, messages))
             severities = messages[0].keys()
             if 'critical' in severities:
                 max_severity = 'critical'
@@ -149,13 +150,12 @@ def _output_json(scan_result):
 def simple_http_server(baseurl, publicdir, jsondata):
     "Start a simple HTTP server"
 
-    import SimpleHTTPServer
-    import SocketServer
+    from oocs.py2x3 import HTTPServer, SocketServer
 
-    class JSONRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+    class JSONRequestHandler(HTTPServer.SimpleHTTPRequestHandler):
         def end_headers (self):
             self.send_header('Access-Control-Allow-Origin', '*')
-            SimpleHTTPServer.SimpleHTTPRequestHandler.end_headers(self)
+            HTTPServer.SimpleHTTPRequestHandler.end_headers(self)
         def do_GET(self):
             """Serve a GET request."""
             if self.path == "/scan" or self.path == '/scan/':
@@ -168,7 +168,7 @@ def simple_http_server(baseurl, publicdir, jsondata):
                 except:
                     die(2, 'runtime error while getting jsondata[\'scan\']')
             else:
-                return SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+                return HTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
     try:
         chdir(publicdir)

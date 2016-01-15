@@ -4,9 +4,35 @@
 import sys
 
 try:
+    import SimpleHTTPServer as HTTPServer
+except ImportError:
+    # Python 3
+    import http.server as HTTPServer
+
+try:
     import json
 except ImportError:
     import simplejson as json
+
+try:
+    import SocketServer
+except ImportError:
+    # Python 3
+    import socketserver as SocketServer
+
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
+
+try:
+    dict.iteritems
+except AttributeError:
+    # Python 3
+    def iteritems(d): return iter(d.items())
+else:
+    # Python 2
+    def iteritems(d): return d.iteritems()
 
 def python_major():
     '''Return the major version # of the python interpreter we're running on'''
