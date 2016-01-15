@@ -37,6 +37,9 @@ In particular three different output formats are supported:
  },
 ```
 
+The html mode is intended for debug and testing only.
+Use the script `oocs-htmlviewer.py` instead.
+
 ---
 
 > Project name | pyoocs
@@ -44,7 +47,7 @@ In particular three different output formats are supported:
 > Tags | Utilities/Security
 > License | GPL v3+
 > Operating System | Linux
-> Implementation | Python 2.4+
+> Implementation | Python 2.4+, Python 3
 > Current status | beta
 
 [1]: https://github.com/madrisan/pyoocs/blob/master/oocs-cfg.json

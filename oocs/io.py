@@ -162,8 +162,11 @@ def simple_http_server(baseurl, publicdir, jsondata):
                 self.end_headers()
                 # send response:
                 try:
-                    json.dump(jsondata['scan'], self.wfile)
+                    jsonstream = json.dumps(jsondata['scan'], sort_keys=True,
+                                            separators=(',', ': '))
+                    self.wfile.write(jsonstream.encode())
                 except:
+                    self.send_response(500)  # Internal Server Error
                     die(2, 'runtime error while getting jsondata[\'scan\']')
             else:
                 return WebServer.SimpleHTTPRequestHandler.do_GET(self)
