@@ -4,10 +4,10 @@
 import sys
 
 try:
-    import SimpleHTTPServer as HTTPServer
+    import SimpleHTTPServer as WebServer
 except ImportError:
     # Python 3
-    import http.server as HTTPServer
+    import http.server as WebServer
 
 try:
     import json

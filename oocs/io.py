@@ -148,12 +148,12 @@ def _output_json(scan_result):
 def simple_http_server(baseurl, publicdir, jsondata):
     "Start a simple HTTP server"
 
-    from oocs.py2x3 import HTTPServer, SocketServer
+    from oocs.py2x3 import SocketServer, WebServer
 
-    class JSONRequestHandler(HTTPServer.SimpleHTTPRequestHandler):
+    class JSONRequestHandler(WebServer.SimpleHTTPRequestHandler):
         def end_headers (self):
             self.send_header('Access-Control-Allow-Origin', '*')
-            HTTPServer.SimpleHTTPRequestHandler.end_headers(self)
+            WebServer.SimpleHTTPRequestHandler.end_headers(self)
         def do_GET(self):
             """Serve a GET request."""
             if self.path == "/scan" or self.path == '/scan/':
@@ -166,7 +166,7 @@ def simple_http_server(baseurl, publicdir, jsondata):
                 except:
                     die(2, 'runtime error while getting jsondata[\'scan\']')
             else:
-                return HTTPServer.SimpleHTTPRequestHandler.do_GET(self)
+                return WebServer.SimpleHTTPRequestHandler.do_GET(self)
 
     try:
         chdir(publicdir)
