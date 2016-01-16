@@ -70,7 +70,7 @@ def _output_console(scan_result):
     hostname = socket.gethostname()
 
     for scan in scan_result:
-        "Display on the console the scan and status messages"
+        # Display on the console the scan and status messages
         writeln('\n# host:' + hostname + ' module:' + scan['module'])
 
         for severity in scan.get('status', []):

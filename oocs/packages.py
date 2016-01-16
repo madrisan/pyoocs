@@ -1,8 +1,6 @@
 # This python module is part of the oocs scanner for Linux.
 # Copyright (C) 2015 Davide Madrisan <davide.madrisan.gmail.com>
 
-import rpm
-
 from oocs.io import Config, message_add, quote
 
 class Packages(object):
@@ -32,9 +30,14 @@ class Packages(object):
         
         self.package_manager = self.cfg.get('package-manager')
         self.forbidden = self.cfg.get('forbidden')
-        
+
     def installed_packages(self, nameonly=False):
         if not self.package_manager == 'rpm':
+            return None
+
+        try:
+            import rpm
+        except ImportError:
             return None
 
         ts = rpm.TransactionSet()
@@ -59,15 +62,20 @@ def check_packages(verbose=False):
             message_add(pck.scan['status'], 'info',
                 'skipping ' + quote(pck.module_name) +
                 ' (disabled in the configuration)')
-        return
+        return pck.scan
  
     if not pck.package_manager == "rpm":
         message_add(pck.scan['status'], 'warning',
             'unsupported package manager ' + quote(pck.package_manager) +
             ' ... skip')
-        return
+        return pck.scan
 
     installed_packages = pck.installed_packages(nameonly=True)
+    if not installed_packages:
+        message_add(pck.scan['status'], 'warning',
+            'no rpm installed... (did you install the rpm python bindings?)')
+        return pck.scan
+
     for pk in list(set(pck.forbidden) & set(installed_packages)):
         message_add(localscan, 'warning',
             'forbidden package found: ' + quote(pk))
