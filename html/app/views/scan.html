@@ -25,22 +25,34 @@
                 <li role="presentation"
                     ng-class="{active:isSelected(1)}">
                     <a ng-click="select(1)"
-                       aria-controls="all deviations" role="tab">All Tests</a>
+                       aria-controls="all deviations"
+                       role="tab">All Tests
+                       <span class="label label-primary label-as-badge">{{totals}}</span>
+                    </a>
                 </li>
                 <li role="presentation"
                     ng-class="{active:isSelected(2)}">
                     <a ng-click="select(2)"
-                       aria-controls="critical deviations" role="tab">Critical</a>
+                       aria-controls="critical deviations"
+                       role="tab">Critical
+                       <span class="label label-danger label-as-badge">{{criticals}}</span>
+                    </a>
                 </li>
                 <li role="presentation"
                     ng-class="{active:isSelected(3)}">
                     <a ng-click="select(3)"
-                       aria-controls="warning deviations" role="tab">Warning</a>
+                       aria-controls="warning deviations"
+                       role="tab">Warning
+                       <span class="label label-warning label-as-badge">{{warnings}}</span>
+                    </a>
                 </li>
                 <li role="presentation"
                     ng-class="{active:isSelected(4)}">
                     <a ng-click="select(4)"
-                       aria-controls="tests passed" role="tab">Passed</a>
+                       aria-controls="tests passed"
+                       role="tab">Passed
+                       <span class="label label-success label-as-badge">{{infos}}</span>
+                    </a>
                 </li>
             </ul>
 

@@ -39,13 +39,25 @@ angular.module('oocsApp')
                            status = jsondata[$scope.hostname].modules[moduleName].status;
 
                        return {
-                           checks  : checks,
-                           status  : status
+                           checks : checks,
+                           status : status
                        };
                    };
 
-                   $scope.max_severity = jsondata[$scope.hostname].max_severity[0];
-                   console.log('max_severity: ' + $scope.max_severity);
+                   var scan_summary = jsondata[$scope.hostname].summary;
+                   //console.log('summary: ' + JSON.stringify(scan_summary));
+
+                   $scope.max_severity = scan_summary.max_severity;
+                   //console.log('max_severity: ' + $scope.max_severity);
+
+                   $scope.infos = scan_summary.infos;
+                   //console.log('infos: ' + $scope.infos);
+                   $scope.warnings = scan_summary.warnings;
+                   //console.log('warnings: ' + $scope.warnings);
+                   $scope.criticals = scan_summary.criticals;
+                   //console.log('criticals: ' + $scope.criticals);
+
+                   $scope.totals = $scope.infos + $scope.warnings + $scope.criticals;
 
                    $scope.max_severity_label = function() {
                        var severities = {
