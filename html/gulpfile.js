@@ -41,6 +41,11 @@ gulp.task('clean', function() {
     return del([cfg.dist]);
 });
 
+// Clear cache
+gulp.task('clearcache', function (done) {
+    return cache.clearAll(done);
+});
+
 // Default task
 gulp.task('default', ['clean'], function() {
     gulp.start('buildless', 'usemin', 'copyviews', 'imagemin', 'copyfonts');
@@ -65,14 +70,13 @@ gulp.task('copyviews', function() {
 
 // Images
 gulp.task('imagemin', function() {
-    return del([cfg.dist + '/images/']), gulp.src('app/images/**/*')
-            .pipe(cache(imagemin({
-                optimizationLevel: 3,
-                progressive: true,
-                interlaced: true
-            })))
-            .pipe(gulp.dest(cfg.dist + '/images/'))
-            .pipe(notify({ message: 'Images task complete' }));
+    return del([cfg.dist + '/images/']), gulp.src('app/images/favicon.ico')
+            //.pipe(cache(imagemin({
+            //    optimizationLevel: 3,
+            //    progressive: true,
+            //    interlaced: true
+            //})))
+            .pipe(gulp.dest(cfg.dist + '/images/'));
 });
 
 // Fonts
@@ -101,7 +105,6 @@ gulp.task('watch', ['browser-sync'], function() {
 
   // Watch image files
   gulp.watch('app/images/**/*', ['imagemin']);
-
 });
 
 gulp.task('browser-sync', ['default'], function () {
