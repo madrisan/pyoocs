@@ -179,7 +179,8 @@ def simple_http_server(baseurl, publicdir, jsondata):
     url = urlparse(baseurl)
 
     try:
-        httpd = SocketServer.TCPServer(('localhost', url.port), JSONRequestHandler)
+        httpd = SocketServer.TCPServer(('localhost', url.port),
+                    JSONRequestHandler)
     except:
         die(2, "cannot open a TCP socket on port " + str(url.port))
 
