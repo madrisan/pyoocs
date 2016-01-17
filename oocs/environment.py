@@ -4,7 +4,7 @@
 from os import getenv, geteuid
 
 from oocs.filesystem import UnixFile
-from oocs.io import Config, die, message_add, quote
+from oocs.io import Config, die, message_add, quote, unlist
 
 class Environment(object):
 
@@ -40,13 +40,12 @@ class Environment(object):
         env_ld_library_path = self.getenv(env_var)
         localscan = {}
 
-        if self.verbose:
-            message_add(localscan, 'info',
-                        env_var + ' is ' + quote(env_ld_library_path))
         if env_ld_library_path:
             message_add(localscan, 'warning',
                 self.module_name +
                 env_var + ' is not empty: (' + quote(env_ld_library_path))
+        elif self.verbose:
+            message_add(localscan, 'info', env_var + ' is unset')
 
         message_add(self.scan['checks'], 'root LD_LIBRARY_PATH',
                     localscan)
@@ -57,7 +56,8 @@ class Environment(object):
         localscan = {}
 
         if self.verbose:
-            message_add(localscan, 'info', env_var + ' is ' + quote(env_path))
+            message_add(localscan, 'info', env_var + ' contains ' +
+               unlist(env_path.split(':')))
 
         # 'env_path' for code DEBUG:
         # env_path = "/usr/bin::./bin:.:/dev/null:/no/such/dir:/var/tmp:"
@@ -84,6 +84,7 @@ class Environment(object):
                         'PATH contains ' + quote(ptok) +
                         ' which does not exist')
                     continue
+
                 if not fp.isdir():
                     message_add(localscan, 'critical',
                         'PATH contains ' + quote(ptok) +
@@ -94,6 +95,7 @@ class Environment(object):
                     message_add(localscan, 'critical',
                                 'PATH contains ' + quote(ptok) +
                                 ' which is not owned by root')
+
                 match_mode, val_found = (
                     fp.check_mode(['040700','040750','040755',
                                    '040500','040550','040555']))
