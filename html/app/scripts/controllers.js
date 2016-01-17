@@ -1,82 +1,93 @@
 angular.module('oocsApp')
 
-       .controller('ScanController', ['$scope', 'ScanService', function($scope, ScanService) {
+       .controller('ScanController', ['$scope', '$state', 'ScanService',
+                   function($scope, $state, ScanService) {
+
            'use strict';
 
-           $scope.showScan = false;
-           $scope.message = "Loading ...";
+           var dispatchJSONdata = function() {
+               //console.log('executing the dispatchJSONdata() body...');
 
-           $scope.hostname = {};
-           $scope.distribution = {};
-           $scope.scan = {};
+               $scope.showScan = false;
+               $scope.message = "Loading ...";
 
-           ScanService.getJSONdata()
-           .then(
-               function(response) {
+               $scope.hostname = {};
+               $scope.distribution = {};
+               $scope.scan = {};
 
-                   function getkeys(data) {
-                       var keys = [];
-                       for (var key in data) {
-                           if (data.hasOwnProperty(key)) {
-                               keys.push(key);
+               ScanService.getJSONdata()
+               .then(
+                   function(response) {
+
+                       function getkeys(data) {
+                           var keys = [];
+                           for (var key in data) {
+                               if (data.hasOwnProperty(key)) {
+                                   keys.push(key);
+                               }
                            }
+                           return keys;
                        }
-                       return keys;
+
+                       var jsondata = response.data;
+
+                       $scope.hostname = getkeys(jsondata)[0];
+                       //console.log('hostname: ' + $scope.hostname);
+
+                       $scope.distribution =
+                           jsondata[$scope.hostname].distribution;
+                       //console.log('distribution: ' + $scope.distribution.description);
+
+                       $scope.modules = getkeys(jsondata[$scope.hostname].modules);
+                       //console.log($scope.modules);
+
+                       $scope.getModuleData = function (moduleName) {
+                           var checks = jsondata[$scope.hostname].modules[moduleName].checks,
+                               status = jsondata[$scope.hostname].modules[moduleName].status;
+
+                           return {
+                               checks : checks,
+                               status : status
+                           };
+                       };
+
+                       var scan_summary = jsondata[$scope.hostname].summary;
+                       //console.log('summary: ' + JSON.stringify(scan_summary));
+
+                       $scope.max_severity = scan_summary.max_severity;
+                       //console.log('max_severity: ' + $scope.max_severity);
+
+                       $scope.infos = scan_summary.infos;
+                       //console.log('infos: ' + $scope.infos);
+                       $scope.warnings = scan_summary.warnings;
+                       //console.log('warnings: ' + $scope.warnings);
+                       $scope.criticals = scan_summary.criticals;
+                       //console.log('criticals: ' + $scope.criticals);
+
+                       $scope.totals = $scope.infos + $scope.warnings + $scope.criticals;
+
+                       $scope.max_severity_label = function() {
+                           var severities = {
+                               'success' : 'label-success',
+                               'warning' : 'label-warning',
+                               'critical': 'label-danger'
+                           };
+
+                           var label = severities[$scope.max_severity];
+                           return label ? label : 'label-default';
+                       };
+
+                       $scope.showScan = true;
+                   },
+                   function(response) {
+                       $scope.message =
+                           "Error: " + response.status + " " + response.statusText;
                    }
+               );
+           };
 
-                   var jsondata = response.data;
-                   $scope.hostname = getkeys(jsondata)[0];
-                   //console.log('hostname: ' + $scope.hostname);
-                   $scope.distribution =
-                       jsondata[$scope.hostname].distribution;
-                   //console.log('distribution: ' + $scope.distribution.description);
-
-                   $scope.modules = getkeys(jsondata[$scope.hostname].modules);
-                   //console.log($scope.modules);
-
-                   $scope.getModuleData = function (moduleName) {
-                       var checks = jsondata[$scope.hostname].modules[moduleName].checks,
-                           status = jsondata[$scope.hostname].modules[moduleName].status;
-
-                       return {
-                           checks : checks,
-                           status : status
-                       };
-                   };
-
-                   var scan_summary = jsondata[$scope.hostname].summary;
-                   //console.log('summary: ' + JSON.stringify(scan_summary));
-
-                   $scope.max_severity = scan_summary.max_severity;
-                   //console.log('max_severity: ' + $scope.max_severity);
-
-                   $scope.infos = scan_summary.infos;
-                   //console.log('infos: ' + $scope.infos);
-                   $scope.warnings = scan_summary.warnings;
-                   //console.log('warnings: ' + $scope.warnings);
-                   $scope.criticals = scan_summary.criticals;
-                   //console.log('criticals: ' + $scope.criticals);
-
-                   $scope.totals = $scope.infos + $scope.warnings + $scope.criticals;
-
-                   $scope.max_severity_label = function() {
-                       var severities = {
-                           'success' : 'label-success',
-                           'warning' : 'label-warning',
-                           'critical': 'label-danger'
-                       };
-
-                       var label = severities[$scope.max_severity];
-                       return label ? label : 'label-default';
-                   };
-
-                   $scope.showScan = true;
-               },
-               function(response) {
-                   $scope.message =
-                       "Error: " + response.status + " " + response.statusText;
-               }
-           );
+           // initial load
+           dispatchJSONdata();
 
            $scope.tab = 1;
            $scope.issueClass = "";
@@ -112,6 +123,12 @@ angular.module('oocsApp')
                    return true;
 
                return false;
+           };
+
+           $scope.reload = function() {
+               //console.log('reloading app...');
+               dispatchJSONdata();
+               $state.reload('app');
            };
 
        }])
