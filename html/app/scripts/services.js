@@ -1,11 +1,11 @@
 angular.module('oocsApp')
-       .constant("baseURL", "@baseURL@")
-       .service('ScanService', ['$http', 'baseURL', function($http, baseURL) {
+       .constant("scanURL", "/scan")
+       .service('ScanService', ['$http', 'scanURL', function($http, scanURL) {
 
            'use strict';
 
            this.getJSONdata = function() {
-                return $http.get(baseURL + 'scan');
+                return $http.get(scanURL);
            };
 
         }])
