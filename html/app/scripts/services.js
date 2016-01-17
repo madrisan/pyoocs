@@ -1,5 +1,6 @@
 angular.module('oocsApp')
-       .constant("scanURL", "/scan")
+
+       .constant('scanURL', '/scan')
        .service('ScanService', ['$http', 'scanURL', function($http, scanURL) {
 
            'use strict';
