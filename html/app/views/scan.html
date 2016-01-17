@@ -64,7 +64,7 @@
                 <div ng-repeat="module in modules">
                     <p ng-click="collapsed = !collapsed"
                        ng-model="collapsed"
-                       ng-class="{'glyphicon glyphicon-chevron-right':collapsed, 'glyphicon glyphicon-chevron-down':!collapsed}"
+                       ng-class="{'fa fa-chevron-right':collapsed, 'fa fa-chevron-down':!collapsed}"
                        data-toggle="collapse" data-target="#{{module}}"
                        aria-expanded="false" aria-controls="{{module}}">
                        <strong> {{module.toUpperCase()}}</strong>
