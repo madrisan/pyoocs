@@ -86,7 +86,6 @@ angular.module('oocsApp')
                );
            };
 
-           // initial load
            dispatchJSONdata();
 
            $scope.tab = 1;
@@ -127,7 +126,6 @@ angular.module('oocsApp')
 
            $scope.reload = function() {
                //console.log('reloading app...');
-               dispatchJSONdata();
                $state.reload('app');
            };
 

@@ -1,17 +1,20 @@
 <div class="container" ng-controller="ScanController">
 
-    <div class="row row-content col-xs-12">
-        <ul class="breadcrumb">
-            <li class="active">Home</li>
-            <li><a ui-sref="app.about">About</a></li>
-        </ul>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul class="breadcrumb">
+                <li class="active">Home</a></li>
+                <li><a ui-sref="app.about">About</a></li>
+            </ul>
+        </div>
     </div>
 
-    <div class="row row-content col-xs-12" ng-if="!showScan">
+    <div class="row row-content" ng-if="!showScan">
         <h3>{{message}}</h3>
     </div>
 
-    <div class="row row-content col-xs-12" ng-if="showScan">
+    <div class="row row-content" ng-if="showScan">
+        <div class="col-xs-12">
 
         <h1><span class="label {{max_severity_label()}}">Linux host {{hostname}}</span></h1>
         <p style="padding:4px;"></p>
@@ -102,5 +105,6 @@
             </div>
         </div>
 
+        </div>
     </div>
 </div>
