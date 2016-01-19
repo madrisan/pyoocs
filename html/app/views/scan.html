@@ -64,12 +64,14 @@
 
         <div class="tab-content">
             <div ng-repeat="module in modules">
-                <p ng-click="collapsed = !collapsed"
-                   ng-model="collapsed"
-                   ng-class="{'fa fa-chevron-right':collapsed, 'fa fa-chevron-down':!collapsed}"
-                   data-toggle="collapse" data-target="#{{module}}"
-                   aria-expanded="false" aria-controls="{{module}}">
-                   <strong> {{module.toUpperCase()}}</strong>
+                <p class="list-group-item">
+                    <i ng-click="collapsed = !collapsed"
+                       ng-model="collapsed"
+                       ng-class="{'fa fa-chevron-right fa-fw':collapsed, 'fa fa-chevron-down fa-fw':!collapsed}"
+                       data-toggle="collapse" data-target="#{{module}}"
+                       aria-expanded="false" aria-controls="{{module}}">
+                    </i>
+                    <strong> {{module.toUpperCase()}}</strong>
                 </p>
 
                 <div class="collapse in" id="{{module}}">
