@@ -1,10 +1,20 @@
 # pyoocs
 
-![alt tag](https://madrisan.files.wordpress.com/2015/09/pyoocs-logo.png)
+![alt text][logo]
 
 ## Out of Compliance Scanner for Linux
 
 ### A customizable and modular security scanner for Linux
+
+> Project name | pyoocs
+> :--- | :---
+> Tags | Utilities/Security
+> License | GPL v3+
+> Operating System | Linux
+> Implementation | Python 2.4+, Python 3
+> Current status | beta
+
+#### Overview
 
 This project is at an early stage of development and only a few modules are currently available:
 
@@ -16,7 +26,7 @@ This project is at an early stage of development and only a few modules are curr
 * *sudo*: checks for root rights given to users and security issues
 
 The checks are configurable via a JSON file.
-You can found an example [here][1]
+You can found an example [here][jsoncfg]
 
 In particular three different output formats are supported:
 
@@ -40,14 +50,10 @@ In particular three different output formats are supported:
 The html mode is intended for debug and testing only.
 Use the script `oocs-htmlviewer.py` instead.
 
----
+#### Screenshot of the Web Interface
 
-> Project name | pyoocs
-> :--- | :---
-> Tags | Utilities/Security
-> License | GPL v3+
-> Operating System | Linux
-> Implementation | Python 2.4+, Python 3
-> Current status | beta
+![alt text][screenshot_web]
 
-[1]: https://github.com/madrisan/pyoocs/blob/master/oocs-cfg.json
+[jsoncfg]: https://github.com/madrisan/pyoocs/blob/master/oocs-cfg.json
+[logo]: https://madrisan.files.wordpress.com/2015/09/pyoocs-logo.png
+[screenshot_web]: https://madrisan.files.wordpress.com/2015/10/screencapture-pyoocs-web-interface.png
