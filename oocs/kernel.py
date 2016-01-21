@@ -117,7 +117,8 @@ def check_kernel(verbose=False):
                         ' (disabled in the configuration)')
         return
 
-    message_add(kernel.scan, 'infos', 'Kernel version: ' + kernel.version())
+    if verbose:
+        message_add(kernel.scan, 'infos', 'Kernel version: ' + kernel.version())
 
     kernel.check_runtime_parameters()
     kernel.check_forbidden_modules()
