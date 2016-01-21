@@ -162,7 +162,7 @@ def check_services(verbose=False):
                 'the service ' + quote(service.name()) +
                 ' is running (with pid:%s owner:%s)' % (
                 unlist(pids,sep=','), unlist(owners,sep=',')))
-        else:
+        elif not pids:
             message_add(localscan, 'critical',
                 'the service ' + quote(service.name()) + ' is not running')
 
