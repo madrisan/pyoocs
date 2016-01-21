@@ -12,10 +12,11 @@ __status__ = "Stable"
 
 import getopt
 from os import path
+from os.path import join
 import sys
 
+from oocs.filesystem import UnixFile
 from oocs.io import die, simple_http_server, writeln
-from oocs.py2x3 import json
 
 def usage():
     progname = sys.argv[0]
@@ -32,13 +33,13 @@ def usage():
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'u:p:s:h',
-                      ["baseurl=", "publicdir=", "scanfile=", "help"])
+        opts, args = getopt.getopt(sys.argv[1:], 'u:p:s:d:h',
+                   ["baseurl=", "publicdir=", "scanfile=", "scandir=", "help"])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
 
-    baseurl = publicdir = scanjsonfile = None
+    baseurl = publicdir = scanjsonfile = scandir = None
 
     for o, a in opts:
         if o in ('-h', '--help'):
@@ -50,26 +51,47 @@ def main():
             publicdir = a
         elif o in ('-s', '--scanfile'):
             scanjsonfile = a
+        elif o in ('-d', '--scandir'):
+            scandir = a
         else:
             assert False, 'unhandled option'
 
-    if not baseurl or not publicdir or not scanjsonfile:
+    if not baseurl or not publicdir or not (scanjsonfile or scandir):
         usage()
         die(2, 'One of more arguments have not been set.')
 
-    if not path.isfile(scanjsonfile):
-        die(1, "JSON scan file not found: " + scanjsonfile)
+    if scanjsonfile and scandir:
+        usage()
+        die(2, 'You cannot set both scanfile (-s) and scandir (-d).')
 
-    scanfd = open(scanjsonfile, 'r')
-    try:
-        scandata = json.load(scanfd)
-        scanfd.close();
-    except IOError:
-        die(1, 'I/O error while opening ' + scanjsonfile)
-    except ValueError:
-        die(1, 'Invalid json file: ' + scanjsonfile)
+    jsondata = []
 
-    simple_http_server(baseurl, publicdir, scandata)
+    if scanjsonfile:
+        fp = UnixFile(scanjsonfile)
+
+        (data, errmsg) = fp.readjson()
+        if not data:
+            die(1, errmsg)
+
+        jsondata.append(data)
+    elif scandir:
+        dp = UnixFile(scandir)
+
+        if not dp.isdir():
+            die(1, 'no such directory: ' + scandir)
+
+        for file in dp.filelist():
+            fp = UnixFile(join(dp.filename, file))
+
+            # skip the non json files
+            if fp.ext.lower() != '.json': continue
+
+            (data, errmsg) = fp.readjson()
+            jsondata.append(data)
+
+        die(2, 'FIXME: scandir is still not implemented')
+
+    simple_http_server(baseurl, publicdir, jsondata)
 
 if __name__ == '__main__':
     main()

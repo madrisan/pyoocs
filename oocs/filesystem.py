@@ -11,7 +11,7 @@ import subprocess
 from os.path import isdir, join
 
 from oocs.io import Config, die, message_add, quote, unlist
-from oocs.py2x3 import isbasestring
+from oocs.py2x3 import isbasestring, json
 
 # Octal representation for files modes:
 #
@@ -120,6 +120,8 @@ class UnixFile(object):
     def __init__(self, filename, abort_on_error=False):
         self.filename = filename
         self.exists = False
+        (_, self.ext) = os.path.splitext(filename)
+
         try:
             self.exists = os.path.exists(self.filename)
             # note: os.stat follows symbolic links
@@ -198,6 +200,22 @@ class UnixFile(object):
         except:
             content = []
         return content
+
+    def readjson(self):
+        "Return the data of a json file"
+        if not os.path.isfile(self.filename):
+            return (None, 'No such file ' + self.filename)
+
+        fd = open(self.filename, 'r')
+        try:
+            data = json.load(fd)
+            fd.close()
+        except IOError:
+            return (None, 'I/O error while opening ' + self.filename)
+        except ValueError:
+            return (None, 'Invalid json file: ' + self.filename)
+
+        return (data, 'No errors occurred')
 
     # owned by root and not writable by others
     def owned_by_root(self):

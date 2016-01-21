@@ -175,7 +175,8 @@ def simple_http_server(baseurl, publicdir, jsondata):
                 self.end_headers()
                 # send response:
                 try:
-                    jsonstream = json.dumps(jsondata['scan'], sort_keys=True,
+                    # FIXME: process all values, not only jsondata[0]
+                    jsonstream = json.dumps(jsondata[0]['scan'], sort_keys=True,
                                             separators=(',', ': '))
                     self.wfile.write(jsonstream.encode())
                 except:
