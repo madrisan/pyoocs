@@ -12,6 +12,7 @@ __status__ = "Stable"
 
 import getopt
 from os import path
+from os.path import basename
 from os.path import join
 import sys
 
@@ -30,6 +31,9 @@ def usage():
              progname + ' -h\n\n' +
             'Example:\n' +
             '%s -u %s -p %s -s %s\n' % (progname, baseurl, publicdir, scanfile))
+
+def warning(message):
+    sys.stderr.write(basename(__file__) + ': warning -- ' + message)
 
 def main():
     try:
@@ -73,7 +77,13 @@ def main():
         if not data:
             die(1, errmsg)
 
-        jsondata.append(data)
+        try:
+            # data integrity/format check
+            currhost = list(data['scan'])
+            jsondata.append(data)
+        except:
+            warning('skipping the json file ' + fp.filename + '\n')
+
     elif scandir:
         dp = UnixFile(scandir)
 
@@ -87,8 +97,15 @@ def main():
             if fp.ext.lower() != '.json': continue
 
             (data, errmsg) = fp.readjson()
-            jsondata.append(data)
 
+            try:
+                # data integrity/format check
+                currhost = list(data['scan'])
+                jsondata.append(data)
+            except:
+                warning('skipping the json file ' + fp.filename + '\n')
+
+    if scandir:
         die(2, 'FIXME: scandir is still not implemented')
 
     simple_http_server(baseurl, publicdir, jsondata)
