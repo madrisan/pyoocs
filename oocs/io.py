@@ -230,8 +230,8 @@ def simple_http_server(baseurl, publicdir, jsondata):
 def _output_html(scan_result, publicdir, baseurl):
     "Scan output in html format"
 
-    jsondata = _create_json(scan_result);
-    simple_http_server(baseurl, publicdir, jsondata)
+    jsondata = _create_json(scan_result)
+    simple_http_server(baseurl, publicdir, [jsondata])
 
 def output_dump(scan):
     cfg = Config()
