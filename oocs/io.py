@@ -2,6 +2,7 @@
 # Copyright (C) 2015,2016 Davide Madrisan <davide.madrisan.gmail.com>
 
 from os import chdir, path
+import re
 
 from oocs.py2x3 import iteritems, json, urlparse
 
@@ -169,19 +170,37 @@ def simple_http_server(baseurl, publicdir, jsondata):
             WebServer.SimpleHTTPRequestHandler.end_headers(self)
         def do_GET(self):
             """Serve a GET request."""
-            if self.path == "/scan" or self.path == '/scan/':
-                self.send_response(200)  # OK
-                self.send_header("Content-type:", "text/html")
-                self.end_headers()
-                # send response:
+            matchurl = re.match(r'^/scan(/(\d+)){0,1}$', self.path)
+
+            if matchurl:
+                if matchurl.group(2):
+                    scannum = int(matchurl.group(2))
+                else:
+                    # FIXME: the /scan page should give the informations about
+                    #   the available scan data (and servers).
+                    #   We default to /scan/0 for backward compatibility..
+                    scannum = 0
+
+                # send response
+
+                if scannum >= len(jsondata):
+                    self.send_error(404, 'File not found')
+                    return None
+
                 try:
-                    # FIXME: process all values, not only jsondata[0]
-                    jsonstream = json.dumps(jsondata[0]['scan'], sort_keys=True,
-                                            separators=(',', ': '))
+                    jsonstream = \
+                        json.dumps(jsondata[scannum]['scan'],
+                                   sort_keys=True, separators=(',', ': '))
+
+                    self.send_response(200)  # OK
+                    self.send_header("Content-type:", "text/plain")
+                    self.end_headers()
                     self.wfile.write(jsonstream.encode())
                 except:
-                    self.send_response(500)  # Internal Server Error
-                    die(2, 'runtime error while getting jsondata[\'scan\']')
+                    # runtime error while getting jsondata[scan]
+                    self.send_error(500, 'Internal Server Error')
+                    return None
+
             else:
                 return WebServer.SimpleHTTPRequestHandler.do_GET(self)
 
