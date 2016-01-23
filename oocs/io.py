@@ -176,9 +176,15 @@ def simple_http_server(baseurl, publicdir, jsondata):
                 if matchurl.group(2):
                     scannum = int(matchurl.group(2))
                 else:
-                    # FIXME: the /scan page should give the informations about
-                    #   the available scan data (and servers).
-                    #   We default to /scan/0 for backward compatibility..
+                    # the /scan page provides the informations about
+                    # the available scan data (server name + url).
+
+                    #from oocs.py2x3 import json
+                    #writeln('DEBUG: jsonheader:\n' + json.dumps(jsonheader,
+                    #         sort_keys=True, indent=2, separators=(',', ': ')))
+
+                    # FIXME: the /scan page should provide 'jsonheader'
+                    #        but for now we make it just an alias of /scan/0
                     scannum = 0
 
                 # send response
@@ -208,6 +214,30 @@ def simple_http_server(baseurl, publicdir, jsondata):
         chdir(publicdir)
     except:
         die(2, "cannot access to the HTML root directory " + publicdir)
+
+    jsonheader = dict()
+    urlnum = 0
+
+    for data in jsondata:
+        try:
+            # NOTE: we assume that each json file contains the data
+            #       of one host only
+            currhost = list(data['scan'])[0]
+
+            # map each host with the corresponding position
+            # (and thus url subpage).
+            # ie: host#1 --> 0 (--> /scan/0)
+            #     host#2 --> 1 (--> /scan/1)
+            #     ...
+            jsonheader[currhost] = urlnum
+        except:
+            pass
+
+        urlnum += 1
+
+    #from oocs.py2x3 import json
+    #writeln('DEBUG: jsonheader:\n' + json.dumps(jsonheader,
+    #         sort_keys=True, indent=2, separators=(',', ': ')))
 
     url = urlparse(baseurl)
 
