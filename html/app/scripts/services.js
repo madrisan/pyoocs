@@ -5,9 +5,9 @@ angular.module('oocsApp')
 
            'use strict';
 
-           this.getJSONdata = function() {
-                //console.log('DEBUG: executing http ' + scanURL);
-                return $http.get(scanURL);
+           this.getJSONdata = function(id) {
+                //console.log('DEBUG: executing http ' + scanURL + '/' + id);
+                return $http.get(scanURL + '/' + id);
            };
 
         }])

@@ -15,7 +15,7 @@ angular.module('oocsApp')
                $scope.distribution = {};
                $scope.scan = {};
 
-               ScanService.getJSONdata()
+               ScanService.getJSONdata(0)
                .then(
                    function(response) {
 

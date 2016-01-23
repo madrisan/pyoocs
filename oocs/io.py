@@ -168,27 +168,17 @@ def simple_http_server(baseurl, publicdir, jsondata):
         def end_headers (self):
             self.send_header('Access-Control-Allow-Origin', '*')
             WebServer.SimpleHTTPRequestHandler.end_headers(self)
+
         def do_GET(self):
             """Serve a GET request."""
+
             matchurl = re.match(r'^/scan(/(\d+)){0,1}$', self.path)
+            if not matchurl:
+                return WebServer.SimpleHTTPRequestHandler.do_GET(self)
 
-            if matchurl:
-                if matchurl.group(2):
-                    scannum = int(matchurl.group(2))
-                else:
-                    # the /scan page provides the informations about
-                    # the available scan data (server name + url).
-
-                    #from oocs.py2x3 import json
-                    #writeln('DEBUG: jsonheader:\n' + json.dumps(jsonheader,
-                    #         sort_keys=True, indent=2, separators=(',', ': ')))
-
-                    # FIXME: the /scan page should provide 'jsonheader'
-                    #        but for now we make it just an alias of /scan/0
-                    scannum = 0
-
-                # send response
-
+            # url: /scan/[0-9]+
+            if matchurl.group(2):
+                scannum = int(matchurl.group(2))
                 if scannum >= len(jsondata):
                     self.send_error(404, 'File not found')
                     return None
@@ -197,18 +187,32 @@ def simple_http_server(baseurl, publicdir, jsondata):
                     jsonstream = \
                         json.dumps(jsondata[scannum]['scan'],
                                    sort_keys=True, separators=(',', ': '))
-
-                    self.send_response(200)  # OK
-                    self.send_header("Content-type:", "text/plain")
-                    self.end_headers()
-                    self.wfile.write(jsonstream.encode())
                 except:
                     # runtime error while getting jsondata[scan]
                     self.send_error(500, 'Internal Server Error')
                     return None
 
+            # url: /scan
             else:
-                return WebServer.SimpleHTTPRequestHandler.do_GET(self)
+                # the /scan page provides the informations about
+                # the available scan data (server name + url).
+
+                #from oocs.py2x3 import json
+                #writeln('DEBUG: jsonheader:\n' + json.dumps(jsonheader,
+                #         sort_keys=True, indent=2, separators=(',', ': ')))
+
+                try:
+                    jsonstream = \
+                        json.dumps(jsonheader,
+                                   sort_keys=True, separators=(',', ': '))
+                except:
+                    self.send_error(500, 'Internal Server Error')
+                    return None
+
+            self.send_response(200)  # OK
+            self.send_header("Content-type:", "text/plain")
+            self.end_headers()
+            self.wfile.write(jsonstream.encode())
 
     try:
         chdir(publicdir)
