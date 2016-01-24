@@ -3,113 +3,14 @@
     <div class="row">
         <div class="col-xs-12">
             <ul class="breadcrumb">
-                <li class="active">Home</a></li>
+                <li class="active">Home</li>
                 <li><a ui-sref="app.about">About</a></li>
             </ul>
         </div>
     </div>
 
-    <div class="row row-content" ng-if="!showScan">
-        <h3>{{message}}</h3>
+    <div ng-repeat="(hostname, urlid) in urls">
+        <p>{{hostname}} : /scan/{{urlid}}</p>
     </div>
 
-    <div class="row row-content" ng-if="showScan">
-        <div class="col-xs-12">
-
-        <h1><span class="label {{max_severity_label()}}">Linux host {{hostname}}</span></h1>
-        <p style="padding:4px;"></p>
-        <p>{{distribution.description}}</p>
-
-        <p style="padding:10px;"></p>
-
-        <button id="reload-button" type="button"
-                class="btn btn-default btn-xs pull-right" ng-click="reload()">
-            <span class="fa fa-spinner"></span> Reload
-        </button>
-
-        <ul class="nav nav-tabs">
-            <li role="presentation"
-                ng-class="{active:isSelected(1)}">
-                <a ng-click="select(1)"
-                   aria-controls="all deviations"
-                   role="tab">All Tests
-                   <span class="label label-primary label-as-badge">{{totals}}</span>
-                </a>
-            </li>
-            <li role="presentation"
-                ng-class="{active:isSelected(2)}">
-                <a ng-click="select(2)"
-                   aria-controls="critical deviations"
-                   role="tab">Critical
-                   <span class="label label-danger label-as-badge">{{criticals}}</span>
-                </a>
-            </li>
-            <li role="presentation"
-                ng-class="{active:isSelected(3)}">
-                <a ng-click="select(3)"
-                   aria-controls="warning deviations"
-                   role="tab">Warning
-                   <span class="label label-warning label-as-badge">{{warnings}}</span>
-                </a>
-            </li>
-            <li role="presentation"
-                ng-class="{active:isSelected(4)}">
-                <a ng-click="select(4)"
-                   aria-controls="tests passed"
-                   role="tab">Passed
-                   <span class="label label-success label-as-badge">{{infos}}</span>
-                </a>
-            </li>
-        </ul>
-
-        <div class="tab-content">
-            <div ng-repeat="module in modules">
-                <p class="list-group-item">
-                    <i ng-click="collapsed = !collapsed"
-                       ng-model="collapsed"
-                       ng-class="{'fa fa-chevron-right fa-fw':collapsed, 'fa fa-chevron-down fa-fw':!collapsed}"
-                       data-toggle="collapse" data-target="#{{module}}"
-                       aria-expanded="false" aria-controls="{{module}}">
-                    </i>
-                    <strong> {{module.toUpperCase()}}</strong>
-                </p>
-
-                <div class="collapse in" id="{{module}}">
-                    <div class="panel panel-default"
-                         ng-repeat="(check, result) in getModuleData(module).checks">
-
-                        <div class="panel-heading"><strong>{{check}}</strong></div>
-                        <!--div class="panel-body">
-                            <p>...</p>
-                        </div-->
-
-                        <ul class="list-group">
-                            <li class="list-group-item list-group-item-danger"
-                                ng-hide="hideIssues('critical')"
-                                ng-repeat="entry in result[0].critical">
-                                <span class="label label-danger"><i class="fa fa-exclamation-circle"></i></span>
-                                &nbsp;<span id={{"scan-item-message-danger-" + module}}>{{entry}}</span>
-                            </li>
-                            <li class="list-group-item list-group-item-warning"
-                                ng-hide="hideIssues('warning')"
-                                ng-repeat="entry in result[0].warning">
-                                <span class="label label-warning"><i class="fa fa-question-circle"></i></span>
-                                &nbsp;<span id={{""scan-item-message-warning-" + module}}>{{entry}}</span>
-                            </li>
-                            <li class="list-group-item list-group-item-success"
-                                ng-hide="hideIssues('passed')"
-                                ng-repeat="entry in result[0].info">
-                                <span class="label label-success"><i class="fa fa-info-circle"></i></span>
-                                &nbsp;<span id={{""scan-item-message-info-" + module}}>{{entry}}</span>
-                            </li>
-                        </ul>
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        </div>
-    </div>
 </div>

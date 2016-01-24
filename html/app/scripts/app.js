@@ -7,17 +7,30 @@ angular.module('oocsApp', ['ui.router'])
 
            // route for the home page
            .state('app', {
-               url   :'/',
+               url   : '/',
                views : {
                    'header': {
                        templateUrl : 'views/header.html',
                    },
                    'content': {
-                       templateUrl : 'views/scan.html',
-                       controller  : 'ScanController'
+//                       templateUrl : 'views/scan.html',
+//                       controller  : 'ScanController'
+                       templateUrl : 'views/scandetail.html',
+                       controller  : 'ScanDetailController'
                    },
                    'footer': {
                        templateUrl : 'views/footer.html',
+                   }
+               }
+           })
+
+           // route for the scandetail page
+           .state('app.scadetail', {
+               url   : 'detail',
+               views : {
+                   'content@': {
+                       templateUrl : 'views/scandetail.html',
+                       controller  : 'ScanDetailController'
                    }
                }
            })
