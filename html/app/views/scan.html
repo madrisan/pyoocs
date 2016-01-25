@@ -9,8 +9,24 @@
         </div>
     </div>
 
-    <div ng-repeat="(hostname, urlid) in urls">
-        <p>{{hostname}} : /scan/{{urlid}}</p>
+   <div class="row row-content" ng-if="!showServerList">
+        <h3>{{message}}</h3>
+   </div>
+
+    <div class="row row-content" ng-if="showServerList">
+        <div class="col-xs-12">
+
+            <h3>Available Scan Reports</h3>
+
+            <ul class="list-group">
+                <div ng-repeat="(hostname, urlid) in urls">
+                    <li class="list-group-item">
+                    <a ui-sref="app.scandetail({id: urlid})">{{hostname}}</a>
+                    </li>
+                </div>
+            </ul>
+
+        </div>
     </div>
 
 </div>

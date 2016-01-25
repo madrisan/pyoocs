@@ -252,7 +252,6 @@ def simple_http_server(baseurl, publicdir, jsondata):
         die(2, "cannot open a TCP socket on port " + str(url.port))
 
     writeln('The Simple HTTP Server is running...\n\n' +
-            'Resources\nhttp://localhost:%d/scan\n\n' % url.port +
             'Home\nhttp://localhost:%d\n' % url.port)
 
     try:

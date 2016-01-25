@@ -1,4 +1,4 @@
-angular.module('oocsApp', ['ui.router'])
+angular.module('oocsApp', ['ui.router', 'ngResource'])
 
        .config(function($stateProvider, $urlRouterProvider) {
 
@@ -13,10 +13,8 @@ angular.module('oocsApp', ['ui.router'])
                        templateUrl : 'views/header.html',
                    },
                    'content': {
-//                       templateUrl : 'views/scan.html',
-//                       controller  : 'ScanController'
-                       templateUrl : 'views/scandetail.html',
-                       controller  : 'ScanDetailController'
+                       templateUrl : 'views/scan.html',
+                       controller  : 'ScanController'
                    },
                    'footer': {
                        templateUrl : 'views/footer.html',
@@ -25,8 +23,8 @@ angular.module('oocsApp', ['ui.router'])
            })
 
            // route for the scandetail page
-           .state('app.scadetail', {
-               url   : 'detail',
+           .state('app.scandetail', {
+               url   : 'scan/:id',
                views : {
                    'content@': {
                        templateUrl : 'views/scandetail.html',

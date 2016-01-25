@@ -105,8 +105,8 @@ def main():
             except:
                 warning('skipping the json file ' + fp.filename + '\n')
 
-    if scandir:
-        die(2, 'FIXME: scandir is still not implemented')
+    #if scandir:
+    #    die(2, 'FIXME: scandir is still not implemented')
 
     simple_http_server(baseurl, publicdir, jsondata)
 
