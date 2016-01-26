@@ -17,9 +17,16 @@
     <div class="row row-content" ng-if="showScan">
         <div class="col-xs-12">
 
-        <h1><span class="label {{max_severity_label()}}">Linux host {{hostname}}</span></h1>
-        <p style="padding:4px;"></p>
-        <p>{{distribution.description}}</p>
+        <h1>
+            <span class="label {{max_severity_label()}}"
+                  data-toggle="tooltip" data-placement="bottom"
+                  title="{{distribution.description}}">
+                Linux host {{hostname}}
+            </span>
+        </h1>
+
+        <!--p style="padding:4px;"></p>
+        <p>{{distribution.description}}</p-->
 
         <p style="padding:10px;"></p>
 
