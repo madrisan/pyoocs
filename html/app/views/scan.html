@@ -19,18 +19,19 @@
             <h3>Avalable Scan Reports</h3>
             <br>
 
-            <div class="input-group input-group-sm col-xs-6">
+            <div class="input-group input-group-sm col-lg-6">
                 <span class="input-group-addon" id="hostname-filter">
                     <i class="fa fa-search fa-pull-left"></i>
                 </span>
                 <input type="text" class="form-control"
+                       placeholder="Search for ..."
                        ng-model="search.hostname"
                        aria-describedby="hostname-filter">
             </div>
 
             <br>
 
-            <div class="input-group input-group-sm col-xs-6">
+            <div class="input-group input-group-sm col-lg-6">
                 <ul class="list-group">
                     <div ng-repeat="url in urls | filter:search:strict">
                         <li class="list-group-item">
