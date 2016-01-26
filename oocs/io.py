@@ -219,7 +219,7 @@ def simple_http_server(baseurl, publicdir, jsondata):
     except:
         die(2, "cannot access to the HTML root directory " + publicdir)
 
-    jsonheader = dict()
+    jsonheader = []
     urlnum = 0
 
     for data in jsondata:
@@ -233,15 +233,11 @@ def simple_http_server(baseurl, publicdir, jsondata):
             # ie: host#1 --> 0 (--> /scan/0)
             #     host#2 --> 1 (--> /scan/1)
             #     ...
-            jsonheader[currhost] = urlnum
+            jsonheader.append({ 'hostname': currhost, 'urlid': urlnum })
         except:
             pass
 
         urlnum += 1
-
-    #from oocs.py2x3 import json
-    #writeln('DEBUG: jsonheader:\n' + json.dumps(jsonheader,
-    #         sort_keys=True, indent=2, separators=(',', ': ')))
 
     url = urlparse(baseurl)
 

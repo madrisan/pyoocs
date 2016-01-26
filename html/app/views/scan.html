@@ -16,15 +16,29 @@
     <div class="row row-content" ng-if="showServerList">
         <div class="col-xs-12">
 
-            <h3>Available Scan Reports</h3>
+            <h3>Avalable Scan Reports</h3>
+            <br>
 
-            <ul class="list-group">
-                <div ng-repeat="(hostname, urlid) in urls">
-                    <li class="list-group-item">
-                    <a ui-sref="app.scandetail({id: urlid})">{{hostname}}</a>
-                    </li>
-                </div>
-            </ul>
+            <div class="input-group input-group-sm col-xs-6">
+                <span class="input-group-addon" id="hostname-filter">
+                    <i class="fa fa-search fa-pull-left"></i>
+                </span>
+                <input type="text" class="form-control"
+                       ng-model="search.hostname"
+                       aria-describedby="hostname-filter">
+            </div>
+
+            <br>
+
+            <div class="input-group input-group-sm col-xs-6">
+                <ul class="list-group">
+                    <div ng-repeat="url in urls | filter:search:strict">
+                        <li class="list-group-item">
+                        <a ui-sref="app.scandetail({id: url.urlid})">{{url.hostname}}</a>
+                        </li>
+                    </div>
+                </ul>
+            </div>
 
         </div>
     </div>

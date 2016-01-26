@@ -14,7 +14,7 @@ oocsAppModule.controller('ScanController', ['$scope', 'ScanService',
     function($scope, ScanService) {
         'use strict';
         $scope.showServerList = false;
-        $scope.urls = {};
+        $scope.urls = [];
 
         ScanService.getServerList()
         .then(
