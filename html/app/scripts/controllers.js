@@ -140,10 +140,6 @@ oocsAppModule.controller('ScanDetailController', ['$scope', '$stateParams', 'Sca
             return false;
         };
 
-        $scope.reload = function() {
-            //console.log('reloading app...');
-            $state.reload('app');
-        };
     }
 ]);
 
