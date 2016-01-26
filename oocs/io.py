@@ -196,11 +196,6 @@ def simple_http_server(baseurl, publicdir, jsondata):
             else:
                 # the /scan page provides the informations about
                 # the available scan data (server name + url).
-
-                #from oocs.py2x3 import json
-                #writeln('DEBUG: jsonheader:\n' + json.dumps(jsonheader,
-                #         sort_keys=True, indent=2, separators=(',', ': ')))
-
                 try:
                     jsonstream = \
                         json.dumps(jsonheader,
@@ -236,6 +231,10 @@ def simple_http_server(baseurl, publicdir, jsondata):
             jsonheader.append({ 'hostname': currhost, 'urlid': urlnum })
         except:
             pass
+
+        #from oocs.py2x3 import json
+        #writeln('DEBUG: jsonheader:\n' + json.dumps(jsonheader,
+        #        sort_keys=True, indent=2, separators=(',', ': ')))
 
         urlnum += 1
 
