@@ -53,7 +53,7 @@ Use the script `oocs-htmlviewer.py` instead.
 #### Screenshot of the Web Interface
 
 PyOOCS provides also a (single page MVC) web application, based on the UI Boostrap and AngularJS technologies,
-that let you to browse the list of the available security reports and select which one to check.
+that let you browse the list of the available security reports and select which one to check.
 
 Here's a screenshot of a detailed server report.
 Note that this server is tagged in red color because some critical deviations have been detected.
