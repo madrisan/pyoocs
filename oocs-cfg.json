@@ -41,6 +41,7 @@
 				"/home"      : ["root:root:040755"],
 				"/root"      : ["root:root:040750|040550|040700"],
 				"/tmp"       : ["root:root:041777"],
+				"/var/log"   : ["root:root:040755"],
 				"/var/tmp"   : ["root:root:041777"],
 				"/etc/crontab"     : ["root:root:100644"],
 				"/etc/cron.d"      : ["root:root:040700"],
