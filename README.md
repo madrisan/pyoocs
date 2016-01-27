@@ -52,6 +52,16 @@ Use the script `oocs-htmlviewer.py` instead.
 
 #### Screenshot of the Web Interface
 
+PyOOCS provides also a (single page MVC) web application, based on the UI Boostrap and AngularJS technologies,
+that let you to browse the list of the available security reports and select which one to check.
+
+Here's a screenshot of a detailed server report.
+Note that this server is tagged in red color because some critical deviations have been detected.
+Each class of vulnerabilities (_critical_ or _warning_) can be inspected by selecting the appropriate tab,
+which also show the number of occurrences that have been detected.
+By default all the tests are displayed.
+
+
 ![alt text][screenshot_web]
 
 [jsoncfg]: https://github.com/madrisan/pyoocs/blob/master/oocs-cfg.json
