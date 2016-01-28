@@ -33,9 +33,9 @@
 
             <div class="input-group input-group-sm col-lg-6">
                 <ul class="list-group">
-                    <div ng-repeat="url in urls | filter:search:strict">
-                        <li class="list-group-item">
-                        <a ui-sref="app.scandetail({id: url.urlid})">{{url.hostname}}</a>
+                    <div ng-repeat="srv in servers | filter:search:strict">
+                        <li class="list-group-item list-group-item-{{bootstrap_label(srv.max_severity)}}">
+                        <a ui-sref="app.scandetail({id: srv.urlid})">{{srv.hostname}}</a>
                         </li>
                     </div>
                 </ul>

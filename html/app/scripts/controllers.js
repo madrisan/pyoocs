@@ -10,19 +10,34 @@ var getkeys = function(data) {
     return keys;
 };
 
+// translate the json severity to the corresponding
+// bootstrap label color
+var bootstrap_label = function(severity) {
+    var severities = {
+        'success' : 'success',
+        'warning' : 'warning',
+        'critical': 'danger'
+    };
+
+    var label = severities[severity];
+    return label ? label : 'default';
+};
+
 oocsAppModule.controller('ScanController', ['$scope', 'ScanService',
     function($scope, ScanService) {
 
         'use strict';
 
         $scope.showServerList = false;
-        $scope.urls = [];
+        $scope.servers = [];
+
 
         ScanService.getServerList()
         .then(
             function(response) {
-                $scope.urls = response.data;
+                $scope.servers = response.data;
                 $scope.showServerList = true;
+                $scope.bootstrap_label = bootstrap_label;
             },
             function(response) {
                 $scope.message = "Error: " + response.status + " " + response.statusText;
@@ -87,14 +102,7 @@ oocsAppModule.controller('ScanDetailController',
                     $scope.totals = $scope.infos + $scope.warnings + $scope.criticals;
 
                     $scope.max_severity_label = function() {
-                        var severities = {
-                            'success' : 'label-success',
-                            'warning' : 'label-warning',
-                            'critical': 'label-danger'
-                        };
-
-                        var label = severities[$scope.max_severity];
-                        return label ? label : 'label-default';
+                        return "label-" + bootstrap_label($scope.max_severity);
                     };
 
                     $scope.showScan = true;

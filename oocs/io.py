@@ -222,13 +222,18 @@ def simple_http_server(baseurl, publicdir, jsondata):
             # NOTE: we assume that each json file contains the data
             #       of one host only
             currhost = list(data['scan'])[0]
+            summary = data['scan'][currhost]['summary']
 
             # map each host with the corresponding position
             # (and thus url subpage).
             # ie: host#1 --> 0 (--> /scan/0)
             #     host#2 --> 1 (--> /scan/1)
             #     ...
-            jsonheader.append({ 'hostname': currhost, 'urlid': urlnum })
+            jsonheader.append({
+                'hostname': currhost,
+                'urlid': urlnum,
+                'max_severity': summary['max_severity']
+            })
         except:
             pass
 
