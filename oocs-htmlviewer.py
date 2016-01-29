@@ -24,13 +24,16 @@ def usage():
 
     baseurl = "http://localhost:8000/"
     publicdir = "html/server/public/"
-    scanfile = "./issues.json"
+    scanfile = "issues.json"
+    scandir = "./jsonfiles/"
 
     writeln('Usage:\n' +
-             progname + ' -u <baseurl> -p <publicdir> -s <json-scan>\n' +
-             progname + ' -h\n\n' +
-            'Example:\n' +
-            '%s -u %s -p %s -s %s\n' % (progname, baseurl, publicdir, scanfile))
+        progname + ' -u <baseurl> -p <publicdir> -s <json-scan>\n' +
+        progname + ' -u <baseurl> -p <publicdir> -d <json-scan-dir>\n' +
+        progname + ' -h\n\n' +
+        'Example:\n' +
+        '%s -u %s -p %s -s %s\n' % (progname, baseurl, publicdir, scanfile) +
+        '%s -u %s -d %s -s %s\n' % (progname, baseurl, publicdir, scandir))
 
 def warning(message):
     sys.stderr.write(basename(__file__) + ': warning -- ' + message)
