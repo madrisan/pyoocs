@@ -34,6 +34,12 @@ PLATFORMS = "Linux"
 URL = "https://github.com/madrisan/pyoocs"
 
 from distutils.core import setup, Extension
+from distutils.command.install_scripts import install_scripts
+
+class oocs_install_scripts(install_scripts):
+    def run(self):
+        install_scripts.run(self)
+
 _oocs = Extension('_oocs', sources = ['ext/_oocs.c'])
 
 if __name__ == '__main__':
@@ -48,6 +54,7 @@ if __name__ == '__main__':
         license = LICENSE,
         platforms = PLATFORMS,
         url = URL,
-        py_modules = ['oocs'],
+        scripts = ['oocs.py'],
         packages=['oocs'],
-        ext_modules = [_oocs])
+        ext_modules = [_oocs],
+        cmdclass = { 'install_scripts': oocs_install_scripts })
