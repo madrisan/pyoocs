@@ -48,4 +48,6 @@ if __name__ == '__main__':
         license = LICENSE,
         platforms = PLATFORMS,
         url = URL,
+        py_modules = ['oocs'],
+        packages=['oocs'],
         ext_modules = [_oocs])
