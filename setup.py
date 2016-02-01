@@ -1,4 +1,4 @@
-NAME = 'PyOOCS'
+NAME = 'pyoocs'
 VERSION = '0'
 DESCRIPTION = "Out of Compliance Scanner for Linux"
 
@@ -54,7 +54,7 @@ if __name__ == '__main__':
         license = LICENSE,
         platforms = PLATFORMS,
         url = URL,
-        scripts = ['oocs.py'],
-        packages=['oocs'],
+        scripts = ['pyoocs.py', 'pyoocs-htmlviewer.py'],
+        packages = ['oocs'],
         ext_modules = [_oocs],
         cmdclass = { 'install_scripts': oocs_install_scripts })

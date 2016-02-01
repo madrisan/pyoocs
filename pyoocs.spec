@@ -1,4 +1,4 @@
-Name:          PyOOCS
+Name:          pyoocs
 Version:       0
 Release:       1mamba
 Summary:       Out of Compliance Scanner for Linux
@@ -23,7 +23,7 @@ BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 %{summary}.
 
 %prep
-%setup -q -n pyoocs-%{version}
+%setup -q -n pyoocs-%{version} -D -T
 
 %build
 CFLAGS="%{optflags}" %{__python} setup.py build
@@ -38,10 +38,10 @@ CFLAGS="%{optflags}" %{__python} setup.py build
 
 %files
 %defattr(-,root,root)
-%{_bindir}/oocs.py
+%{_bindir}/pyoocs.py
+%{_bindir}/pyoocs-htmlviewer.py
 %{python_sitearch}/*.egg-info
 %{python_sitearch}/*.so
-%{python_sitearch}/oocs.py*
 %{python_sitearch}/oocs/*.py*
 %doc LICENSE README.md
 
