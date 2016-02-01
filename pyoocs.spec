@@ -23,7 +23,7 @@ BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 %{summary}.
 
 %prep
-%setup -q -n pyoocs-%{version} -D -T
+%setup -q
 
 %build
 CFLAGS="%{optflags}" %{__python} setup.py build
@@ -36,6 +36,9 @@ CFLAGS="%{optflags}" %{__python} setup.py build
    --install-headers=%{_includedir}/python \
    --install-lib=%{python_sitearch}
 
+install -d %{buildroot}%{_sysconfdir}
+install -m 0644 oocs-cfg.json %{buildroot}%{_sysconfdir}/oocs-cfg.json
+
 %files
 %defattr(-,root,root)
 %{_bindir}/pyoocs.py
@@ -43,6 +46,7 @@ CFLAGS="%{optflags}" %{__python} setup.py build
 %{python_sitearch}/*.egg-info
 %{python_sitearch}/*.so
 %{python_sitearch}/oocs/*.py*
+%config(noreplace) %{_sysconfdir}/oocs-cfg.json
 %doc LICENSE README.md
 
 %changelog

@@ -8,7 +8,7 @@ from oocs.py2x3 import iteritems, json, urlparse
 
 class Config(object):
     def __init__(self):
-        self.configfile = 'oocs-cfg.json'
+        self.configfile = '/etc/oocs-cfg.json'
         if not path.isfile(self.configfile):
             die(1, "Configuration file not found: " + self.configfile)
 
