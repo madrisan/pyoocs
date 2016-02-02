@@ -356,12 +356,12 @@ def check_sudo(verbose=False):
             message_add(sudocfg.scan['status'], 'info',
                 'Skipping ' + quote(sudocfg.module_name) +
                 ' (disabled in the configuration)')
-        return
+        return {}
 
     if geteuid() != 0:
         message_add(sudocfg.scan['status'], 'warning',
             'This check (' + __name__ + ') must be run as root' + ' ... skip')
-        return
+        return {}
 
     (super_users, cmnd_warning, cmnd_normal) = sudocfg.catch_root_escalation()
 

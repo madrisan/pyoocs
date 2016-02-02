@@ -113,13 +113,13 @@ def check_environment(verbose=False):
             message_add(environment.scan['status'], 'info',
                         'Skipping ' + quote(environment.module_name) +
                         ' (disabled in the configuration)')
-        return
+        return {}
 
     if geteuid() != 0:
         message_add(environment.scan['status'], 'warning',
                     'This check (' + __name__ + ') must be run as root' +
                     ' ... skip')
-        return
+        return {}
 
     environment.check_path()
     environment.check_ld_library_path()

@@ -71,6 +71,8 @@ def _output_console(scan_result):
     hostname = socket.gethostname()
 
     for scan in scan_result:
+        if not scan: continue
+
         # Display on the console the scan and status messages
         writeln('\n# host:' + hostname + ' module:' + scan['module'])
 
@@ -119,6 +121,8 @@ def _create_json(scan_result):
 
     for scan in scan_result:
         module_name = scan.pop('module', None)
+        if not module_name: continue
+
         checks = scan.pop('checks', None)
         status = scan.pop('status', None)
 
