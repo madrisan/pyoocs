@@ -20,18 +20,6 @@
  * The function utmp_get_runlevel() is Copyright 2010 Lennart Poettering
  */
 
-/* How to build:
- *   python setup.py build
- *     --> build/lib.linux-x86_64-2.7/system.so 
- * How to install:
- *   python setup.py install
- *     --> /usr/lib64/python2.7/site-packages/system.so
- * How to test:
- *   import sys
- *   sys.path.append('build/lib.linux-x86_64-2.7/')
- *   from system import runlevel
- *   runlevel()  */
-
 #include <Python.h>
 
 #include <stdio.h>
@@ -103,7 +91,7 @@ int utmp_get_runlevel(int *runlevel, int *previous) {
         return r;
 }
 
-static PyObject * _oocs_runlevel(PyObject *self, PyObject *args) {
+static PyObject * _oocsext_runlevel(PyObject *self, PyObject *args) {
         int runlevel;
 
         if (utmp_get_runlevel(&runlevel, NULL) < 0) {
@@ -113,14 +101,14 @@ static PyObject * _oocs_runlevel(PyObject *self, PyObject *args) {
         return Py_BuildValue("c", runlevel <=0 ? 'N' : runlevel);
 }
 
-static PyMethodDef PyOOCSMethods[] = {
-        { "runlevel", _oocs_runlevel, METH_VARARGS,
+static PyMethodDef PyOOCSExtMethods[] = {
+        { "runlevel", _oocsext_runlevel, METH_VARARGS,
           "Print the current SysV runlevel." },
         { NULL, NULL, 0, NULL }        /* Sentinel */
 };
 
-PyMODINIT_FUNC init_oocs(void) {
-        (void) Py_InitModule("_oocs", PyOOCSMethods);
+PyMODINIT_FUNC init_oocsext(void) {
+        (void) Py_InitModule("_oocsext", PyOOCSExtMethods);
 }
 
 

@@ -40,7 +40,14 @@ class oocs_install_scripts(install_scripts):
     def run(self):
         install_scripts.run(self)
 
-_oocs = Extension('_oocs', sources = ['ext/_oocs.c'])
+cflags = ['-std=c99']
+additional_link_args = []
+
+oocsext = Extension('oocs._oocsext',
+    sources = ['ext/_oocs.c'],
+    extra_compile_args = cflags,
+    extra_link_args = additional_link_args
+)
 
 if __name__ == '__main__':
 
@@ -56,5 +63,6 @@ if __name__ == '__main__':
         url = URL,
         scripts = ['pyoocs.py', 'pyoocs-htmlviewer.py'],
         packages = ['oocs'],
-        ext_modules = [_oocs],
-        cmdclass = { 'install_scripts': oocs_install_scripts })
+        ext_modules = [oocsext],
+        cmdclass = { 'install_scripts': oocs_install_scripts }
+    )

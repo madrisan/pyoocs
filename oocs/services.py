@@ -8,6 +8,7 @@ from pwd import getpwuid
 
 from oocs.filesystem import Filesystems, UnixCommand, UnixFile
 from oocs.io import Config, message_add, quote, unlist
+from oocs._oocsext import runlevel
 
 class Services(object):
 
@@ -39,11 +40,11 @@ class Services(object):
 
     def configuration(self): return self.cfg
 
-    def runlevel(self):
-        rl = UnixCommand('/sbin/runlevel')
-        out, err, retcode = rl.execute()
-        if retcode != 0: return err or 'unknown error'
-        return out.split()[1]
+    def sysv_runlevel(self):
+        try:
+            return runlevel()
+        except:
+            return ''
 
 class Service(Services):
     def __init__(self, service):

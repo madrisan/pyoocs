@@ -44,8 +44,8 @@ install -m 0644 oocs-cfg.json %{buildroot}%{_sysconfdir}/oocs-cfg.json
 %{_bindir}/pyoocs.py
 %{_bindir}/pyoocs-htmlviewer.py
 %{python_sitearch}/*.egg-info
-%{python_sitearch}/*.so
 %{python_sitearch}/oocs/*.py*
+%{python_sitearch}/oocs/*.so
 %config(noreplace) %{_sysconfdir}/oocs-cfg.json
 %doc LICENSE README.md
 
