@@ -34,6 +34,7 @@ class Services(object):
 
         self.required = self.cfg.get("required", [])
         self.forbidden = self.cfg.get("forbidden", [])
+        self.runlevel = self.cfg.get("runlevel", '')
 
         self.enabled = (self.cfg.get('enable', 1) == 1)
         self.verbose = (self.cfg.get('verbose', verbose) == 1)
@@ -145,6 +146,12 @@ class Service(Services):
 def check_services(verbose=False):
     services = Services(verbose=verbose)
     localscan = {}
+
+    curr_runlevel = services.sysv_runlevel()
+    if services.runlevel and curr_runlevel != services.runlevel:
+        message_add(localscan, 'warning',
+            'the current runlevel is ' + quote(curr_runlevel) +
+            ' but should be ' + quote(services.runlevel))
 
     if not services.enabled:
         if verbose:

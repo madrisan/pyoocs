@@ -107,6 +107,7 @@
 		"services": {
 			"enable": 1,
 			"verbose": 1,
+			"runlevel": 3,
 			"required": [
 				"/usr/sbin/atd",
 				"/usr/sbin/sshd",
