@@ -19,10 +19,13 @@
  */
 
 #include <Python.h>
-
 #include "_oocs.h"
 
-static PyObject * _oocsext_runlevel(PyObject *self, PyObject *args) {
+static char oocsext_doc[] =
+"";
+
+static PyObject *
+_oocsext_runlevel(PyObject *self, PyObject *args) {
         int runlevel;
 
         if (utmp_get_runlevel(&runlevel, NULL) < 0) {
@@ -38,12 +41,33 @@ static PyMethodDef PyOOCSExtMethods[] = {
         { NULL, NULL, 0, NULL }        /* Sentinel */
 };
 
-PyMODINIT_FUNC init_oocsext(void) {
+#if PY_MAJOR_VERSION >= 3
+
+static struct PyModuleDef oocsext_module = {
+        PyModuleDef_HEAD_INIT,
+        "_oocsext",   /* name of module */
+        oocsext_doc,  /* module documentation, may be NULL */
+        -1,           /* size of per-interpreter state of the module,
+                         or -1 if the module keeps state in global variables. */
+        PyOOCSExtMethods
+};
+
+PyMODINIT_FUNC
+PyInit__oocsext(void) {
+        return PyModule_Create(&oocsext_module);
+}
+
+#else
+
+void
+init_oocsext(void) {
         (void) Py_InitModule("_oocsext", PyOOCSExtMethods);
 }
 
+#endif
 
-int main(int argc, char *argv[]) {
-        Py_SetProgramName(argv[0]);
+int
+main(int argc, char *argv[]) {
+        /* Initialize the Python interpreter */
         Py_Initialize();
 }
