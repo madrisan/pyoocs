@@ -1,3 +1,7 @@
+# rpm build instructions:
+#  - python2:  rpmbuild -ba pyoocs.spec
+#  - python3:  rpmbuild -ba pyoocs.spec --define="with_pyver 3"
+
 Name:          pyoocs
 Version:       0
 Release:       1mamba
@@ -22,6 +26,10 @@ BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 %description
 %{summary}.
 
+%if "%{?with_pyver}"
+%pyver_package
+%endif
+
 %prep
 %setup -q
 
@@ -33,21 +41,26 @@ CFLAGS="%{optflags}" %{__python} setup.py build
 %{__python} setup.py install \
    -O1 --skip-build \
    --root="%{buildroot}" \
-   --install-headers=%{_includedir}/python \
+   --install-headers=%{python_inc} \
    --install-lib=%{python_sitearch}
 
 install -d %{buildroot}%{_sysconfdir}
 install -m 0644 oocs-cfg.json %{buildroot}%{_sysconfdir}/oocs-cfg.json
 
-%files
+mv %{buildroot}%{_bindir}/pyoocs.py \
+   %{buildroot}%{_bindir}/py%{with_pyver}oocs.py
+mv %{buildroot}%{_bindir}/pyoocs-htmlviewer.py \
+   %{buildroot}%{_bindir}/py%{with_pyver}oocs-htmlviewer.py
+
+%files %{?pyappend}
 %defattr(-,root,root)
-%{_bindir}/pyoocs.py
-%{_bindir}/pyoocs-htmlviewer.py
+%{_bindir}/py%{with_pyver}oocs.py
+%{_bindir}/py%{with_pyver}oocs-htmlviewer.py
 %{python_sitearch}/*.egg-info
 %{python_sitearch}/oocs
 %config(noreplace) %{_sysconfdir}/oocs-cfg.json
 %doc LICENSE README.md
 
 %changelog
-* Tue Feb 09 2016 Davide Madrisan <davide.madrisan@gmail.com> 0-1mamba
+* Wed Feb 10 2016 Davide Madrisan <davide.madrisan@gmail.com> 0-1mamba
 - package created by autospec
