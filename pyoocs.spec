@@ -26,7 +26,7 @@ BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 %description
 %{summary}.
 
-%if "%{?with_pyver}"
+%if 0%{?with_pyver}
 %pyver_package
 %endif
 
@@ -47,10 +47,12 @@ CFLAGS="%{optflags}" %{__python} setup.py build
 install -d %{buildroot}%{_sysconfdir}
 install -m 0644 oocs-cfg.json %{buildroot}%{_sysconfdir}/oocs-cfg.json
 
+%if 0%{?with_pyver}
 mv %{buildroot}%{_bindir}/pyoocs.py \
    %{buildroot}%{_bindir}/py%{with_pyver}oocs.py
 mv %{buildroot}%{_bindir}/pyoocs-htmlviewer.py \
    %{buildroot}%{_bindir}/py%{with_pyver}oocs-htmlviewer.py
+%endif
 
 %files %{?pyappend}
 %defattr(-,root,root)
