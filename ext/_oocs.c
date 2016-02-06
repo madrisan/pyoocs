@@ -21,9 +21,6 @@
 #include <Python.h>
 #include "_oocs.h"
 
-static char oocsext_doc[] =
-"";
-
 static PyObject *
 _oocsext_runlevel(PyObject *self, PyObject *args) {
         int runlevel;
@@ -42,6 +39,8 @@ static PyMethodDef PyOOCSExtMethods[] = {
 };
 
 #if PY_MAJOR_VERSION >= 3
+static char oocsext_doc[] =
+"";
 
 static struct PyModuleDef oocsext_module = {
         PyModuleDef_HEAD_INIT,
@@ -63,7 +62,6 @@ void
 init_oocsext(void) {
         (void) Py_InitModule("_oocsext", PyOOCSExtMethods);
 }
-
 #endif
 
 int
