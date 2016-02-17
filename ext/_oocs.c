@@ -32,9 +32,16 @@ _oocsext_runlevel(PyObject *self, PyObject *args) {
         return Py_BuildValue("c", runlevel <=0 ? 'N' : runlevel);
 }
 
+static PyObject *
+_oocsext_systemd_active(PyObject *self, PyObject *args) {
+        return Py_BuildValue("i", systemd_active());
+}
+
 static PyMethodDef PyOOCSExtMethods[] = {
         { "runlevel", _oocsext_runlevel, METH_VARARGS,
           "Print the current SysV runlevel." },
+        { "systemd_active", _oocsext_systemd_active, METH_VARARGS,
+          "Return 0 if systemd is active, 1 otherwise." },
         { NULL, NULL, 0, NULL }        /* Sentinel */
 };
 

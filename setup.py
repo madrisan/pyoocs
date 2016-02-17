@@ -44,7 +44,7 @@ cflags = ['-std=c99']
 additional_link_args = []
 
 oocsext = Extension('oocs._oocsext',
-    sources = ['ext/_oocs.c', 'ext/runlevel.c'],
+    sources = ['ext/_oocs.c', 'ext/systemd.c', 'ext/runlevel.c'],
     extra_compile_args = cflags,
     extra_link_args = additional_link_args
 )

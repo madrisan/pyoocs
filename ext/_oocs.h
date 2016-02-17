@@ -16,3 +16,4 @@
 #pragma once
 
 int utmp_get_runlevel(int *runlevel, int *previous);
+int systemd_active();
