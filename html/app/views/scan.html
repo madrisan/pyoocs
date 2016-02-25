@@ -9,9 +9,9 @@
         </div>
     </div>
 
-   <div class="row row-content" ng-if="!showServerList">
+    <div class="row row-content" ng-if="!showServerList">
         <h3>{{message}}</h3>
-   </div>
+    </div>
 
     <div class="row row-content" ng-if="showServerList">
         <div class="col-xs-12">
@@ -35,7 +35,7 @@
                 <ul class="list-group">
                     <div ng-repeat="srv in servers | filter:search:strict">
                         <li class="list-group-item list-group-item-{{bootstrap_label(srv.max_severity)}}">
-                        <a ui-sref="app.scandetail({id: srv.urlid})">{{srv.hostname}}</a>
+                            <a ui-sref="app.scandetail({id: srv.urlid})">{{srv.hostname}}</a>
                         </li>
                     </div>
                 </ul>
