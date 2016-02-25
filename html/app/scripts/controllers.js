@@ -1,159 +1,142 @@
-var oocsAppModule = angular.module('oocsApp');
+(function() {
+    var app = angular.module('scan-controllers', ['scan-services']);
 
-var getkeys = function(data) {
-    var keys = [];
-    for (var key in data) {
-        if (data.hasOwnProperty(key)) {
-            keys.push(key);
+    var getkeys = function(data) {
+        var keys = [];
+        for (var key in data) {
+            if (data.hasOwnProperty(key)) {
+                keys.push(key);
+            }
         }
-    }
-    return keys;
-};
-
-// translate the json severity to the corresponding
-// bootstrap label color
-var bootstrap_label = function(severity) {
-    var severities = {
-        'success' : 'success',
-        'warning' : 'warning',
-        'critical': 'danger'
+        return keys;
     };
 
-    var label = severities[severity];
-    return label ? label : 'default';
-};
+    // translate the json severity to the corresponding
+    // bootstrap label color
+    var bootstrap_label = function(severity) {
+        var severities = {
+            'success' : 'success',
+            'warning' : 'warning',
+            'critical': 'danger'
+        };
 
-oocsAppModule.controller('ScanController', ['$scope', 'ScanService',
-    function($scope, ScanService) {
+        var label = severities[severity];
+        return label ? label : 'default';
+    };
 
-        'use strict';
+    app.controller('ScanController', ['$scope', 'ScanService',
+        function($scope, ScanService) {
+            $scope.showServerList = false;
+            $scope.servers = [];
 
-        $scope.showServerList = false;
-        $scope.servers = [];
-
-
-        ScanService.getServerList()
-        .then(
-            function(response) {
-                $scope.servers = response.data;
-                $scope.showServerList = true;
-                $scope.bootstrap_label = bootstrap_label;
-            },
-            function(response) {
-                $scope.message = "Error: " + response.status + " " + response.statusText;
+            ScanService.getServerList()
+                .then(
+                    function(response) {
+                        $scope.servers = response.data;
+                        $scope.showServerList = true;
+                        $scope.bootstrap_label = bootstrap_label;
+                    },
+                    function(response) {
+                        $scope.message = "Error: " + response.status + " " + response.statusText;
+                    }
+                );
             }
-        );
-    }
-]);
+    ]);
 
-oocsAppModule.controller('ScanDetailController',
-    ['$scope', '$stateParams', 'ScanDetailService',
-    function($scope, $stateParams, ScanDetailService) {
+    app.controller('ScanDetailController',
+                   ['$scope', '$stateParams', 'ScanDetailService',
+        function($scope, $stateParams, ScanDetailService) {
+            $scope.showScan = false;
+            $scope.message = "Loading ...";
 
-        'use strict';
+            $scope.hostname = {};
+            $scope.distribution = {};
+            $scope.modules = {};
 
-        //console.log('executing the dispatchJSONdata() body...');
+            ScanDetailService.getJSONdata()
+                .get({id:parseInt($stateParams.id, 10)})
+                .$promise.then(
+                    function(response) {
+                        var jsondata = response;
 
-        $scope.showScan = false;
-        $scope.message = "Loading ...";
+                        $scope.hostname = getkeys(jsondata)[0];
+                        //console.log('hostname: ' + $scope.hostname);
 
-        $scope.hostname = {};
-        $scope.distribution = {};
-        $scope.modules = {};
+                        $scope.distribution = jsondata[$scope.hostname].distribution;
+                        //console.log('distribution: ' + $scope.distribution.description);
 
-        ScanDetailService.getJSONdata()
-            .get({id:parseInt($stateParams.id, 10)})
-            .$promise.then(
-                function(response) {
-                    var jsondata = response;
+                        $scope.modules = getkeys(jsondata[$scope.hostname].modules);
+                        //console.log($scope.modules);
 
-                    $scope.hostname = getkeys(jsondata)[0];
-                    //console.log('hostname: ' + $scope.hostname);
+                        $scope.getModuleData = function (moduleName) {
+                            var checks = jsondata[$scope.hostname].modules[moduleName].checks,
+                                status = jsondata[$scope.hostname].modules[moduleName].status;
 
-                    $scope.distribution = jsondata[$scope.hostname].distribution;
-                    //console.log('distribution: ' + $scope.distribution.description);
-
-                    $scope.modules = getkeys(jsondata[$scope.hostname].modules);
-                    //console.log($scope.modules);
-
-                    $scope.getModuleData = function (moduleName) {
-                        var checks = jsondata[$scope.hostname].modules[moduleName].checks,
-                            status = jsondata[$scope.hostname].modules[moduleName].status;
-
-                        return {
-                            checks : checks,
-                            status : status
+                            return { checks: checks, status: status };
                         };
-                    };
 
-                    var scan_summary = jsondata[$scope.hostname].summary;
-                    //console.log('summary: ' + JSON.stringify(scan_summary));
+                        var scan_summary = jsondata[$scope.hostname].summary;
+                        //console.log('summary: ' + JSON.stringify(scan_summary));
 
-                    $scope.max_severity = scan_summary.max_severity;
-                    //console.log('max_severity: ' + $scope.max_severity);
+                        $scope.max_severity = scan_summary.max_severity;
+                        //console.log('max_severity: ' + $scope.max_severity);
+                        $scope.infos = scan_summary.infos;
+                        //console.log('infos: ' + $scope.infos);
+                        $scope.warnings = scan_summary.warnings;
+                        //console.log('warnings: ' + $scope.warnings);
+                        $scope.criticals = scan_summary.criticals;
+                        //console.log('criticals: ' + $scope.criticals);
+                        $scope.totals = $scope.infos + $scope.warnings + $scope.criticals;
 
-                    $scope.infos = scan_summary.infos;
-                    //console.log('infos: ' + $scope.infos);
-                    $scope.warnings = scan_summary.warnings;
-                    //console.log('warnings: ' + $scope.warnings);
-                    $scope.criticals = scan_summary.criticals;
-                    //console.log('criticals: ' + $scope.criticals);
+                        $scope.max_severity_label = function() {
+                            return "label-" + bootstrap_label($scope.max_severity);
+                        };
 
-                    $scope.totals = $scope.infos + $scope.warnings + $scope.criticals;
+                        $scope.showScan = true;
+                    },
+                    function(response) {
+                        $scope.message =
+                            "Error: " + response.status + " " + response.statusText;
+                    }
+                );
 
-                    $scope.max_severity_label = function() {
-                        return "label-" + bootstrap_label($scope.max_severity);
-                    };
+            $scope.tab = 1;
+            $scope.issueClass = "";
 
-                    $scope.showScan = true;
-                },
-                function(response) {
-                    $scope.message =
-                        "Error: " + response.status + " " + response.statusText;
+            $scope.select = function(setTab) {
+                $scope.tab = setTab;
+
+                if (setTab === 2) {
+                    $scope.issueClass = "critical";
                 }
-            );
+                else if (setTab === 3) {
+                    $scope.issueClass = "warning";
+                }
+                else if (setTab === 4) {
+                    $scope.issueClass = "passed";
+                }
+                else {
+                    $scope.issueClass = "";
+                }
+                //console.log("issueClass: " + $scope.issueClass);
+            };
 
-        $scope.tab = 1;
-        $scope.issueClass = "";
+            $scope.isSelected = function(checkTab) {
+                return ($scope.tab === checkTab);
+            };
 
-        $scope.select = function(setTab) {
-            $scope.tab = setTab;
+            $scope.hideIssues = function(currIssueClass) {
+                if ($scope.issueClass === "")
+                    return false;
 
-            if (setTab === 2) {
-                $scope.issueClass = "critical";
-            }
-            else if (setTab === 3) {
-                $scope.issueClass = "warning";
-            }
-            else if (setTab === 4) {
-                $scope.issueClass = "passed";
-            }
-            else {
-                $scope.issueClass = "";
-            }
+                if (currIssueClass != $scope.issueClass)
+                    return true;
 
-            //console.log("issueClass: " + $scope.issueClass);
-        };
-
-        $scope.isSelected = function(checkTab) {
-            return ($scope.tab === checkTab);
-        };
-
-        $scope.hideIssues = function(currIssueClass) {
-            if ($scope.issueClass === "")
                 return false;
+            };
+        }
+    ]);
 
-            if (currIssueClass != $scope.issueClass)
-                return true;
-
-            return false;
-        };
-
-    }
-]);
-
-oocsAppModule.controller('AboutController', ['$scope', function($scope) {
-    'use strict';
-
-    }
-]);
+    app.controller('AboutController', ['$scope', function($scope) {
+    }]);
+})();

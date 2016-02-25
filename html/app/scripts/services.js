@@ -1,21 +1,18 @@
-angular.module('oocsApp')
+(function() {
+    var app = angular.module('scan-services', []);
 
-       .constant('scanURL', '/scan')
+    app.constant('scanURL', '/scan');
 
-       .service('ScanService', ['$http', 'scanURL', function($http, scanURL) {
-           'use strict';
+    app.service('ScanService', ['$http', 'scanURL', function($http, scanURL) {
+        this.getServerList = function() {
+            return $http.get(scanURL);
+        };
+    }]);
 
-           this.getServerList = function() {
-               return $http.get(scanURL);
-           };
-       }])
-
-       .service('ScanDetailService', ['$resource', 'scanURL', function($resource, scanURL) {
-           'use strict';
-
-           this.getJSONdata = function() {
-               //console.log('DEBUG: executing http ' + scanURL + '/' + id);
-               return $resource(scanURL + '/:id', null, {'update': {method: 'PUT'}});
-           };
-       }])
-;
+    app.service('ScanDetailService', ['$resource', 'scanURL', function($resource, scanURL) {
+        this.getJSONdata = function() {
+            //console.log('DEBUG: executing http ' + scanURL + '/' + id);
+            return $resource(scanURL + '/:id', null, {'update': {method: 'PUT'}});
+        };
+    }]);
+})();
