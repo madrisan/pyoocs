@@ -21,6 +21,11 @@
 #include <Python.h>
 #include "_oocs.h"
 
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+
+#pragma message "Python major version: " STR(PY_MAJOR_VERSION)
+
 static PyObject *
 _oocsext_runlevel(PyObject *self, PyObject *args) {
         int runlevel;
