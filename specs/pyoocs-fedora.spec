@@ -88,7 +88,6 @@ popd
 %{_bindir}/pyoocs-htmlviewer.py
 %{_bindir}/pyoocs.py
 %{python2_sitearch}/%{modname}
-%{python2_sitearch}/*.so
 %{python2_sitearch}/*.egg-info
 %{_sysconfdir}/oocs-cfg.json
 
@@ -98,7 +97,6 @@ popd
 %{_bindir}/pyoocs-htmlviewer.py
 %{_bindir}/pyoocs.py
 %{python3_sitearch}/%{modname}
-%{python3_sitearch}/*.so
 %{python3_sitearch}/*.egg-info
 %{_sysconfdir}/oocs-cfg.json
 %endif
