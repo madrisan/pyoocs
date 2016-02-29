@@ -55,7 +55,7 @@
 				"/etc/shadow": ["root:root:100400|100000", "root:shadow:100640"],
 				"/etc/ssh/sshd_config": ["root:root:100640|100600"],
 				"files-in:/etc/profile.d/": ["root:root:100755|100644"],
-				"files-in:/var/log/sudo/" : ["root:root:100400"],
+				"files-in:/var/log/sudo/" : ["root:root:100400|100600"],
 				"subdirs-in:/home/": ["::040700"]
 			}
 		},
