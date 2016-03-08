@@ -33,7 +33,7 @@ def usage():
         progname + ' -h\n\n' +
         'Example:\n' +
         '%s -u %s -p %s -s %s\n' % (progname, baseurl, publicdir, scanfile) +
-        '%s -u %s -d %s -s %s\n' % (progname, baseurl, publicdir, scandir))
+        '%s -u %s -p %s -d %s\n' % (progname, baseurl, publicdir, scandir))
 
 def warning(message):
     sys.stderr.write(basename(__file__) + ': warning -- ' + message)
