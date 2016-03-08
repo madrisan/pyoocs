@@ -20,8 +20,7 @@
             'critical': 'danger'
         };
 
-        var label = severities[severity];
-        return label ? label : 'default';
+        return severities[severity] || 'default';
     };
 
     app.controller('ScanController', ['$scope', 'ScanService',
