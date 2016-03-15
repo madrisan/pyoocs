@@ -48,7 +48,7 @@ In particular three different output formats are supported:
 ```
 
 The html mode is intended for debug and testing only.
-Use the script `oocs-htmlviewer.py` instead.
+Use the script `oocs-htmlviewer.py` instead, or its Node.JS equivalent `oocs-htmlviewer.js`.
 
 #### Screenshot of the Web Interface
 
