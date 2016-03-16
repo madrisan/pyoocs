@@ -125,9 +125,12 @@ app.use('/scan', scanRouter);
 app.use(express.static(argv.publicdir));
 
 urlTokens = url.parse(argv.baseurl);
-var hostname = urlTokens.hostname,
-    port = urlTokens.port;
+var uri = {
+    hostname: urlTokens.hostname,
+    port: urlTokens.port
+};
 
-app.listen(port, hostname, function() {
-    console.log('Server running at http://%s:%s/', hostname, port);
+var server = app.listen(uri.port, uri.hostname, function() {
+    console.log('Server running at http://%s:%s/',
+                server.address().address, server.address().port);
 });
