@@ -3,13 +3,12 @@
 // HTML viewer for the Out of Compliance Scanner (pyOOCS)
 // Copyright (C) 2016 Davide Madrisan <davide.madrisan.gmail.com>
 
-var express = require('express'),
-    path = require('path'),
-    fs = require('fs'),
-    url = require('url'),
-    bodyParser = require('body-parser');
-
-var progName = path.basename(__filename);
+var express = require('express')
+  , app = express()
+  , path = require('path')
+  , fs = require('fs')
+  , url = require('url')
+  , bodyParser = require('body-parser');
 
 var argv = require('yargs')
     .usage('Usage: $0 -u <baseurl> -p <publicdir> -d <json-scan-dir>')
@@ -28,6 +27,8 @@ var argv = require('yargs')
     .alias('h', 'help')
     .epilog('Copyright (C) 2016 Davide Madrisan <davide.madrisan.gmail.com>')
     .argv
+
+var progName = path.basename(__filename);
 
 var checkDir = function(dir) {
     fs.stat(dir, function(err, stats) {
@@ -52,9 +53,7 @@ for (var i in scanFiles) {
     }
 }
 
-var app = express();
 var scanRouter = express.Router();
-
 scanRouter.use(bodyParser.json());
 
 scanRouter.route('/')
@@ -105,16 +104,21 @@ scanRouter.route('/:dishId')
     .get(function(req, res, next) {
         if (req.params.dishId > jsonFiles.length) {
             res.writeHead(404, { 'Content-Type': 'text/html' });
-            res.write('404 Not Found\n');
+            res.end('<h1>404 Not Found - Scan ID out of bound</h1>');
         }
         else {
             var jsonFile = path.join(argv.scandir, jsonFiles[req.params.dishId]);
-            var jsonObj = JSON.parse(fs.readFileSync(jsonFile));
 
-            res.writeHead(200, { 'Content-Type': 'text/json' });
-            res.write(JSON.stringify(jsonObj.scan));
+            fs.readFile(jsonFile, function(err, data) {
+                if (err) {
+                    res.writeHead(500, { 'Content-Type': 'text/html' });
+                    res.end('<h1>500 Internal Error - Cannot read JSON file</h1>');
+                }
+                res.writeHead(200, { 'Content-Type': 'text/json' });
+                var jsonObj = JSON.parse(data);
+                res.end(JSON.stringify(jsonObj.scan));
+            });
         }
-        res.end();
     });
 
 app.use('/scan', scanRouter);
