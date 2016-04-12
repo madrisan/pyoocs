@@ -2,6 +2,7 @@
 # Copyright (C) 2015,2016 Davide Madrisan <davide.madrisan.gmail.com>
 
 from os import chdir, path
+import datetime as dt
 import re
 
 from oocs.py2x3 import iteritems, json, urlparse
@@ -98,9 +99,12 @@ def _create_json(scan_result):
     distro = Distribution()
 
     hostname = socket.gethostname()
+    now = dt.datetime.now()
+
     json = {
         'scan' : {
             hostname : {
+                'scan_time' : now.isoformat(),
                 'distribution' : {
                     'codename'      : distro.codename,
                     'description'   : distro.description,
