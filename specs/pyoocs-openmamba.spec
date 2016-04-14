@@ -2,6 +2,8 @@
 #  - python2:  rpmbuild -ba pyoocs.spec
 #  - python3:  rpmbuild -ba pyoocs.spec --define="with_pyver 3"
 
+%global webserverdir /srv/www-oocs/html/server/public
+
 Name:          pyoocs
 Version:       0
 Release:       1mamba
@@ -21,6 +23,7 @@ BuildRequires: glibc-devel
 ## AUTOBUILDREQ-END
 BuildRequires: libpython-devel
 Requires:      python >= %python_version
+BuildRequires: nodejs
 BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 
 %description
@@ -30,11 +33,24 @@ BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 %pyver_package
 %endif
 
+%package html
+Group:         Applications/Security
+Summary:       Web Front-end for %{name}
+
+%description html
+Web Front-end for %{name}.
+
 %prep
 %setup -q
 
 %build
 CFLAGS="%{optflags}" %{__python} setup.py build
+
+# build the front-end AngularJS application
+cd html
+bower install
+npm install
+gulp
 
 %install
 [ "%{buildroot}" != / ] && rm -rf "%{buildroot}"
@@ -54,14 +70,22 @@ mv %{buildroot}%{_bindir}/pyoocs-htmlviewer.py \
    %{buildroot}%{_bindir}/py%{with_pyver}oocs-htmlviewer.py
 %endif
 
+# install the front-end
+install -d %{buildroot}%{webserverdir}
+cp -r html/server/public/* %{buildroot}%{webserverdir}
+
 %files %{?pyappend}
 %defattr(-,root,root)
-%{_bindir}/py%{with_pyver}oocs.py
-%{_bindir}/py%{with_pyver}oocs-htmlviewer.py
+%{_bindir}/py%{?with_pyver}oocs.py
+%{_bindir}/py%{?with_pyver}oocs-htmlviewer.py
 %{python_sitearch}/*.egg-info
 %{python_sitearch}/oocs
 %config(noreplace) %{_sysconfdir}/oocs-cfg.json
 %doc LICENSE README.md
+
+%files html
+%defattr(-,root,root)
+%{webserverdir}
 
 %changelog
 * Wed Feb 10 2016 Davide Madrisan <davide.madrisan@gmail.com> 0-1mamba
