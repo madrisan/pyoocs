@@ -2,7 +2,8 @@
 #  - python2:  rpmbuild -ba pyoocs.spec
 #  - python3:  rpmbuild -ba pyoocs.spec --define="with_pyver 3"
 
-%global webserverdir /srv/www-oocs/html/server/public
+%global _webserverdir /srv/www-oocs/html/server/public
+%global _htmlviewerdir /srv/www-oocs/html/viewer
 
 Name:          pyoocs
 Version:       0
@@ -17,13 +18,10 @@ URL:           https://github.com/madrisan/pyoocs
 Source:        https://github.com/madrisan/pyoocs.git/master/pyoocs-%{version}.tar.bz2
 License:       GPLv3
 Requires:      python >= %python_version
-BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 ## AUTOBUILDREQ-BEGIN
 BuildRequires: glibc-devel
-## AUTOBUILDREQ-END
-BuildRequires: libpython-devel
-Requires:      python >= %python_version
 BuildRequires: nodejs
+## AUTOBUILDREQ-END
 BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 
 %description
@@ -37,9 +35,6 @@ BuildRoot:     %{_tmppath}/%{name}-%{version}-root
 Group:         Applications/Security
 Summary:       Web Front-end for %{name}
 
-%description html
-Web Front-end for %{name}.
-
 %prep
 %setup -q
 
@@ -51,6 +46,9 @@ cd html
 bower install
 npm install
 gulp
+
+cd pyoocs-htmlviewer
+npm install
 
 %install
 [ "%{buildroot}" != / ] && rm -rf "%{buildroot}"
@@ -71,8 +69,12 @@ mv %{buildroot}%{_bindir}/pyoocs-htmlviewer.py \
 %endif
 
 # install the front-end
-install -d %{buildroot}%{webserverdir}
-cp -r html/server/public/* %{buildroot}%{webserverdir}
+install -d %{buildroot}%{_webserverdir}
+cp -r html/server/public/* %{buildroot}%{_webserverdir}
+
+# install the htmlviewer
+install -d %{buildroot}%{_htmlviewerdir}
+cp -r html/pyoocs-htmlviewer/* %{buildroot}%{_htmlviewerdir}
 
 %files %{?pyappend}
 %defattr(-,root,root)
@@ -85,7 +87,8 @@ cp -r html/server/public/* %{buildroot}%{webserverdir}
 
 %files html
 %defattr(-,root,root)
-%{webserverdir}
+%{_webserverdir}
+%{_htmlviewerdir}
 
 %changelog
 * Wed Feb 10 2016 Davide Madrisan <davide.madrisan@gmail.com> 0-1mamba
