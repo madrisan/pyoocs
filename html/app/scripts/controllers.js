@@ -55,26 +55,24 @@
             ScanDetailService.getJSONdata()
                 .get({id:parseInt($stateParams.id, 10)})
                 .$promise.then(
-                    function(response) {
-                        var jsondata = response;
-
-                        $scope.hostname = getkeys(jsondata)[0];
+                    function(jsondata) {
+                        $scope.hostname = jsondata._id;
                         //console.log('hostname: ' + $scope.hostname);
-
-                        $scope.distribution = jsondata[$scope.hostname].distribution;
+                        $scope.distribution = jsondata.distribution;
                         //console.log('distribution: ' + $scope.distribution.description);
-
-                        $scope.modules = getkeys(jsondata[$scope.hostname].modules);
-                        //console.log($scope.modules);
+                        $scope.modules = getkeys(jsondata.modules);
+                        //console.log('modules: ' + $scope.modules);
 
                         $scope.getModuleData = function (moduleName) {
-                            var checks = jsondata[$scope.hostname].modules[moduleName].checks,
-                                status = jsondata[$scope.hostname].modules[moduleName].status;
+                            var checks = jsondata.modules[moduleName].checks,
+                                status = jsondata.modules[moduleName].status;
 
                             return { checks: checks, status: status };
                         };
+                        //console.log('getModuleData(filesystem).checks = ' +
+                        //    JSON.stringify($scope.getModuleData('filesystem').checks));
 
-                        var scan_summary = jsondata[$scope.hostname].summary;
+                        var scan_summary = jsondata.summary;
                         //console.log('summary: ' + JSON.stringify(scan_summary));
 
                         $scope.max_severity = scan_summary.max_severity;

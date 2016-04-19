@@ -81,8 +81,8 @@ def main():
             die(1, errmsg)
 
         try:
-            # data integrity/format check
-            currhost = list(data['scan'])
+            # (too much) simple data integrity/format check
+            currhost = data['_id']
             jsondata.append(data)
         except:
             warning('skipping the json file ' + fp.filename + '\n')
@@ -102,8 +102,8 @@ def main():
             (data, errmsg) = fp.readjson()
 
             try:
-                # data integrity/format check
-                currhost = list(data['scan'])
+                # (too much) simple data integrity/format check
+                currhost = data['_id']
                 jsondata.append(data)
             except:
                 warning('skipping the json file ' + fp.filename + '\n')

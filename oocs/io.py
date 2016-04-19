@@ -102,23 +102,20 @@ def _create_json(scan_result):
     now = dt.datetime.now()
 
     json = {
-        'scan' : {
-            hostname : {
-                'scan_time' : now.isoformat(),
-                'distribution' : {
-                    'codename'      : distro.codename,
-                    'description'   : distro.description,
-                    'majversion'    : distro.majversion,
-                    'patch_release' : distro.patch_release,
-                    'vendor'        : distro.vendor,
-                    'version'       : distro.version
-                },
-                'modules' : {}
-            }
-        }
+        '_id' : hostname,
+        'scan_time' : now.isoformat(),
+        'distribution' : {
+            'codename'      : distro.codename,
+            'description'   : distro.description,
+            'majversion'    : distro.majversion,
+            'patch_release' : distro.patch_release,
+            'vendor'        : distro.vendor,
+            'version'       : distro.version
+        },
+        'modules' : {}
     }
 
-    modules_branch = json['scan'][hostname]['modules']
+    modules_branch = json['modules']
 
     max_severity = 'success'
     infos = warnings = criticals = 0
@@ -151,7 +148,7 @@ def _create_json(scan_result):
             elif 'warning' in severities:
                 max_severity = 'warning'
 
-    json['scan'][hostname]['summary'] = {
+    json['summary'] = {
         "max_severity": max_severity,
         "infos": infos,
         "warnings": warnings,
@@ -193,7 +190,7 @@ def simple_http_server(baseurl, publicdir, jsondata):
 
                 try:
                     jsonstream = \
-                        json.dumps(jsondata[scannum]['scan'],
+                        json.dumps(jsondata[scannum],
                                    sort_keys=True, separators=(',', ': '))
                 except:
                     # runtime error while getting jsondata[scan]
@@ -229,8 +226,8 @@ def simple_http_server(baseurl, publicdir, jsondata):
         try:
             # NOTE: we assume that each json file contains the data
             #       of one host only
-            currhost = list(data['scan'])[0]
-            summary = data['scan'][currhost]['summary']
+            currhost = data['_id']
+            summary = data['summary']
 
             # map each host with the corresponding position
             # (and thus url subpage).
