@@ -47,7 +47,7 @@ bower install
 npm install
 gulp
 
-cd pyoocs-htmlviewer
+cd viewer
 npm install
 
 %install
@@ -74,7 +74,7 @@ cp -r html/server/public/* %{buildroot}%{_webserverdir}
 
 # install the htmlviewer
 install -d %{buildroot}%{_htmlviewerdir}
-cp -r html/pyoocs-htmlviewer/* %{buildroot}%{_htmlviewerdir}
+cp -r html/viewer/* %{buildroot}%{_htmlviewerdir}
 
 %files %{?pyappend}
 %defattr(-,root,root)
