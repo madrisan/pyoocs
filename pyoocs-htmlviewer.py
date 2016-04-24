@@ -82,7 +82,7 @@ def main():
 
         try:
             # (too much) simple data integrity/format check
-            currhost = data['_id']
+            currhost = data['hostname']
             jsondata.append(data)
         except:
             warning('skipping the json file ' + fp.filename + '\n')
@@ -103,7 +103,7 @@ def main():
 
             try:
                 # (too much) simple data integrity/format check
-                currhost = data['_id']
+                currhost = data['hostname']
                 jsondata.append(data)
             except:
                 warning('skipping the json file ' + fp.filename + '\n')
