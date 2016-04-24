@@ -23,7 +23,7 @@ def usage():
     progname = sys.argv[0]
 
     baseurl = "http://localhost:8000/"
-    publicdir = "html/server/public/"
+    publicdir = "/srv/www-oocs/html/server/public/"
     scanfile = "issues.json"
     scandir = "./jsonfiles/"
 

@@ -43,7 +43,7 @@ In particular three different output formats are supported:
  "oocs-output" : "html",
  "oocs-html-opts": {
      "baseUrl": "http://localhost:8000/",
-     "publicDir": "html/server/public/"
+     "publicDir": "/srv/www-oocs/html/server/public/"
  },
 ```
 
