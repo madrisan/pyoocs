@@ -1,8 +1,8 @@
 {
-  "name": "pyoocs-htmlviewer",
+  "name": "pyoocs-viewer",
   "version": "0.0.1",
   "description": "HTML viewer for the Out of Compliance Scanner (pyOOCS)",
-  "main": "pyoocs-htmlviewer.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,13 +16,15 @@
     "linux"
   ],
   "author": "Davide Madrisan",
-  "license": "GPLv3",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/madrisan/pyoocs/issues"
   },
   "dependencies": {
-    "yargs": "~4.2.0",
+    "body-parser": "~1.15.0",
     "express": "~4.13.4",
-    "body-parser": "~1.15.0"
+    "express-params": "0.0.3",
+    "http-status": "^0.2.2",
+    "mongodb": "^2.1.16"
   }
 }

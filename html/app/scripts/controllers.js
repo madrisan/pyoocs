@@ -53,7 +53,7 @@
             $scope.modules = {};
 
             ScanDetailService.getJSONdata()
-                .get({id:parseInt($stateParams.id, 10)})
+                .get({id:parseInt($stateParams.id, 16)})
                 .$promise.then(
                     function(jsondata) {
                         $scope.hostname = jsondata._id;

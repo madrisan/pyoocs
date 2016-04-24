@@ -102,7 +102,7 @@ def _create_json(scan_result):
     now = dt.datetime.now()
 
     json = {
-        '_id' : hostname,
+        'hostname' : hostname,
         'scan_time' : now.isoformat(),
         'distribution' : {
             'codename'      : distro.codename,
@@ -226,7 +226,7 @@ def simple_http_server(baseurl, publicdir, jsondata):
         try:
             # NOTE: we assume that each json file contains the data
             #       of one host only
-            currhost = data['_id']
+            currhost = data['hostname']
             summary = data['summary']
 
             # map each host with the corresponding position
