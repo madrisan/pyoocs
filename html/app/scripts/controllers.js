@@ -56,7 +56,7 @@
                 .get({id: $stateParams.id})
                 .$promise.then(
                     function(jsondata) {
-                        $scope.hostname = jsondata._id;
+                        $scope.hostname = jsondata.hostname;
                         //console.log('hostname: ' + $scope.hostname);
                         $scope.distribution = jsondata.distribution;
                         //console.log('distribution: ' + $scope.distribution.description);
