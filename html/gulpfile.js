@@ -46,7 +46,7 @@ gulp.task('usemin', ['buildless', 'jshint'], function () {
     return gulp.src('./app/index.html')
             .pipe(usemin({
                 css: [minifycss(), rev()],
-                js: [ngannotate(), uglify(), rev()]
+                js: [ngannotate(), /*uglify(),*/ rev()]
             }))
             .pipe(gulp.dest(cfg.dist));
 });
