@@ -2,7 +2,8 @@ var express = require('express')
   , assert = require('assert')
   , bodyParser = require('body-parser')
   , path = require('path')
-  , HTTPStatus = require('http-status');
+  , HTTPStatus = require('http-status')
+  , ObjectID = require('mongodb').ObjectID;
 
 var db = require('../db');
 
@@ -21,7 +22,7 @@ module.exports = function() {
             collection.find({}, query).toArray(function(err, docs) {
                 assert.equal(err, null, 'mongodb find() error');
                 docs.forEach(function(doc) {
-                    console.log(doc.hostname);
+                    //console.log(doc.hostname);
                     jsonHeader.push({
                         'hostname': doc.hostname,
                         'urlid': doc._id,
@@ -35,18 +36,22 @@ module.exports = function() {
 
     api.route('/:id')
         .get(function(req, res, next) {
+            console.log('req.params.id: ' + req.params.id);
+
             var collection = db.get().collection('scan')
-              , query = { _id: req.params.id };
+              , query = { _id: ObjectID(req.params.id) };
 
             collection.findOne(query, function(err, doc) {
                 assert.equal(err, null, 'mongodb findOne() error');
+                console.log('returned doc: ' + JSON.stringify(doc));
                 if (doc) {
                     console.log(JSON.stringify(doc));
                     res.json(doc);
                 }
                 else {
                     res.writeHead(HTTPStatus.NOT_FOUND, { 'Content-Type': 'text/html' });
-                    res.end('<h1>' + HTTPStatus.NOT_FOUND + ' Not Found - Unknown scan id</h1>');
+                    res.end('<h1>' + HTTPStatus.NOT_FOUND +
+                            ' Not Found - Unknown scan id ' + req.params.id + '</h1>');
                 }
             });
         });

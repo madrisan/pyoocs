@@ -11,7 +11,7 @@
 
     app.service('ScanDetailService', ['$resource', 'scanURL', function($resource, scanURL) {
         this.getJSONdata = function() {
-            //console.log('DEBUG: executing http ' + scanURL + '/' + id);
+            console.log('DEBUG: executing http ' + scanURL + '/' + id);
             return $resource(scanURL + '/:id', null, {'update': {method: 'PUT'}});
         };
     }]);
