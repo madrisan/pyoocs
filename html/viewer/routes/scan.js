@@ -36,16 +36,15 @@ module.exports = function() {
 
     api.route('/:id')
         .get(function(req, res, next) {
-            console.log('req.params.id: ' + req.params.id);
+            //console.log('req.params.id: ' + req.params.id);
 
             var collection = db.get().collection('scan')
               , query = { _id: ObjectID(req.params.id) };
 
             collection.findOne(query, function(err, doc) {
                 assert.equal(err, null, 'mongodb findOne() error');
-                console.log('returned doc: ' + JSON.stringify(doc));
                 if (doc) {
-                    console.log(JSON.stringify(doc));
+                    //console.log('returned doc: ' + JSON.stringify(doc));
                     res.json(doc);
                 }
                 else {
