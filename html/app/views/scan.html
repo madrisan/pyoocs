@@ -10,7 +10,10 @@
     </div>
 
     <div class="row row-content" ng-if="!showServerList">
-        <h3>{{message}}</h3>
+        <div class="alert alert-danger" role="alert">
+           <h3>{{mainMessage}}</h3>
+           <p>{{detailedMessage}}</p>
+        </div>
     </div>
 
     <div class="row row-content" ng-if="showServerList">

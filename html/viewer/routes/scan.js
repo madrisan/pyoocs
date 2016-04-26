@@ -19,8 +19,13 @@ module.exports = function() {
               , query = { hostname: 1, summary: 1 };
 
             assert(collection, 'collection is null');
-            collection.find({}, query).toArray(function(err, docs) {
-                assert.equal(err, null, 'mongodb find() error');
+
+            collection.find({}, query).toArray(function(error, docs) {
+                if (error) {
+                     return res.
+                         status(HTTPStatus.INTERNAL_SERVER_ERROR).
+                         json({ error: error.toString() });
+                }
                 docs.forEach(function(doc) {
                     //console.log(doc.hostname);
                     jsonHeader.push({
@@ -38,19 +43,26 @@ module.exports = function() {
         .get(function(req, res, next) {
             //console.log('req.params.id: ' + req.params.id);
 
-            var collection = db.get().collection('scan')
-              , query = { _id: ObjectID(req.params.id) };
+            var collection = db.get().collection('scan');
+            try {
+                query = { _id: ObjectID(req.params.id) };
+            }
+            catch(error) {
+                return res.
+                    status(HTTPStatus.INTERNAL_SERVER_ERROR).
+                    json({ error: error.message });
+            }
 
-            collection.findOne(query, function(err, doc) {
-                assert.equal(err, null, 'mongodb findOne() error');
+            collection.findOne(query, function(error, doc) {
+                assert.equal(error, null, 'mongodb findOne() error');
                 if (doc) {
-                    //console.log('returned doc: ' + JSON.stringify(doc));
                     res.json(doc);
+                    //console.log('returned doc: ' + JSON.stringify(doc));
                 }
                 else {
-                    res.writeHead(HTTPStatus.NOT_FOUND, { 'Content-Type': 'text/html' });
-                    res.end('<h1>' + HTTPStatus.NOT_FOUND +
-                            ' Not Found - Unknown scan id ' + req.params.id + '</h1>');
+                     return res.
+                         status(HTTPStatus.NOT_FOUND).
+                         json({ error: 'No such document ' + req.params.id });
                 }
             });
         });

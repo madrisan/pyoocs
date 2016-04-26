@@ -36,7 +36,8 @@
                         $scope.bootstrap_label = bootstrap_label;
                     },
                     function(response) {
-                        $scope.message = "Error: " + response.status + " " + response.statusText;
+                        $scope.message = "Error " + response.status +
+                            " (" + response.statusText + ") -- " + response.data.error;
                     }
                 );
             }
@@ -46,7 +47,8 @@
                    ['$scope', '$stateParams', 'ScanDetailService',
         function($scope, $stateParams, ScanDetailService) {
             $scope.showScan = false;
-            $scope.message = "Loading ...";
+            $scope.mainMessage = 'Loading ...';
+            $scope.detailedMessage = '';
 
             $scope.hostname = {};
             $scope.distribution = {};
@@ -92,8 +94,9 @@
                         $scope.showScan = true;
                     },
                     function(response) {
-                        $scope.message =
-                            "Error: " + response.status + " " + response.statusText;
+                        $scope.mainMessage = "Error " + response.status +
+                            " (" + response.statusText + ")";
+                        $scope.detailedMessage = response.data.error;
                     }
                 );
 
