@@ -9,10 +9,10 @@ var express = require('express')
 module.exports = function() {
     var app = express();
 
-    app.use(favicon(path.join(__dirname, '../server/public/images', 'favicon.ico')));
+    app.use(favicon(path.join(__dirname, '../public/images', 'favicon.ico')));
     app.use(logger('dev'));
     app.use('/scan', require('./routes/scan')());
-    app.use(express.static(path.join(__dirname, '../server/public')));
+    app.use(express.static(path.join(__dirname, '../public')));
 
     return app;
 };

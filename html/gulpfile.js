@@ -16,12 +16,12 @@ var gulp        = require('gulp'),
     less        = require('gulp-less');
 
 var cfg = {
-    dist: 'server/public/'
+    dist: 'public/'
 };
 
 // JavaScript syntax checker
 gulp.task('jshint', function() {
-    return gulp.src('app/scripts/**/*.js')
+    return gulp.src('client/app/scripts/**/*.js')
             .pipe(jshint())
             .pipe(jshint.reporter(stylish));
 });
@@ -43,7 +43,7 @@ gulp.task('default', ['clean'], function() {
 
 // Minification and uglification
 gulp.task('usemin', ['buildless', 'jshint'], function () {
-    return gulp.src('./app/index.html')
+    return gulp.src('client/app/index.html')
             .pipe(usemin({
                 css: [minifycss(), rev()],
                 js: [ngannotate(), /*uglify(),*/ rev()]
@@ -53,13 +53,13 @@ gulp.task('usemin', ['buildless', 'jshint'], function () {
 
 // Views
 gulp.task('copyviews', function() {
-    return gulp.src('app/views/**/*.html')
+    return gulp.src('client/app/views/**/*.html')
             .pipe(gulp.dest(cfg.dist + '/views/'));
 });
 
 // Images
 gulp.task('imagemin', function() {
-    return del([cfg.dist + '/images/']), gulp.src('app/images/favicon.ico')
+    return del([cfg.dist + '/images/']), gulp.src('client/app/images/favicon.ico')
             //.pipe(cache(imagemin({
             //    optimizationLevel: 3,
             //    progressive: true,
@@ -70,39 +70,39 @@ gulp.task('imagemin', function() {
 
 // Fonts
 gulp.task('copyfonts', function() {
-    gulp.src('./bower_components/font-awesome/fonts/**/*.{ttf,woff,eof,svg}*')
+    gulp.src('client/bower_components/font-awesome/fonts/**/*.{ttf,woff,eof,svg}*')
      .pipe(gulp.dest(cfg.dist + '/fonts/'));
 
-    gulp.src('./bower_components/bootstrap/dist/fonts/**/*.{ttf,woff,eof,svg}*')
+    gulp.src('client/bower_components/bootstrap/dist/fonts/**/*.{ttf,woff,eof,svg}*')
      .pipe(gulp.dest(cfg.dist + '/fonts/'));
 });
 
 // CSS
 gulp.task('buildless', function() {
-    return gulp.src('app/styles/**/*.less')
+    return gulp.src('client/app/styles/**/*.less')
      .pipe(less())
-     .pipe(gulp.dest('./app/styles'));
+     .pipe(gulp.dest('client/app/styles'));
 });
 
 // Watch
 gulp.task('watch', ['browser-sync'], function() {
   // Watch .js .css and .html files
-  gulp.watch('{app/scripts/**/*.js,app/styles/**/*.less,app/**/*.html}', ['usemin']);
+  gulp.watch('{client/app/scripts/**/*.js,client/app/styles/**/*.less,client/app/**/*.html}', ['usemin']);
 
   // Watch views html files
-  gulp.watch('app/views/**/*.html', ['copyviews']);
+  gulp.watch('client/app/views/**/*.html', ['copyviews']);
 
   // Watch image files
-  gulp.watch('app/images/**/*', ['imagemin']);
+  gulp.watch('client/app/images/**/*', ['imagemin']);
 });
 
 gulp.task('browser-sync', ['default'], function () {
     var files = [
-        'app/index.html',
-        'app/views/**/*.html',
-        'app/styles/**/*.css',
-        'app/images/**/*.png',
-        'app/scripts/**/*.js',
+        'client/app/index.html',
+        'client/app/views/**/*.html',
+        'client/app/styles/**/*.css',
+        'client/app/images/**/*.png',
+        'client/app/scripts/**/*.js',
         cfg.dist + '/**/*'
     ];
 

@@ -1,6 +1,22 @@
 {
-  "name": "pyoocs",
-  "private": true,
+  "name": "oocs-viewer",
+  "version": "0.0.1",
+  "description": "HTML viewer for the Out of Compliance Scanner (pyOOCS)",
+  "author": "Davide Madrisan",
+  "license": "GPL-3.0",
+  "scripts": {
+    "start": "node server",
+    "test": "gulp test"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "express": "^4.13.4",
+    "express-params": "0.0.3",
+    "http-status": "^0.2.2",
+    "mongodb": "^2.1.18",
+    "morgan": "^1.7.0",
+    "serve-favicon": "^2.3.0"
+  },
   "devDependencies": {
     "browser-sync": "^2.10.1",
     "del": "^2.2.0",
@@ -24,6 +40,20 @@
     "jshint-stylish": "^2.1.0"
   },
   "engines": {
-    "node": ">=0.10.0"
-  }
+    "node": "^4.4.0",
+    "npm": "^2.14.20"
+  },
+  "keywords": [
+    "compliance",
+    "scanner",
+    "linux"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/madrisan/pyoocs"
+  },
+  "bugs": {
+    "url": "https://github.com/madrisan/pyoocs/issues"
+  },
+  "private": true
 }
