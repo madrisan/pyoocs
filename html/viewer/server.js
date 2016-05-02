@@ -2,13 +2,15 @@
 // Copyright (C) 2016 Davide Madrisan <davide.madrisan.gmail.com>
 
 var express = require('express')
-var publicdir = '../server/public';
+  , path = require('path')
+  , favicon = require('serve-favicon');
 
 module.exports = function() {
     var app = express();
 
+    app.use(favicon(path.join(__dirname, '../server/public/images', 'favicon.ico')));
     app.use('/scan', require('./routes/scan')());
-    app.use(express.static(publicdir));
+    app.use(express.static(path.join(__dirname, '../server/public')));
 
     return app;
 };
