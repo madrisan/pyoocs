@@ -2,13 +2,13 @@
 // Copyright (C) 2016 Davide Madrisan <davide.madrisan.gmail.com>
 
 var express = require('express')
-var cfg = require('./config');
+var publicdir = '../server/public';
 
 module.exports = function() {
     var app = express();
 
     app.use('/scan', require('./routes/scan')());
-    app.use(express.static(cfg.publicdir));
+    app.use(express.static(publicdir));
 
     return app;
 };
