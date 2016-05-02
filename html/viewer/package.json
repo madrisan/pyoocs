@@ -26,6 +26,7 @@
     "express-params": "0.0.3",
     "http-status": "^0.2.2",
     "mongodb": "^2.1.16",
+    "morgan": "^1.7.0",
     "serve-favicon": "^2.3.0"
   }
 }
