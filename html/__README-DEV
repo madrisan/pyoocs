@@ -1,0 +1,25 @@
+** How to build the web interface directly from the Git source:
+
+1. Install Node.js and npm (provided by your Linux distribution)
+
+2. Install gulp and bower
+
+      npm install gulp bower
+
+3. If necessary download and install the bower components
+
+      cd client/
+      ../node_modules/.bin/bower install
+
+4. Build the frontend files
+
+      cd ..
+      npm run watch
+
+
+** How to load the express server
+
+Simply type in the directory html the following command:
+
+     npm run start
+
