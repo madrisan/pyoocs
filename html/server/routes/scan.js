@@ -5,67 +5,71 @@ var express = require('express')
   , HTTPStatus = require('http-status')
   , ObjectID = require('mongodb').ObjectID;
 
-var db = require('../db');
-
-module.exports = function() {
+module.exports = function(wagner) {
     var api = express.Router();
 
     api.use(bodyParser.json());
 
     api.route('/')
-        .get(function(req, res, next) {
-            var jsonHeader = []
-              , collection = db.get().collection('scan')
-              , query = { hostname: 1, summary: 1 };
+        .get(wagner.invoke(function(Scan) {
+            return function(req, res) {
+                var jsonHeader = []
+                  , query = { hostname: 1, summary: 1 };
 
-            assert(collection, 'collection is null');
+                Scan.
+                    find({}, query).
+                    sort({ hostname: 1 }).
+                    exec(function(error, docs) {
+                        if (error) {
+                            return res.
+                                status(HTTPStatus.INTERNAL_SERVER_ERROR).
+                                json({ error: error.toString() });
+                        }
+                        docs.forEach(function(doc) {
+                            console.log('doc: ' + doc);
+                            console.log('doc.hostname: ' + doc.hostname);
+                            console.log('doc._id: ' + doc._id);
+                            console.log('doc.urlid: ' + doc.urlid);
+                            console.log('doc.summary: ' + doc.summary);
 
-            collection.find({}, query).toArray(function(error, docs) {
-                if (error) {
-                     return res.
-                         status(HTTPStatus.INTERNAL_SERVER_ERROR).
-                         json({ error: error.toString() });
-                }
-                docs.forEach(function(doc) {
-                    //console.log(doc.hostname);
-                    jsonHeader.push({
-                        'hostname': doc.hostname,
-                        'urlid': doc._id,
-                        'max_severity': doc.summary.max_severity || 'unknown'
+                            jsonHeader.push({
+                                'hostname': doc.hostname,
+                                'urlid': doc._id,
+                                'max_severity': doc.summary.max_severity || 'unknown'
+                            });
+                        });
+                        res.json(jsonHeader);
                     });
-                });
-
-                res.json(jsonHeader);
-            });
-        });
+            };
+        }));
 
     api.route('/:id')
-        .get(function(req, res, next) {
-            //console.log('req.params.id: ' + req.params.id);
-
-            var collection = db.get().collection('scan');
-            try {
-                query = { _id: ObjectID(req.params.id) };
-            }
-            catch(error) {
-                return res.
-                    status(HTTPStatus.INTERNAL_SERVER_ERROR).
-                    json({ error: error.message });
-            }
-
-            collection.findOne(query, function(error, doc) {
-                assert.equal(error, null, 'mongodb findOne() error');
-                if (doc) {
-                    res.json(doc);
-                    //console.log('returned doc: ' + JSON.stringify(doc));
+        .get(wagner.invoke(function(Scan) {
+            return function(req, res) {
+                //console.log('req.params.id: ' + req.params.id);
+                try {
+                    query = { _id: ObjectID(req.params.id) };
                 }
-                else {
-                     return res.
-                         status(HTTPStatus.NOT_FOUND).
-                         json({ error: 'No such document ' + req.params.id });
+                catch(error) {
+                    return res.
+                        status(HTTPStatus.INTERNAL_SERVER_ERROR).
+                        json({ error: error.message });
                 }
-            });
-        });
+
+                Scan.findOne(query, function(error, doc) {
+                    assert.equal(error, null, 'mongodb findOne() error');
+                    if (doc) {
+                        res.json(doc);
+                        //console.log('returned doc: ' + JSON.stringify(doc));
+                    }
+                    else {
+                         return res.
+                             status(HTTPStatus.NOT_FOUND).
+                             json({ error: 'No such document ' + req.params.id });
+                    }
+                });
+            }
+        }));
 
     return api;
 };

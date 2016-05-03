@@ -3,19 +3,15 @@
 // HTML viewer for the Out of Compliance Scanner (pyOOCS)
 // Copyright (C) 2016 Davide Madrisan <davide.madrisan.gmail.com>
 
-var assert = require('assert')
-  , url = require('url');
+var express = require('express')
+  , url = require('url')
+  , wagner = require('wagner-core');
 
-var database = require('./config/database')
-  , db = require('./db')
-  , server = require('./server');
+require('./models')(wagner);
 
-var port = process.env.PORT || 8080;
+var server = require('./server')(wagner)
+  , port = process.env.PORT || 8080;
 
-db.connect(database.url, function(err) {
-    assert.equal(err, null);
-
-    server().listen(port, function() {
-        console.log('OOCS server listening on port %s.', port);
-    });
+server.listen(port, function() {
+    console.log('OOCS server listening on port %s.', port);
 });

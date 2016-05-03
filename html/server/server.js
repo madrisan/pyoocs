@@ -6,13 +6,16 @@ var express = require('express')
   , favicon = require('serve-favicon')
   , logger = require('morgan');
 
-module.exports = function() {
+
+module.exports = function(wagner) {
     var app = express();
 
     app.use(favicon(path.join(__dirname, '../public/images', 'favicon.ico')));
     app.use(logger('dev'));
-    app.use('/scan', require('./routes/scan')());
-    app.use(express.static(path.join(__dirname, '../public')));
+    app.use('/scan', require('./routes/scan')(wagner));
+
+    app.use(express.static(path.join(__dirname, '../public'),
+            { maxAge: 4 * 60 * 60 * 1000 /* 2hrs */ }));
 
     return app;
 };
