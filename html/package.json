@@ -6,7 +6,8 @@
   "license": "GPL-3.0",
   "scripts": {
     "start": "node server",
-    "test": "gulp test"
+    "test": "gulp test",
+    "watch": "gulp watch"
   },
   "dependencies": {
     "body-parser": "^1.15.0",
