@@ -11,7 +11,9 @@
 > Tags | Utilities/Security
 > License | GPL v3+
 > Operating System | Linux
-> Implementation | Python 2.4+, Python 3
+> Implementation - *scan engine* | Python 2.4+, Python 3
+> Implementation - *front-end* | Bootstrap, Angular, JavaScript
+> Implementation - *back-end* | Node.js, Express, MongoDB 3.2
 > Current status | beta
 
 #### Overview
