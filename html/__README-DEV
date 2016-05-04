@@ -6,15 +6,19 @@
 
       npm install gulp bower
 
-3. If necessary download and install the bower components
+3. Install all the remaining node modules
+
+      npm install
+
+4. Download and install the bower components
 
       cd client/
       ../node_modules/.bin/bower install
 
-4. Build the frontend files
+5. Build the frontend files
 
       cd ..
-      npm run watch
+      ./node_modules/.bin/gulp
 
 
 ** How to load the express server
