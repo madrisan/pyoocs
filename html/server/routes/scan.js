@@ -3,7 +3,7 @@ var express = require('express')
   , bodyParser = require('body-parser')
   , path = require('path')
   , HTTPStatus = require('http-status')
-  , ObjectID = require('mongodb').ObjectID;
+  , mongoose = require('mongoose');
 
 module.exports = function(wagner) {
     var api = express.Router();
@@ -26,11 +26,9 @@ module.exports = function(wagner) {
                                 json({ error: error.toString() });
                         }
                         docs.forEach(function(doc) {
-                            console.log('doc: ' + doc);
-                            console.log('doc.hostname: ' + doc.hostname);
-                            console.log('doc._id: ' + doc._id);
-                            console.log('doc.urlid: ' + doc.urlid);
-                            console.log('doc.summary: ' + doc.summary);
+                            //console.log('doc.hostname: ' + doc.hostname);
+                            //console.log('doc._id: ' + doc._id);
+                            //console.log('doc.summary: ' + doc.summary);
 
                             jsonHeader.push({
                                 'hostname': doc.hostname,
@@ -48,7 +46,7 @@ module.exports = function(wagner) {
             return function(req, res) {
                 //console.log('req.params.id: ' + req.params.id);
                 try {
-                    query = { _id: ObjectID(req.params.id) };
+                    query = { _id: mongoose.mongo.ObjectID(req.params.id) };
                 }
                 catch(error) {
                     return res.
