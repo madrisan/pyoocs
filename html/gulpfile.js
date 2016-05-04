@@ -1,5 +1,5 @@
 var gulp        = require('gulp'),
-    minifycss   = require('gulp-minify-css'),
+    cleancss    = require('gulp-clean-css'),
     jshint      = require('gulp-jshint'),
     stylish     = require('jshint-stylish'),
     uglify      = require('gulp-uglify'),
@@ -45,7 +45,7 @@ gulp.task('default', ['clean'], function() {
 gulp.task('usemin', ['buildless', 'jshint'], function () {
     return gulp.src('client/app/index.html')
             .pipe(usemin({
-                css: [minifycss(), rev()],
+                css: [cleancss({compatibility: 'ie8'}), rev()],
                 js: [ngannotate(), /*uglify(),*/ rev()]
             }))
             .pipe(gulp.dest(cfg.dist));
