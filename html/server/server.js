@@ -7,11 +7,13 @@ var express = require('express')
   , logger = require('morgan');
 
 
-module.exports = function(wagner) {
+module.exports = function(wagner, logFormat = 'dev') {
     var app = express();
 
     app.use(favicon(path.join(__dirname, '../public/images', 'favicon.ico')));
-    app.use(logger('dev'));
+    if (logFormat) {
+        app.use(logger(logFormat));
+    };
     app.use('/scan', require('./routes/scan')(wagner));
 
     app.use(express.static(path.join(__dirname, '../public'),
