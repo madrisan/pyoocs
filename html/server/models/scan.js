@@ -1,16 +1,35 @@
 var mongoose = require('mongoose');
 
-var scanSchema = {
+var scanDetailSchema = {
     hostname: {
         type: String,
         required: true
     },
-    distribution: Object,
+    distribution: {
+        codename: {
+            type: String
+        },
+        description: {
+            type: String
+        },
+        majversion: {
+            type: String
+        },
+        patch_release: {
+            type: String
+        },
+        vendor: {
+            type: String
+        },
+        version: {
+            type: String
+        }
+    },
     modules: Object,
     scan_time: {
         type: Date, default: Date.now
     },
-    summary : {
+    summary: {
         criticals: {
             type: Number, default: 0
         },
@@ -26,5 +45,5 @@ var scanSchema = {
     }
 };
 
-module.exports = new mongoose.Schema(scanSchema);
-module.exports.scanSchema = scanSchema;
+module.exports = new mongoose.Schema(scanDetailSchema);
+module.exports.scanDetailSchema = scanDetailSchema;

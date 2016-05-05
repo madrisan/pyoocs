@@ -41,7 +41,32 @@ describe('Express Server API', function() {
                 "infos" : 24,
                 "max_severity" : "critical",
                 "warnings" : 12
-            }
+            },
+            "distribution" : {
+                "description" : "openmamba GNU/Linux 3.90.0 for x86_64 (rolling)",
+                "vendor" : "openmamba",
+                "version" : "3.90.0"
+            },
+            "modules" : {
+                "filesystem" : {
+                    "checks" : {
+                        "required filesystems" : [{
+                            "critical" : [
+                                "/var: no such filesystem",
+                                "/var/log: no such filesystem"
+                            ],
+                            "info" : [
+                                "/home (rw, nodev, noatime, data=ordered)",
+                                "/tmp (rw, nosuid, nodev, noexec, noatime)"
+                            ],
+                            "warning" : [
+                                "/dev/shm: mount options 'rw, nosuid, nodev', required: 'nodev,noexec,nosuid'"
+                            ]
+                        }]
+                    }
+                }
+            },
+            "scan_time" : "2016-04-19T23:27:59.418284"
           },
           {
             "_id" : mongoose.mongo.ObjectID("000000000000000000000002"),
@@ -51,7 +76,8 @@ describe('Express Server API', function() {
                 "infos" : 34,
                 "max_severity" : "warning",
                 "warnings" : 6
-            }
+            },
+            "scan_time" : "2016-04-19T23:26:27.439007"
           }
         ];
 
@@ -74,7 +100,15 @@ describe('Express Server API', function() {
         server.close();
     });
 
-    it('can parse a scan list', function(done) {
+    it('can query the MongoDB collection oocs.scan', function(done) {
+        Scan.find({ hostname: '__hostname_A' }, function(error, doc) {
+            assert.ifError(error);
+        });
+
+        done();
+    });
+
+    it('can load and parse the page /scan', function(done) {
         var url = 'http://localhost:' + port + '/scan';
 
         superagent.get(url, function(error, res) {
@@ -82,13 +116,39 @@ describe('Express Server API', function() {
             assert.equal(res.status, HTTPStatus.OK);
 
             var scans = JSON.parse(res.text)
-            //console.log(scans);
 
-            // assert.equal(scans.length, 2);
             assert.equal(scans[0].hostname, '__hostname_A');
             assert.equal(scans[0].max_severity, 'critical');
+            assert.equal(scans[0].urlid, '000000000000000000000001');
+
             assert.equal(scans[1].hostname, '__hostname_B');
             assert.equal(scans[1].max_severity, 'warning');
+            assert.equal(scans[1].urlid, '000000000000000000000002');
+
+            done();
+        });
+    });
+
+    it('can load and parse a scan detail', function(done) {
+        var url =
+            'http://localhost:' + port + '/scan/000000000000000000000001';
+
+        superagent.get(url, function(error, res) {
+            assert.ifError(error);
+            assert.equal(res.status, HTTPStatus.OK);
+
+            var detail = JSON.parse(res.text)
+
+            assert.equal(detail.summary.infos, 24);
+            assert.equal(detail.summary.warnings, 12);
+            assert.equal(detail.summary.criticals, 4);
+            assert.equal(detail.scan_time, '2016-04-19T23:27:59.418Z');
+            assert.equal(detail.distribution.description,
+                         'openmamba GNU/Linux 3.90.0 for x86_64 (rolling)');
+            assert.equal(detail.modules.filesystem.
+                         checks['required filesystems'][0].critical[0],
+                         '/var: no such filesystem');
+
             done();
         });
     });
