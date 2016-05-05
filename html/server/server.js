@@ -14,6 +14,7 @@ module.exports = function(wagner, logFormat = 'dev') {
     if (logFormat) {
         app.use(logger(logFormat));
     };
+    app.use('/users', require('./routes/users')(wagner));
     app.use('/scan', require('./routes/scan')(wagner));
 
     app.use(express.static(path.join(__dirname, '../public'),

@@ -10,11 +10,12 @@ module.exports = function(wagner) {
         return mongoose;
     });
 
-    var Scan =
-        mongoose.model('Scan', require('./models/scan'), 'scan');
+    var Scan = mongoose.model('Scan', require('./models/scan'), 'scan')
+      , User = mongoose.model('User', require('./models/user'), 'users');
 
     var models = {
-        Scan: Scan
+        Scan: Scan,
+        User: User
     };
 
     _.each(models, function(value, key) {

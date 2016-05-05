@@ -13,9 +13,13 @@
     "body-parser": "^1.15.0",
     "express": "^4.13.4",
     "express-params": "0.0.3",
+    "express-session": "^1.13.0",
     "http-status": "^0.2.2",
     "mongoose": "^4.4.14",
     "morgan": "^1.7.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^4.0.0",
     "serve-favicon": "^2.3.0",
     "underscore": "^1.8.3",
     "wagner-core": "^0.2.0"

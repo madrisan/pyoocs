@@ -12,6 +12,8 @@ require('./models')(wagner);
 var server = require('./server')(wagner)
   , port = process.env.PORT || 8080;
 
+wagner.invoke(require('./auth'), { app: server });
+
 server.listen(port, function() {
     console.log('OOCS server listening on port %s.', port);
 });
