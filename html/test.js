@@ -25,9 +25,9 @@ describe('Express Server API', function() {
 
         Scan = deps.Scan;
 
-        var app = require('./server/server')(wagner, null)
+        var app = require('./server/server')(wagner)
 
-        port = process.env.PORT || 8080;
+        port = process.env.PORT || 3000;
         server = app.listen(port);
     });
 

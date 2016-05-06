@@ -9,10 +9,9 @@ var express = require('express')
 
 module.exports = function(wagner, logFormat) {
     var app = express();
-    var logFormat = typeof logFormat !== 'undefined' ? logFormat : 'dev';
 
     app.use(favicon(path.join(__dirname, '../public/images', 'favicon.ico')));
-    if (logFormat) {
+    if (typeof logFormat !== 'undefined') {
         app.use(logger(logFormat));
     };
     app.use('/users', require('./routes/users')(wagner));

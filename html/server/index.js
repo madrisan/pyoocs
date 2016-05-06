@@ -8,7 +8,7 @@ var express = require('express')
 
 require('./models')(wagner);
 
-var server = require('./server')(wagner)
+var server = require('./server')(wagner, 'dev')
   , port = process.env.PORT || 8080;
 
 wagner.invoke(require('./auth'), { app: server });
