@@ -7,8 +7,9 @@ var express = require('express')
   , logger = require('morgan');
 
 
-module.exports = function(wagner, logFormat = 'dev') {
+module.exports = function(wagner, logFormat) {
     var app = express();
+    var logFormat = typeof logFormat !== 'undefined' ? logFormat : 'dev';
 
     app.use(favicon(path.join(__dirname, '../public/images', 'favicon.ico')));
     if (logFormat) {
