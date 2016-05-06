@@ -44,8 +44,7 @@ gulp.task('default', ['clean'], function() {
                'usemin',
                'copyviews',
                'imagemin',
-               'copyfonts',
-               'tests');
+               'copyfonts');
 });
 
 // Minification and uglification
@@ -112,7 +111,7 @@ gulp.task('watch', ['browser-sync'], function() {
 });
 
 // Test
-gulp.task('tests', function() {
+gulp.task('test', ['usemin', 'copyviews', 'imagemin', 'copyfonts'], function() {
     var error = false;
     gulp.
         src('./test.js').
