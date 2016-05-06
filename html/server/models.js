@@ -4,6 +4,10 @@ var mongoose = require('mongoose')
 var database = require('./config/database')
 
 module.exports = function(wagner) {
+    mongoose.connection.on('error', function(error) {
+        console.log(error.name + ': ' + error.message);
+        throw error;
+    });
     mongoose.connect(database.url);
 
     wagner.factory('db', function() {
