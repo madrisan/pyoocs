@@ -4,7 +4,6 @@
 // Copyright (C) 2016 Davide Madrisan <davide.madrisan.gmail.com>
 
 var express = require('express')
-  , url = require('url')
   , wagner = require('wagner-core');
 
 require('./models')(wagner);
