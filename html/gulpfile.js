@@ -68,7 +68,7 @@ gulp.task('copyviews', function() {
 // Images
 gulp.task('imagemin', function() {
     return del([cfg.dist + '/images/']), gulp.
-        src('client/app/images/favicon.ico').
+        src('client/app/images/**/*.{ico,jpg}').
     //  pipe(cache(imagemin({
     //      optimizationLevel: 3,
     //      progressive: true,

@@ -27,7 +27,7 @@
 .row-content {
   margin: 0px auto;
   padding: 10px 0px;
-  min-height: 40px;
+  min-height: 600px;
 }
 .row-footer {
   background-color: #005c00;
@@ -51,4 +51,27 @@
 }
 .list-group-item:hover {
   opacity: .8;
+}
+.container-login {
+  background: url('/images/login_background.jpg');
+}
+.login-title {
+  font-size: 25px;
+  color: #009900;
+  font-weight: bold;
+  text-align: center;
+  padding: 20px;
+}
+.login-form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: auto;
+  width: 400px;
+  border-radius: 5px;
+  padding-left: 25px;
+  padding-right: 25px;
+  padding-bottom: 15px;
+  background-color: #dddddd;
 }

@@ -1,0 +1,35 @@
+<div class="container-login" ng-controller="loginController">
+
+    <div class="row row-content">
+        <form class="login-form" name="lgform" novalidate>
+            <div class="login-title">login</div>
+
+            <div class="input-group"
+                 ng-class="{'has-error': lgform.lgEmail.$error.required && lgform.lgEmail.$dirty}">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                <input type="email" class="form-control"
+                       ng-model="user.email" name="lgEmail"
+                       placeholder="Email address"
+                       aria-describedby="email" required autofocus>
+            </div>
+            <div class="input-group"
+                 ng-class="{'has-error': lgform.lgPassword.$error.required && lgform.lgPassword.$dirty}">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                <input type="password" class="form-control"
+                       ng-model="user.password" name="lgPassword"
+                       placeholder="Password"
+                       aria-describedby="password" required>
+            </div>
+            <div class="checkbox">
+                <label>
+                   <input type="checkbox" ng-model="user.rememberMe">Remember me
+                </label>
+            </div>
+            <div class="pull-right">
+                <button type="submit" ng-click="loginUpdate(user)"
+                        class="btn btn-large btn-success pull-right">Login</button>
+            <div>
+        </form>
+    </div>
+
+</div>

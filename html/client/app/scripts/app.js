@@ -25,6 +25,16 @@
                 }
             }
         }).
+        // route for the login page
+        state('app.login', {
+            url: 'users/login',
+            views: {
+                'content@': {
+                    templateUrl: 'views/login.html',
+                    controller: 'loginController'
+                }
+            }
+        }).
         // route for the scandetail page
         state('app.scandetail', {
             url: 'scan/:id',
