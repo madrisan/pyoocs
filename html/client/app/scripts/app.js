@@ -51,7 +51,6 @@
             views: {
                 'content@': {
                     templateUrl: 'views/about.html',
-                    controller: 'aboutController'
                 }
             }
         });
