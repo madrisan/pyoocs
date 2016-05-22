@@ -34,6 +34,9 @@
   padding: 10px 0px;
   color: #ffffff;
 }
+.row-about {
+  padding: 10px 0px;
+}
 [id^=scan-item-message] {
   font-size: 12px;
 }
