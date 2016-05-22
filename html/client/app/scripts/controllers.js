@@ -1,5 +1,5 @@
 (function() {
-    var app = angular.module('scan-controllers', ['scan-services']);
+    var app = angular.module('scanControllers', ['scanServices']);
 
     var getkeys = function(data) {
         var keys = [];
@@ -23,12 +23,12 @@
         return severities[severity] || 'default';
     };
 
-    app.controller('ScanController', ['$scope', 'ScanService',
-        function($scope, ScanService) {
+    app.controller('scanController', ['$scope', 'scanService',
+        function($scope, scanService) {
             $scope.showServerList = false;
             $scope.servers = [];
 
-            ScanService.getServerList()
+            scanService.getServerList()
                 .then(
                     function(response) {
                         $scope.servers = response.data;
@@ -43,9 +43,9 @@
             }
     ]);
 
-    app.controller('ScanDetailController',
-                   ['$scope', '$stateParams', 'ScanDetailService',
-        function($scope, $stateParams, ScanDetailService) {
+    app.controller('scandetailController',
+                   ['$scope', '$stateParams', 'scandetailService',
+        function($scope, $stateParams, scandetailService) {
             $scope.showScan = false;
             $scope.mainMessage = 'Loading ...';
             $scope.detailedMessage = '';
@@ -54,7 +54,7 @@
             $scope.distribution = {};
             $scope.modules = {};
 
-            ScanDetailService.getJSONdata()
+            scandetailService.getJSONdata()
                 .get({id: $stateParams.id})
                 .$promise.then(
                     function(jsondata) {
@@ -137,6 +137,6 @@
         }
     ]);
 
-    app.controller('AboutController', ['$scope', function($scope) {
+    app.controller('aboutController', ['$scope', function($scope) {
     }]);
 })();
