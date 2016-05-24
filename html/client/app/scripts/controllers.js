@@ -137,12 +137,17 @@
         }
     ]);
 
+    // app.controller('loginController',
+    //     ['$scope', 'Auth', function($scope, Auth) {
+    //     $scope.auth = Auth;
+    // }]);
+
     app.controller('loginController',
-        ['$scope', '$localStorage', 'loginService',
-        function($scope, $localStorage, loginService) {
+        ['$scope', '$localStorage',
+        function($scope, $localStorage) {
             $scope.credentials = {};
 
-            $scope.loginUpdate = function(credentials) {
+            $scope.submit = function(credentials) {
                 $scope.credentials = angular.copy(credentials);
 
                 console.log('email   : ' + $scope.credentials.email);
@@ -158,7 +163,5 @@
 
                 // FIXME: add the services implementation ...
             };
-        }
-    ]);
-
+        }]);
 })();

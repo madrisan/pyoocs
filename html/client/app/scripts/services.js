@@ -2,13 +2,6 @@
     var app = angular.module('scanServices', []);
 
     app.constant('scanURL', '/scan');
-    app.constant('loginURL', '/users/login');
-
-    app.service('loginService', ['$http', 'loginURL', function($http, loginURL) {
-        this.validateCredential = function() {
-            return $http.get(loginURL);
-        };
-    }]);
 
     app.service('scanService', ['$http', 'scanURL', function($http, scanURL) {
         this.getServerList = function() {
