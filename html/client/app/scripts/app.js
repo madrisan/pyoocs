@@ -64,19 +64,25 @@
     // start capturing attempted state changes and inspecting them for our
     // requireLogin property.
 
-    app.run(function ($rootScope, $state) {
+    app.run(function ($rootScope, $state, authFactory) {
         $rootScope.$on('$stateChangeStart',
                        function(e, toState, toParams, fromState, fromParams) {
 
             var requireLogin = toState.data ? toState.data.requireLogin : false;
-            //console.log('requireLogin: ' + requireLogin);
+            console.log('requireLogin: ' + requireLogin);
 
-            //console.log('fromState: ' + fromState.name + ' ---> toState: ' + toState.name);
+            console.log('fromState: ' + fromState.name + ' ---> toState: ' + toState.name);
 
             if (requireLogin && toState.name !== 'app.login') {
-                //console.log('redirect to app.login...');
-                e.preventDefault();
-                $state.go('app.login');
+                console.log('redirect to app.login...');
+
+                var authenticated = authFactory.isAuthenticated();
+                console.log('authenticated: ' + authenticated);
+
+                if (authenticated !== true) {
+                     e.preventDefault();    // stop current execution
+                     $state.go('app.login');   // go to the login form
+                }
             }
         });
     });

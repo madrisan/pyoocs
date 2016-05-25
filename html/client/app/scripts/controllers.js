@@ -137,14 +137,9 @@
         }
     ]);
 
-    // app.controller('loginController',
-    //     ['$scope', 'Auth', function($scope, Auth) {
-    //     $scope.auth = Auth;
-    // }]);
-
     app.controller('loginController',
-        ['$scope', '$localStorage',
-        function($scope, $localStorage) {
+        ['$scope', '$localStorage', 'authFactory',
+        function($scope, $localStorage, authFactory) {
             $scope.credentials = {};
 
             $scope.submit = function(credentials) {
@@ -161,7 +156,10 @@
                     });
                 }
 
-                // FIXME: add the services implementation ...
+                authFactory.login(
+                    $scope.credentials.email,
+                    $scope.credentials.password
+                );
             };
         }]);
 })();
