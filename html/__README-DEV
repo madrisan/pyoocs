@@ -2,20 +2,16 @@
 
 1. Install Node.js and npm (provided by your Linux distribution)
 
-2. Install gulp and bower
-
-      npm install gulp bower
-
-3. Install all the remaining node modules
+2. Install all the required node modules
 
       npm install
 
-4. Download and install the bower components
+3. Install the bower components
 
       cd client/
       ../node_modules/.bin/bower install
 
-5. Build the frontend files
+4. Build the frontend files
 
       cd ..
       ./node_modules/.bin/gulp

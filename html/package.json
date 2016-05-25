@@ -25,6 +25,7 @@
     "wagner-core": "^0.2.0"
   },
   "devDependencies": {
+    "bower": "^1.7.9",
     "browser-sync": "^2.10.1",
     "del": "^2.2.0",
     "gulp": "^3.9.0",
