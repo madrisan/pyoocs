@@ -145,9 +145,9 @@
             $scope.submit = function(credentials) {
                 $scope.credentials = angular.copy(credentials);
 
-                console.log('email   : ' + $scope.credentials.email);
-                console.log('password: ' + $scope.credentials.password);
-                console.log('remember: ' + $scope.credentials.rememberMe);
+                //console.log('email   : ' + $scope.credentials.email);
+                //console.log('password: ' + $scope.credentials.password);
+                //console.log('remember: ' + $scope.credentials.rememberMe);
 
                 if($scope.credentials.rememberMe) {
                     $localStorage.storeObject('userinfo', {

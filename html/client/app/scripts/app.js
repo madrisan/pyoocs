@@ -69,7 +69,7 @@
                        function(e, toState, toParams, fromState, fromParams) {
 
             var requireLogin = toState.data ? toState.data.requireLogin : false;
-            console.log('requireLogin: ' + requireLogin);
+            //console.log('requireLogin: ' + requireLogin);
 
             console.log('fromState: ' + fromState.name + ' ---> toState: ' + toState.name);
 
@@ -84,6 +84,11 @@
                      $state.go('app.login');   // go to the login form
                 }
             }
+        });
+
+        $rootScope.$on('login:successful', function() {
+            console.log('redirect to app...');
+            $state.go('app');
         });
     });
 

@@ -1,13 +1,39 @@
 var express = require('express')
   , passport = require('passport')
-  , HTTPStatus = require('http-status');
-//, secret = require('../config/secure');  FIXME
+  , bodyParser = require('body-parser')
+  , HTTPStatus = require('http-status')
+  , jwt = require('jsonwebtoken')
+  , config = require('../config/secure');
 
 module.exports = function(wagner) {
     var api = express.Router();
 
+    api.use(bodyParser.json());
+
     api.post('/login',
         function(req, res, next) {
+            // Note: static user/passwd just for testing
+            //
+            //var post = req.body;
+            //if (post.email === 'davide.madrisan@gmail.com' &&
+            //    post.password === '1234') {
+            //    var token = jwt.sign(
+            //        { user: post.email },
+            //        config.secretKey, {
+            //        expiresIn: '1h'   // the token will be valid for one hour
+            //    });
+            //
+            //    return res.status(HTTPStatus.OK).json({
+            //        status: 'Login successful',
+            //        success: true,
+            //        token: token
+            //    });
+            //} else {
+            //    return res.status(HTTPStatus.UNAUTHORIZED).json({
+            //        error: 'Login failed'
+            //    });
+            //}
+
             passport.authenticate('local', function(error, user, info) {
                 if (error) {
                     return next(error);

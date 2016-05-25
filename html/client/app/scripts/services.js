@@ -4,13 +4,10 @@
     app.constant('scanURL', '/scan');
     app.constant('loginURL', '/users/login');
 
-    app.factory("authFactory",
-        ['$resource', '$http', 'loginURL', '$localStorage', '$rootScope',
-        function ($resource, $http, loginURL, $localStorage, $rootScope) {
+    app.factory('authFactory',
+        ['$http', '$q', '$localStorage', '$rootScope', 'loginURL',
+        function ($http, $q, $localStorage, $rootScope, loginURL) {
 
-        console.log('inside authFactory..');
-
-        var authFac = {};
         var userInfo = {};
 
         function useUserCredentials(credentials) {
@@ -34,55 +31,45 @@
         }
 
         function storeUserCredentials(credentials) {
-            $localStorage.storeObject('userInfo', credentials);
+            $localStorage.storeObject('accessToken', credentials);
             useUserCredentials(credentials);
         }
 
-        authFac.login = function(email, password) {
-            $resource(loginURL).
-                save({ email: email, password: password },
-                    function(response) {
-                        console.log('post:' + loginURL + ' : ' + response);
-                        storeUserCredentials({
-                            email: email,
-                            token: response.token
-                        });
-                        userInfo.authenticated = true;
-                        $rootScope.$broadcast('login:successful');
-                    },
-                    function(response) {
-                        userInfo.authenticated = false;
+        function login(email, password) {
+            var deferred = $q.defer();
 
-                        // FIXME: login unsuccessful
-                        //   response.data.err.message
-                        //   response.data.err.name
-                        console.log('login unsuccessful');
-                    }
-                 );
-        };
+            $http.post(loginURL, { email: email, password: password }).
+                then(function(response) {
+                    console.log('post:' + loginURL + ' : ' +
+                                JSON.stringify(response.data));
+
+                    storeUserCredentials({
+                        email: email,
+                        token: response.data.token
+                    });
+                    userInfo.authenticated = true;
+                    $rootScope.$broadcast('login:successful');
+                }, function(error) {
+                    userInfo.authenticated = false;
+                    deferred.reject(error);
+                });
+
+            return deferred.promise;
+        }
 
         //authFac.getUserInfo = function() {
         //    return userInfo;
         //};
 
-        authFac.isAuthenticated = function() {
+        function isAuthenticated() {
             return userInfo.authenticated;
-        };
+        }
 
         loadUserCredentials();
 
-        return authFac;
-    }]);
-
-    app.service('scanService', ['$http', 'scanURL', function($http, scanURL) {
-        this.getServerList = function() {
-            return $http.get(scanURL);
-        };
-    }]);
-
-    app.service('scandetailService', ['$resource', 'scanURL', function($resource, scanURL) {
-        this.getJSONdata = function() {
-            return $resource(scanURL + '/:id', null, {'update': {method: 'PUT'}});
+        return {
+            login: login,
+            isAuthenticated: isAuthenticated
         };
     }]);
 
@@ -105,4 +92,17 @@
             }
         };
     }]);
+
+    app.service('scanService', ['$http', 'scanURL', function($http, scanURL) {
+        this.getServerList = function() {
+            return $http.get(scanURL);
+        };
+    }]);
+
+    app.service('scandetailService', ['$resource', 'scanURL', function($resource, scanURL) {
+        this.getJSONdata = function() {
+            return $resource(scanURL + '/:id', null, {'update': {method: 'PUT'}});
+        };
+    }]);
+
 })();
