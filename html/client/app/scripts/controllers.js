@@ -137,6 +137,25 @@
         }
     ]);
 
+    app.controller('headerController',
+        ['$scope', '$rootScope', 'authFactory',
+        function($scope, $rootScope, authFactory) {
+            $scope.loggedIn = false;
+            $scope.loggedUser = '';
+
+            $scope.logOut = function() {
+                AuthFactory.logout();
+                $scope.loggedIn = false;
+                $scope.loggedUser = '';
+            };
+
+            $rootScope.$on('login:successful', function() {
+                $scope.loggedIn = true;
+                $scope.loggedUser = authFactory.getAuthenticatedUser();
+            });
+
+        }]);
+
     app.controller('loginController',
         ['$scope', '$localStorage', 'authFactory',
         function($scope, $localStorage, authFactory) {
@@ -161,5 +180,6 @@
                     $scope.credentials.password
                 );
             };
+
         }]);
 })();

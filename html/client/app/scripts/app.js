@@ -16,7 +16,8 @@
             url: '/',
             views: {
                 'header': {
-                    templateUrl: 'views/header.html'
+                    templateUrl: 'views/header.html',
+                    controller: 'headerController'
                 },
                 'content': {
                     templateUrl: 'views/scan.html',
@@ -61,10 +62,25 @@
         });
     });
 
+    //app.config(function($httpProvider) {
+    //    $httpProvider.interceptors.push(function($q, $injector) {
+    //        return {
+    //            responseError: function(rejection) {
+    //                if (rejection.status !== 401) {
+    //                    return rejection;
+    //                }
+    //
+    //                console.log('catched a 401 error...');
+    //                return $q.reject(rejection);
+    //            }
+    //        };
+    //    });
+    //});
+
     // start capturing attempted state changes and inspecting them for our
     // requireLogin property.
 
-    app.run(function ($rootScope, $state, authFactory) {
+    app.run(function($rootScope, $state, authFactory) {
         $rootScope.$on('$stateChangeStart',
                        function(e, toState, toParams, fromState, fromParams) {
 

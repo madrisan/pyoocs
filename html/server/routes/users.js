@@ -22,7 +22,7 @@ module.exports = function(wagner) {
             //        config.secretKey, {
             //        expiresIn: '1h'   // the token will be valid for one hour
             //    });
-            //
+
             //    return res.status(HTTPStatus.OK).json({
             //        status: 'Login successful',
             //        success: true,
@@ -62,6 +62,16 @@ module.exports = function(wagner) {
                     });
                 });
             })(req, res, next);
+        }
+    );
+
+    api.get('/logout',
+        function(req, res) {
+            // FIXME: ...
+            // ...
+            res.status(HTTPStatus.OK).json({
+                status: 'Bye!'
+            });
         }
     );
 

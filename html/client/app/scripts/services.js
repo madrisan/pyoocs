@@ -3,10 +3,11 @@
 
     app.constant('scanURL', '/scan');
     app.constant('loginURL', '/users/login');
+    app.constant('logoutURL', '/users/logout');
 
     app.factory('authFactory',
-        ['$http', '$q', '$localStorage', '$rootScope', 'loginURL',
-        function ($http, $q, $localStorage, $rootScope, loginURL) {
+        ['$http', '$q', '$localStorage', '$rootScope', 'loginURL', 'logoutURL',
+        function ($http, $q, $localStorage, $rootScope, loginURL, logoutURL) {
 
         var userInfo = {};
 
@@ -35,6 +36,12 @@
             useUserCredentials(credentials);
         }
 
+        function destroyUserCredentials() {
+            userInfo = {};
+            $http.defaults.headers.common['x-access-token'] = undefined;
+            $localStorage.remove('accessToken');
+        }
+
         function login(email, password) {
             var deferred = $q.defer();
 
@@ -57,9 +64,15 @@
             return deferred.promise;
         }
 
-        //authFac.getUserInfo = function() {
-        //    return userInfo;
-        //};
+        function logout() {
+            $http.get(logoutURL).
+                then(function(response) {});
+            destroyUserCredentials();
+        }
+
+        function getAuthenticatedUser() {
+            return userInfo.email;
+        }
 
         function isAuthenticated() {
             return userInfo.authenticated;
@@ -69,6 +82,8 @@
 
         return {
             login: login,
+            logout: logout,
+            getAuthenticatedUser: getAuthenticatedUser,
             isAuthenticated: isAuthenticated
         };
     }]);
