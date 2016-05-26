@@ -144,9 +144,10 @@
             $scope.loggedUser = '';
 
             $scope.logOut = function() {
-                AuthFactory.logout();
+                authFactory.logout();
                 $scope.loggedIn = false;
                 $scope.loggedUser = '';
+                window.location = '/';
             };
 
             $rootScope.$on('login:successful', function() {
