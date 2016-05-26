@@ -140,13 +140,20 @@
     app.controller('headerController',
         ['$scope', '$rootScope', 'authFactory',
         function($scope, $rootScope, authFactory) {
-            $scope.loggedIn = false;
-            $scope.loggedUser = '';
+            if (authFactory.isAuthenticated()) {
+                $scope.loggedIn = true;
+                $scope.loggedUser = authFactory.getAuthenticatedUser();
+            } else {
+                $scope.loggedIn = false;
+                $scope.loggedUser = '';
+            }
 
             $scope.logOut = function() {
                 authFactory.logout();
+
                 $scope.loggedIn = false;
                 $scope.loggedUser = '';
+
                 window.location = '/';
             };
 
