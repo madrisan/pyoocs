@@ -9,30 +9,29 @@ module.exports = function(wagner) {
 
     api.post('/login',
         function(req, res, next) {
-      //      // Note: static user/passwd just for testing
-      //      //
-      //      var post = req.body;
-      //      if (post.email === 'davide.madrisan@gmail.com' &&
-      //          post.password === '1234') {
-      //          var token = jwt.sign(
-      //              { user: post.email },
-      //              config.secretKey, {
-      //              expiresIn: '1h'   // the token will be valid for one hour
-      //          });
+            // passport takes the req.body.email and req.body.password and
+            // passes it to our verification function in the local strategy.
 
-      //          return res.status(HTTPStatus.OK).json({
-      //              status: 'Login successful',
-      //              success: true,
-      //              token: token
-      //          });
-      //      } else {
-      //          return res.status(HTTPStatus.UNAUTHORIZED).json({
-      //              error: 'Login failed'
-      //          });
-      //      }
-      //  }
-            // passport takes the req.body.username and req.body.password and passes it
-            // to our verification function in the local strategy.
+            // Note: static user/passwd (just for debugging)
+            //
+            // var post = req.body;
+            // if (post.email === '...' && post.password === '...') {
+            //     var token = jwt.sign(
+            //         { user: post.email },
+            //         config.secretKey, {
+            //         expiresIn: '1h'   // the token will be valid for one hour
+            //     });
+            //
+            //     return res.status(HTTPStatus.OK).json({
+            //         status: 'Login successful',
+            //         success: true,
+            //         token: token
+            //     });
+            // } else {
+            //     return res.status(HTTPStatus.UNAUTHORIZED).json({
+            //         error: 'Login failed'
+            //     });
+            // }
 
             passport.authenticate('local', function(error, user, info) {
                 if (error) { return next(error); }
@@ -75,8 +74,6 @@ module.exports = function(wagner) {
 
     api.get('/logout',
         function(req, res) {
-            // FIXME: ...
-            // ...
             res.status(HTTPStatus.OK).json({
                 status: 'Bye!'
             });

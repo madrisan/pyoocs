@@ -2,16 +2,6 @@ function setupAuth(User, app) {
     var passport = require('passport')
       , localStrategy = require('passport-local').Strategy;
 
-    //var secret = require('./config/secure')
-
-    // Express middlewares
-    // see: https://github.com/expressjs/session#options
-    //app.use(require('express-session')({
-    //    secret: secret.session_cookie,
-    //    resave: false,
-    //    saveUninitialized: false
-    //}));
-
     // Configure passport middleware
     app.use(passport.initialize());
     app.use(passport.session());
@@ -26,7 +16,6 @@ function setupAuth(User, app) {
             //console.log('password: ' + password);
             User.findOne(
                 { "profile.email": email },
-                //{ _id: 0, profile: 1 },
                 function(error, user) {
                     if (error) { return done(err); }
 
