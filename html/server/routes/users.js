@@ -1,6 +1,5 @@
 var express = require('express')
   , passport = require('passport')
-  , bodyParser = require('body-parser')
   , HTTPStatus = require('http-status')
   , jwt = require('jsonwebtoken')
   , config = require('../config/secure');
@@ -8,62 +7,71 @@ var express = require('express')
 module.exports = function(wagner) {
     var api = express.Router();
 
-    api.use(bodyParser.json());
-
     api.post('/login',
         function(req, res, next) {
-            // Note: static user/passwd just for testing
-            //
-            //var post = req.body;
-            //if (post.email === 'davide.madrisan@gmail.com' &&
-            //    post.password === '1234') {
-            //    var token = jwt.sign(
-            //        { user: post.email },
-            //        config.secretKey, {
-            //        expiresIn: '1h'   // the token will be valid for one hour
-            //    });
+      //      // Note: static user/passwd just for testing
+      //      //
+      //      var post = req.body;
+      //      if (post.email === 'davide.madrisan@gmail.com' &&
+      //          post.password === '1234') {
+      //          var token = jwt.sign(
+      //              { user: post.email },
+      //              config.secretKey, {
+      //              expiresIn: '1h'   // the token will be valid for one hour
+      //          });
 
-            //    return res.status(HTTPStatus.OK).json({
-            //        status: 'Login successful',
-            //        success: true,
-            //        token: token
-            //    });
-            //} else {
-            //    return res.status(HTTPStatus.UNAUTHORIZED).json({
-            //        error: 'Login failed'
-            //    });
-            //}
+      //          return res.status(HTTPStatus.OK).json({
+      //              status: 'Login successful',
+      //              success: true,
+      //              token: token
+      //          });
+      //      } else {
+      //          return res.status(HTTPStatus.UNAUTHORIZED).json({
+      //              error: 'Login failed'
+      //          });
+      //      }
+      //  }
+            // passport takes the req.body.username and req.body.password and passes it
+            // to our verification function in the local strategy.
 
             passport.authenticate('local', function(error, user, info) {
-                if (error) {
-                    return next(error);
-                }
+                if (error) { return next(error); }
+
                 if (!user) {
                     return res.status(HTTPStatus.UNAUTHORIZED).json({
                         error: info
                     });
                 }
+
+                // the middleware will call req.logIn (a passport function attached to
+                // the request) - this will call our passport.serializeUser method.
+                // this method can access the user object we passed back to the
+                // middleware.  It's its job to determine what data from the user object
+                // should be stored in the session.  The result of the serializeUser
+                // method is attached to the session as
+                // req.session.passport.user = { // our serialised user object // }.
+
+                // The result is also attached to the request as req.user.
+                // Once done, our requestHandler is invoked.
+
                 req.logIn(user, function(error) {
-                    if (error) {
-                        return res.status(HTTPStatus.INTERNAL_SERVER_ERROR).json({
-                            error: 'Could not log in user'
-                        });
-                    }
+                    if (error) { return next(error); }
 
                     // generate a token for the user
-                    var token = jwt.sign(user, secure.secretKey, {
-                        expiresIn: 3600   // the token will be valid for one hour
-                    });
-
+                    var token = jwt.sign(
+                        user,
+                        config.secretKey, {
+                            expiresIn: '1h'   // the token will be valid for one hour
+                        }
+                    );
                     res.status(HTTPStatus.OK).json({
                         status: 'Login successful',
                         success: true,
                         token: token
                     });
-                });
-            })(req, res, next);
-        }
-    );
+            });
+        })(req, res, next);
+    });
 
     api.get('/logout',
         function(req, res) {

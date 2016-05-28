@@ -8,8 +8,6 @@ var express = require('express')
 module.exports = function(wagner) {
     var api = express.Router();
 
-    api.use(bodyParser.json());
-
     api.route('/')
         .get(wagner.invoke(function(Scan) {
             return function(req, res) {
