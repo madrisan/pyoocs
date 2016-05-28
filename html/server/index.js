@@ -4,6 +4,7 @@
 // Copyright (C) 2016 Davide Madrisan <davide.madrisan.gmail.com>
 
 var express = require('express')
+  , HTTPStatus = require('http-status')
   , bodyParser = require('body-parser')
   , cookieParser = require('cookie-parser')
   , favicon = require('serve-favicon')
@@ -28,6 +29,31 @@ app.use('/scan', require('./routes/scan')(wagner));
 
 app.use(express.static(path.join(__dirname, '../public'),
         { maxAge: 4 * 60 * 60 * 1000 /* 2hrs */ }));
+
+// error handlers
+
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+  app.use(function(error, req, res, next) {
+    res.status(err.status || HTTPStatus.INTERNAL_SERVER_ERROR);
+    // return json strings to the angular/ionic application
+    res.json({
+        message: error.message,
+        error: error
+    });
+  });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function(error, req, res, next) {
+  res.status(error.status || HTTPStatus.INTERNAL_SERVER_ERROR);
+  res.json({
+    message: error.message,
+    error: {}
+  });
+});
 
 app.listen(port, function() {
     console.log('OOCS server listening on port %s.', port);
