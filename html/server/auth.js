@@ -17,7 +17,7 @@ function setupAuth(User, app) {
             User.findOne(
                 { "profile.email": email },
                 function(error, user) {
-                    if (error) { return done(err); }
+                    if (error) { return done(error); }
 
                     //console.log('user :' + user.profile.email);
                     if (!user) { return done(null, false); }
