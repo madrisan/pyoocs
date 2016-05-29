@@ -12,7 +12,10 @@ var userSchema = {
         password: {
             type: String,
             required: true
-        }
+        },
+    },
+    admin: {
+        type: Boolean, default: false
     }
 };
 
