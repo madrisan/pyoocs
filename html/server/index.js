@@ -35,24 +35,24 @@ app.use(express.static(path.join(__dirname, '../public'),
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(error, req, res, next) {
-    res.status(error.status || HTTPStatus.INTERNAL_SERVER_ERROR);
-    // return json strings to the angular/ionic application
-    res.json({
-        message: error.message,
-        error: error
+    app.use(function(error, req, res, next) {
+        res.status(error.status || HTTPStatus.INTERNAL_SERVER_ERROR);
+        // return json strings to the angular/ionic application
+        res.json({
+            message: error.message,
+            error: error
+        });
     });
-  });
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(error, req, res, next) {
-  res.status(error.status || HTTPStatus.INTERNAL_SERVER_ERROR);
-  res.json({
-    message: error.message,
-    error: {}
-  });
+    res.status(error.status || HTTPStatus.INTERNAL_SERVER_ERROR);
+    res.json({
+        message: error.message,
+        error: {}
+    });
 });
 
 app.listen(port, function() {
