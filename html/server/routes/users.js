@@ -7,6 +7,19 @@ var express = require('express')
 module.exports = function(wagner) {
     var api = express.Router();
 
+    api.get('/', wagner.invoke(function(User) {
+        return function(req, res) {
+            User.find({}, { "profile.password": 0 }, function(error, users) {
+                if (error) {
+                    return res.
+                        status(status.INTERNAL_SERVER_ERROR).
+                        json({ error: error.toString() });
+                }
+                res.json({ users: users });
+            });
+        }
+    }));
+
     api.post('/login',
         function(req, res, next) {
             // passport takes the req.body.email and req.body.password and
