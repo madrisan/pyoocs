@@ -52,7 +52,7 @@ module.exports = function(wagner) {
                 }
                 catch(error) {
                     return res.
-                        status(HTTPStatus.INTERNAL_SERVER_ERROR).
+                        status(HTTPStatus.BAD_REQUEST).
                         json({ error: error.message });
                 }
 
