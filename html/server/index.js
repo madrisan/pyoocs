@@ -36,7 +36,7 @@ app.use(express.static(path.join(__dirname, '../public'),
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(error, req, res, next) {
-    res.status(err.status || HTTPStatus.INTERNAL_SERVER_ERROR);
+    res.status(error.status || HTTPStatus.INTERNAL_SERVER_ERROR);
     // return json strings to the angular/ionic application
     res.json({
         message: error.message,
