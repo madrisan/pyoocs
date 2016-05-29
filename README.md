@@ -13,7 +13,7 @@
 > Operating System | Linux
 > Implementation - *scan engine* | Python 2.4+, Python 3
 > Implementation - *front-end* | Bootstrap, Angular, JavaScript
-> Implementation - *back-end* | Node.js, Express, MongoDB 3.2
+> Implementation - *back-end* | Node.js, Express, Passport, MongoDB 3.2
 > Current status | beta
 
 #### Overview
