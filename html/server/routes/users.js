@@ -1,13 +1,14 @@
 var express = require('express')
   , passport = require('passport')
-  , HTTPStatus = require('http-status')
-  , jwt = require('jsonwebtoken')
-  , config = require('../config/secure');
+  , HTTPStatus = require('http-status');
+
+var verify = require('./verify');
 
 module.exports = function(wagner) {
     var api = express.Router();
 
-    api.get('/', wagner.invoke(function(User) {
+    api.get('/', verify.verifyOrdinaryUser, verify.verifyAdminUser,
+        wagner.invoke(function(User) {
         return function(req, res) {
             User.find({}, { "profile.password": 0 }, function(error, users) {
                 if (error) {
@@ -29,12 +30,7 @@ module.exports = function(wagner) {
             //
             // var post = req.body;
             // if (post.email === '...' && post.password === '...') {
-            //     var token = jwt.sign(
-            //         { user: post.email },
-            //         config.secretKey, {
-            //         expiresIn: '1h'   // the token will be valid for one hour
-            //     });
-            //
+            //     var token = verify.generateToken(post.email);
             //     return res.status(HTTPStatus.OK).json({
             //         status: 'Login successful',
             //         success: true,
@@ -70,12 +66,13 @@ module.exports = function(wagner) {
                     if (error) { return next(error); }
 
                     // generate a token for the user
-                    var token = jwt.sign(
-                        user,
-                        config.secretKey, {
-                            expiresIn: '1h'   // the token will be valid for one hour
-                        }
-                    );
+                    var token = verify.generateToken(user);
+                    if (!token) {
+                        return res.
+                            status(status.INTERNAL_SERVER_ERROR).
+                            json({ error: "The access token cannot be created" });
+                    }
+
                     res.status(HTTPStatus.OK).json({
                         status: 'Login successful',
                         success: true,
@@ -85,7 +82,7 @@ module.exports = function(wagner) {
         })(req, res, next);
     });
 
-    api.get('/logout',
+    api.get('/logout', verify.verifyOrdinaryUser,
         function(req, res) {
             res.status(HTTPStatus.OK).json({
                 status: 'Bye!'

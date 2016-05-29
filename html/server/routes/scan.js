@@ -5,10 +5,13 @@ var express = require('express')
   , HTTPStatus = require('http-status')
   , mongoose = require('mongoose');
 
+var verify = require('./verify');
+
 module.exports = function(wagner) {
     var api = express.Router();
 
     api.route('/')
+        .all(verify.verifyOrdinaryUser)
         .get(wagner.invoke(function(Scan) {
             return function(req, res) {
                 var jsonHeader = []
@@ -40,6 +43,7 @@ module.exports = function(wagner) {
         }));
 
     api.route('/:id')
+        .all(verify.verifyOrdinaryUser)
         .get(wagner.invoke(function(Scan) {
             return function(req, res) {
                 //console.log('req.params.id: ' + req.params.id);
