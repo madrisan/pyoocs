@@ -12,25 +12,37 @@ var assert = require('assert')
 
 describe('Express Server API', function() {
     var server, port
-      , Scan;
+      , Scan, User;
 
     before(function() {
         var app = express();
         require('./server/models')(wagner);
         wagner.invoke(require('./server/auth'), { app: app });
 
-        var deps = wagner.invoke(function(Scan) {
+        var deps = wagner.invoke(function(Scan, User) {
             return {
-                Scan: Scan
+                Scan: Scan,
+                User: User
             };
         });
 
         Scan = deps.Scan;
+        User = deps.User;
 
         app.use('/scan', require('./server/routes/scan')(wagner));
+        app.use('/users', require('./server/routes/users')(wagner));
+
+        app.use(function(error, req, res, next) {
+            res.status(error.status || HTTPStatus.INTERNAL_SERVER_ERROR);
+            res.json({
+                message: error.message,
+                error: {}
+            });
+        });
 
         port = process.env.PORT || 3000;
         server = app.listen(port);
+
     });
 
     before(function(done) {
