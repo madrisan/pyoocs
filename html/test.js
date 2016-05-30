@@ -14,9 +14,11 @@ describe('Express Server API', function() {
     var server, port
       , Scan;
 
-    require('./server/models')(wagner);
-
     before(function() {
+        var app = express();
+        require('./server/models')(wagner);
+        wagner.invoke(require('./server/auth'), { app: app });
+
         var deps = wagner.invoke(function(Scan) {
             return {
                 Scan: Scan
@@ -25,7 +27,7 @@ describe('Express Server API', function() {
 
         Scan = deps.Scan;
 
-        var app = require('./server/server')(wagner)
+        app.use('/scan', require('./server/routes/scan')(wagner));
 
         port = process.env.PORT || 3000;
         server = app.listen(port);
