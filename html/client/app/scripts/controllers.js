@@ -168,6 +168,7 @@
         ['$scope', '$localStorage', 'authFactory',
         function($scope, $localStorage, authFactory) {
             $scope.credentials = {};
+            $scope.loginError = false;
 
             $scope.submit = function(credentials) {
                 $scope.credentials = angular.copy(credentials);
@@ -183,10 +184,17 @@
                     });
                 }
 
-                authFactory.login(
+                var promise = authFactory.login(
                     $scope.credentials.email,
                     $scope.credentials.password
                 );
+                promise.then(function(message) {
+                    console.log('authFactory.login promise: ' + message);
+                }, function(reason) {
+                    console.log('authFactory.login promise: ' +
+                                JSON.stringify(reason.statusText));
+                    $scope.loginError = true;
+                });
             };
 
         }]);

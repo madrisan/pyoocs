@@ -25,6 +25,12 @@
                    <input type="checkbox" ng-model="user.rememberMe">Remember me
                 </label>
             </div>
+            <div ng-if="loginError" class="alert alert-danger">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                Invalid email address and/or password
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            </div>
             <div class="pull-right">
                 <button type="submit" ng-click="submit(user)"
                         class="btn btn-large btn-success pull-right">Login</button>

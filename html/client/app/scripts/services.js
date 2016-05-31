@@ -54,10 +54,15 @@
                         email: email,
                         token: response.data.token
                     });
+
                     userInfo.authenticated = true;
                     $rootScope.$broadcast('login:successful');
+
+                    deferred.resolve('login successful');
                 }, function(error) {
                     userInfo.authenticated = false;
+                    $rootScope.$broadcast('login:failed');
+
                     deferred.reject(error);
                 });
 
