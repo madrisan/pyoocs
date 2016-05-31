@@ -1,5 +1,6 @@
 (function() {
-    var app = angular.module('scanControllers', ['scanServices']);
+    var app = angular.module('scanControllers',
+                             ['ui-notification', 'scanServices']);
 
     var getkeys = function(data) {
         var keys = [];
@@ -165,8 +166,8 @@
         }]);
 
     app.controller('loginController',
-        ['$scope', '$localStorage', 'authFactory',
-        function($scope, $localStorage, authFactory) {
+        ['$scope', '$localStorage', 'authFactory', 'Notification',
+        function($scope, $localStorage, authFactory, Notification) {
             $scope.credentials = {};
             $scope.loginError = false;
 
@@ -193,7 +194,16 @@
                 }, function(reason) {
                     console.log('authFactory.login promise: ' +
                                 JSON.stringify(reason.statusText));
-                    $scope.loginError = true;
+                    $scope.loginErrorNotification();
+                });
+            };
+
+            $scope.loginErrorNotification = function() {
+                Notification.error({
+                    message: 'Incorrect login credentials',
+                    positionX: 'center',
+                    positionY: 'top',
+                    delay: 3000
                 });
             };
 
