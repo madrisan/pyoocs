@@ -2,6 +2,9 @@
 @dark-green: darken(@light-green, 12%);
 @light-gray: #dddddd;
 @white: #ffffff;
+@critical: #cc3300;
+@warning: #ffb84d;
+@success: #33cc33;
 
 .jumbotron {
   padding: 60px 15px 5px 0px;
@@ -78,6 +81,20 @@
 .list-group-item:hover {
   opacity: .8;
 }
+
+.scan-icon-success {
+  color: @success;
+}
+
+.scan-icon-warning {
+  color: @warning;
+}
+
+.scan-icon-danger {
+  color: @critical;
+}
+
+.progress { height: 8px; }
 
 .container-login {
   background: url('/images/login_background.jpg');

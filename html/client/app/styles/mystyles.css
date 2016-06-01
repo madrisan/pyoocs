@@ -55,6 +55,18 @@
 .list-group-item:hover {
   opacity: .8;
 }
+.scan-icon-success {
+  color: #33cc33;
+}
+.scan-icon-warning {
+  color: #ffb84d;
+}
+.scan-icon-danger {
+  color: #cc3300;
+}
+.progress {
+  height: 8px;
+}
 .container-login {
   background: url('/images/login_background.jpg');
 }

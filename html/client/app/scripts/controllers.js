@@ -35,6 +35,23 @@
                         $scope.servers = response.data;
                         $scope.showServerList = true;
                         $scope.bootstrap_label = bootstrap_label;
+
+                        for(var i = 0; i < $scope.servers.length; i++) {
+                            var passed = parseInt($scope.servers[i].passed, 10),
+                                warnings = parseInt($scope.servers[i].warnings, 10),
+                                criticals = parseInt($scope.servers[i].criticals, 10),
+                                total = passed + warnings + criticals;
+
+                            var ppassed = Math.round(passed * 100 / total),
+                                pwarnings = Math.round(warnings * 100 / total),
+                                pcriticals = Math.round(criticals * 100 / total);
+
+                            $scope.servers[i].ppassed = ppassed;
+                            $scope.servers[i].pwarnings = pwarnings;
+                            $scope.servers[i].pcriticals = pcriticals;
+
+                            console.log('% ' + ppassed + ' ' + pwarnings + ' ' + pcriticals);
+                        }
                     },
                     function(response) {
                         $scope.message = "Error " + response.status +

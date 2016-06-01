@@ -19,9 +19,6 @@
     <div class="row row-content" ng-if="showServerList">
         <div class="col-xs-12">
 
-            <h3>Available Scan Reports</h3>
-            <br>
-
             <div class="input-group input-group-sm col-lg-6">
                 <span class="input-group-addon" id="hostname-filter">
                     <i class="fa fa-search fa-pull-left"></i>
@@ -31,19 +28,35 @@
                        ng-model="search.hostname"
                        aria-describedby="hostname-filter">
             </div>
+            <br />
 
-            <br>
+            <h3>Available Scan Reports</h3>
+            <br />
 
-            <div class="input-group input-group-sm col-lg-6">
-                <ul class="list-group">
-                    <div ng-repeat="srv in servers | filter:search:strict">
-                        <li class="list-group-item list-group-item-{{bootstrap_label(srv.max_severity)}}">
+            <ul>
+                <div ng-repeat="srv in servers | filter:search:strict">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <i class="fa fa-server fa-lg scan-icon-{{bootstrap_label(srv.max_severity)}}"
+                               aria-hidden="true"></i>&nbsp;
                             <a ui-sref="app.scandetail({id: srv.urlid})">{{srv.hostname}}</a>
-                        </li>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-success"
+                                     role="progressbar" style="width:{{srv.ppassed}}%">
+                                </div>
+                                <div class="progress-bar progress-bar-warning"
+                                     role="progressbar" style="width:{{srv.pwarnings}}%">
+                                </div>
+                                <div class="progress-bar progress-bar-danger"
+                                     role="progressbar" style="width:{{srv.pcriticals}}%">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </ul>
-            </div>
-
+                </div>
+            </ul>
         </div>
     </div>
 

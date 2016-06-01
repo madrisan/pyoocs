@@ -34,6 +34,9 @@ module.exports = function(wagner) {
                             jsonHeader.push({
                                 'hostname': doc.hostname,
                                 'urlid': doc._id,
+                                'passed': doc.summary.infos || '0',
+                                'warnings': doc.summary.warnings || '0',
+                                'criticals': doc.summary.criticals || '0',
                                 'max_severity': doc.summary.max_severity || 'unknown'
                             });
                         });
