@@ -40,7 +40,7 @@
                         <th>Issues Ratio</th>
                     </tr>
                     <tr ng-repeat="srv in servers | filter:search:strict">
-                        <td>
+                        <td style="background-color:#f1f1f1">
                         <i class="fa fa-desktop fa-lg scan-icon-{{bootstrap_label(srv.max_severity)}}"
                            aria-hidden="true"></i>&nbsp;
                         <a ui-sref="app.scandetail({id: srv.urlid})">{{srv.hostname}}</a>
