@@ -30,18 +30,26 @@
             </div>
             <br />
 
-            <h3>Available Scan Reports</h3>
-            <br />
+            <div class="container">
+                <h3>Available Scan Reports</h3>
+                <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <th>System</th>
+                        <th>Passed</th><th>Warnings</th><th>Criticals</th>
+                        <th>Issues Ratio</th>
+                    </tr>
+                    <tr ng-repeat="srv in servers | filter:search:strict">
+                        <td>
+                        <i class="fa fa-desktop fa-lg scan-icon-{{bootstrap_label(srv.max_severity)}}"
+                           aria-hidden="true"></i>&nbsp;
+                        <a ui-sref="app.scandetail({id: srv.urlid})">{{srv.hostname}}</a>
+                        </td>
 
-            <ul>
-                <div ng-repeat="srv in servers | filter:search:strict">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <i class="fa fa-server fa-lg scan-icon-{{bootstrap_label(srv.max_severity)}}"
-                               aria-hidden="true"></i>&nbsp;
-                            <a ui-sref="app.scandetail({id: srv.urlid})">{{srv.hostname}}</a>
-                        </div>
-                        <div class="col-md-3">
+                        <td>{{srv.passed}}</td>
+                        <td>{{srv.warnings}}</td>
+                        <td>{{srv.criticals}}</td>
+                        <td>
                             <div class="progress">
                                 <div class="progress-bar progress-bar-success"
                                      role="progressbar" style="width:{{srv.ppassed}}%">
@@ -53,10 +61,11 @@
                                      role="progressbar" style="width:{{srv.pcriticals}}%">
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </ul>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
         </div>
     </div>
 
