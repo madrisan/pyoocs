@@ -64,9 +64,14 @@ Each class of vulnerabilities (_critical_ or _warning_) can be inspected by sele
 which also show the number of occurrences that have been detected.
 By default all the tests are displayed.
 
-
-![alt text][screenshot_web]
+- - -
+![alt text][screenshot_scan]
+###### Image 1. Screenshot of the scan view
+- - -
+![alt text][screenshot_scandetail]
+###### Image 2. Screenshot of the scan-detail view
 
 [jsoncfg]: https://github.com/madrisan/pyoocs/blob/master/oocs-cfg.json
 [logo]: https://madrisan.files.wordpress.com/2015/09/pyoocs-logo.png
-[screenshot_web]: https://madrisan.files.wordpress.com/2015/10/screencapture-pyoocs-web-interface.png
+[screenshot_scan]: https://github.com/madrisan/pyoocs/blob/master/screenshots/screenshot-oocs-web-scan-view.png
+[screenshot_scandetail]: https://github.com/madrisan/pyoocs/blob/master/screenshots/screenshot-oocs-web-scandetail-view.png
