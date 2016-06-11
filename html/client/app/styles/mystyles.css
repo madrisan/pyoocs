@@ -1,6 +1,5 @@
 .jumbotron {
-  padding: 60px 15px 5px 0px;
-  margin: 0px auto;
+  padding: 60px 0px 10px 0px;
   background: #009900;
   color: #ffffff;
 }
@@ -19,23 +18,31 @@
   background: #dddddd;
   color: #005c00;
 }
+.nav-tabs {
+  display: flex;
+}
+.nav-tabs li {
+  display: flex;
+  flex: 1;
+}
+.nav-tabs > li > a {
+  flex: 1;
+}
 .row-header {
-  padding: 10px 0px;
-  margin: 0;
   color: #ffffff;
 }
 .row-content {
-  margin: 0px auto;
-  padding: 10px 0px;
+  padding-top: 10px;
   min-height: 600px;
 }
 .row-footer {
   background-color: #005c00;
-  padding: 10px 0px;
+  padding-top: 10px;
   color: #ffffff;
 }
 .row-about {
-  padding: 10px 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 [id^=scan-item-message] {
   font-size: 12px;

@@ -2,13 +2,13 @@
 @dark-green: darken(@light-green, 12%);
 @light-gray: #dddddd;
 @white: #ffffff;
+
 @critical: #cc3300;
 @warning: #ffb84d;
 @success: #33cc33;
 
 .jumbotron {
-  padding: 60px 15px 5px 0px;
-  margin: 0px auto;
+  padding: 60px 0px 10px 0px;
   background: @light-green;
   color: @white;
 }
@@ -36,26 +36,35 @@
   }
 }
 
+.nav-tabs{
+  display: flex;
+}
+.nav-tabs li {
+  display: flex;
+  flex: 1;
+}
+.nav-tabs > li > a {
+  flex: 1;
+}
+
 .row-header {
-  padding: 10px 0px;
-  margin: 0;
   color: @white;
 }
 
 .row-content {
-  margin: 0px auto;
-  padding: 10px 0px;
+  padding-top: 10px;
   min-height: 600px;
 }
 
 .row-footer {
   background-color: @dark-green;
-  padding: 10px 0px;
+  padding-top: 10px;
   color: @white;
 }
 
 .row-about {
-  padding: 10px 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 [id^=scan-item-message] {
