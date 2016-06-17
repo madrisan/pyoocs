@@ -62,20 +62,20 @@
         });
     });
 
-    //app.config(function($httpProvider) {
-    //    $httpProvider.interceptors.push(function($q, $injector) {
-    //        return {
-    //            responseError: function(rejection) {
-    //                if (rejection.status !== 401) {
-    //                    return rejection;
-    //                }
-    //
-    //                console.log('catched a 401 error...');
-    //                return $q.reject(rejection);
-    //            }
-    //        };
-    //    });
-    //});
+    app.config(function($httpProvider) {
+        $httpProvider.interceptors.push(function($q, $injector) {
+            return {
+                responseError: function(rejection) {
+                    if (rejection.status !== 401) {
+                        return rejection;
+                    }
+
+                    console.log('an http 401 error has been intercepted...');
+                    return $q.reject(rejection);
+                }
+            };
+        });
+    });
 
     // start capturing attempted state changes and inspecting them for our
     // requireLogin property.
