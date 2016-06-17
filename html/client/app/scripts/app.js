@@ -69,8 +69,6 @@
                     if (rejection.status !== 401) {
                         return rejection;
                     }
-
-                    console.log('an http 401 error has been intercepted...');
                     return $q.reject(rejection);
                 }
             };
