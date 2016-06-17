@@ -113,10 +113,24 @@
         };
     }]);
 
-    app.service('scanService', ['$http', 'scanURL', function($http, scanURL) {
-        this.getServerList = function() {
-            return $http.get(scanURL);
+    app.factory('scanService', ['$http', '$q', 'scanURL', function($http, $q, scanURL) {
+        var scanService = {
+            getServerList: function() {
+                var deferred = $q.defer();
+                $http.get(scanURL).
+                    success(function(data) {
+                        deferred.resolve(data);
+                    }).
+                    error(function(message, code) {
+                        deferred.reject(message);
+                    });
+
+                // return the promise to the controller
+                return deferred.promise;
+            }
         };
+
+        return scanService;
     }]);
 
     app.service('scandetailService', ['$resource', 'scanURL', function($resource, scanURL) {

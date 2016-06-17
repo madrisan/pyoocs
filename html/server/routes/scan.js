@@ -26,6 +26,7 @@ module.exports = function(wagner) {
                                 status(HTTPStatus.INTERNAL_SERVER_ERROR).
                                 json({ error: error.toString() });
                         }
+
                         docs.forEach(function(doc) {
                             //console.log('doc.hostname: ' + doc.hostname);
                             //console.log('doc._id: ' + doc._id);
