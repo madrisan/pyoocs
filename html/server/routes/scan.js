@@ -5,10 +5,9 @@ var express = require('express')
   , HTTPStatus = require('http-status')
   , mongoose = require('mongoose');
 
-var verify = require('./verify');
-
 module.exports = function(wagner) {
-    var api = express.Router();
+    var verify = require('./verify')(wagner)
+      , api = express.Router();
 
     api.route('/')
         .all(verify.verifyOrdinaryUser)

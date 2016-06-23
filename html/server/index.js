@@ -15,6 +15,8 @@ var app = express();
 var port = process.env.PORT || 8080;
 
 require('./models')(wagner);
+require('./dependencies')(wagner);
+
 wagner.invoke(require('./auth'), { app: app });
 
 app.use(favicon(path.join(__dirname, '../public/images', 'favicon.ico')));

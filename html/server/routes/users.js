@@ -2,10 +2,9 @@ var express = require('express')
   , passport = require('passport')
   , HTTPStatus = require('http-status');
 
-var verify = require('./verify');
-
 module.exports = function(wagner) {
-    var api = express.Router();
+    var verify = require('./verify')(wagner)
+      , api = express.Router();
 
     api.get('/', verify.verifyOrdinaryUser, verify.verifyAdminUser,
         wagner.invoke(function(User) {
