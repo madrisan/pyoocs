@@ -23,7 +23,7 @@ var cfg = {
 // JavaScript syntax checker
 gulp.task('jshint', function() {
     return gulp.
-        src('client/app/scripts/**/*.js').
+        src('client/app/js/**/*.js').
         pipe(jshint()).
         pipe(jshint.reporter(stylish));
 });
@@ -67,14 +67,14 @@ gulp.task('copyviews', function() {
 
 // Images
 gulp.task('imagemin', function() {
-    return del([cfg.dist + '/images/']), gulp.
-        src('client/app/images/**/*.{ico,jpg}').
+    return del([cfg.dist + '/img/']), gulp.
+        src('client/app/img/**/*.{ico,jpg}').
     //  pipe(cache(imagemin({
     //      optimizationLevel: 3,
     //      progressive: true,
     //      interlaced: true
     //  }))).
-        pipe(gulp.dest(cfg.dist + '/images/'));
+        pipe(gulp.dest(cfg.dist + '/img/'));
 });
 
 // Fonts
@@ -91,23 +91,23 @@ gulp.task('copyfonts', function() {
 // CSS
 gulp.task('buildless', function() {
     return gulp.
-        src('client/app/styles/**/*.less').
+        src('client/app/css/**/*.less').
         pipe(less()).
-        pipe(gulp.dest('client/app/styles'));
+        pipe(gulp.dest('client/app/css'));
 });
 
 // Watch
 gulp.task('watch', ['browser-sync'], function() {
     // Watch .js .css and .html files
-    gulp.watch('{ client/app/scripts/**/*.js,  \
-                  client/app/styles/**/*.less, \
+    gulp.watch('{ client/app/js/**/*.js,  \
+                  client/app/css/**/*.less, \
                   client/app/**/*.html }', ['usemin']);
 
     // Watch views html files
     gulp.watch('client/app/views/**/*.html', ['copyviews']);
 
     // Watch image files
-    gulp.watch('client/app/images/**/*', ['imagemin']);
+    gulp.watch('client/app/img/**/*', ['imagemin']);
 });
 
 // Test
@@ -133,9 +133,9 @@ gulp.task('browser-sync', ['default'], function () {
     var files = [
         'client/app/index.html',
         'client/app/views/**/*.html',
-        'client/app/styles/**/*.css',
-        'client/app/images/**/*.png',
-        'client/app/scripts/**/*.js',
+        'client/app/css/**/*.css',
+        'client/app/img/**/*.png',
+        'client/app/js/**/*.js',
         './test.js',
         cfg.dist + '/**/*'
     ];

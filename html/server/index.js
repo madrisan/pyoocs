@@ -19,7 +19,7 @@ require('./dependencies')(wagner);
 
 wagner.invoke(require('./auth'), { app: app });
 
-app.use(favicon(path.join(__dirname, '../public/images', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, '../public/img', 'favicon.ico')));
 app.use(require('morgan')('dev'));
 
 app.use(bodyParser.json());
